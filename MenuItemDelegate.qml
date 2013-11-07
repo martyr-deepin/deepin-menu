@@ -7,38 +7,68 @@ Component {
 
     Rectangle {
         id: itemArea
-        /* width: ListView.width */
-        width: menuItems.width
-        height: 30
-        /* color: mouseArea.pressed ? Qt.rgba(100, 0, 0, 1) : Qt.rgba(0, 100, 0, 1) */
-		color: Qt.rgba(1, 1, 1, 0)
-
+        width: ListView.view.width
+        height: componentText.text == "" ? menu.menuItemPadding * 2 : Math.max(componentImage.implicitHeight 
+																			   + menu.menuItemPadding * 2, 
+																			   componentText.implicitHeight 
+																			   + menu.menuItemPadding * 2)
+        color: Qt.rgba(0, 0, 0, 0)
+		
+        property string componentSubMenu: itemSubMenu
+		
+		/* Component.onCompleted: { */
+		/* 	console.log(componentImage.implicitHeight) */
+		/* 	console.log(componentText.implicitHeight) */
+		/* 	console.log(height) */
+		/* 	console.log("=================") */
+		/* } */
+		
         Image {
             id: componentImage
+            visible: itemIcon != ""
             source: itemIcon
             anchors.left: parent.left
+			anchors.leftMargin: menu.menuPadding
+			anchors.rightMargin: menu.menuPadding			
             anchors.verticalCenter: parent.verticalCenter
-            anchors.leftMargin:2
         }
 
         Text {
             id: componentText
+            visible: itemText != ""
             text: itemText
             font.pixelSize: 12
             anchors.left: componentImage.right
             anchors.verticalCenter: parent.verticalCenter
-            anchors.leftMargin: 2
+            anchors.leftMargin: menu.picTextSpacing
+        }
+
+        Rectangle {
+			/* visible: itemArea.ListView.view.model.count == 0 */
+			id: itemSeparator
+			visible: componentText.text == ""
+			width: 1
+			height: itemArea.ListView.view.width 
+			transformOrigin: Item.Center
+			rotation: 90
+			anchors.centerIn: parent
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0) }
+                GradientStop { position: 0.5; color: "black" }
+                GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0) }
+            }
         }
 
         MouseArea {
             id: mouseArea
+            visible: !itemSeparator.visible
             anchors.fill: parent
             hoverEnabled: true
 
-            onPressed: MenuItemJs.onPressed(parent)
-            onReleased: MenuItemJs.onReleased(parent)
-            onEntered: MenuItemJs.onEntered(parent)
-            onExited: MenuItemJs.onExited(parent)
+            onPressed: MenuItemJs.onPressed(parent, menu)
+            onReleased: MenuItemJs.onReleased(parent, menu)
+            onEntered: MenuItemJs.onEntered(parent, menu)
+            onExited: MenuItemJs.onExited(parent, menu)
         }
     }
 }
