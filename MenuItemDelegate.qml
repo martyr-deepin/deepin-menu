@@ -15,6 +15,7 @@ Component {
         color: Qt.rgba(0, 0, 0, 0)
 		
         property string componentSubMenu: itemSubMenu
+		property string componentId: itemId
 		
 		/* Component.onCompleted: { */
 		/* 	console.log(componentImage.implicitHeight) */

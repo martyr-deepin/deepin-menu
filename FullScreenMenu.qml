@@ -12,11 +12,11 @@ Rectangle {
     MouseArea {
         id: mouseArea
         anchors.fill: parent
-		/* acceptedButtons: Qt.LeftButton | Qt.RightButton */
+		acceptedButtons: Qt.LeftButton | Qt.RightButton
         onPressed: {
 			/* mouse.accepted = false */
 			/* _injection.postMouseEvent(mouse.x, mouse.y, 1) */
-            /* _application.quit() */
+            _application.quit()
         }
     }
 
@@ -27,11 +27,11 @@ Rectangle {
     }
 
     Component.onCompleted: {
-        var test_menu = '[{"itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-driver.png","itemText":"Driver(<u>D</u>)","itemSubMenu":[{"itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[{"itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[]}]}]},{},{"itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[]}, {"itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-driver.png","itemText":"Driver(<u>D</u>)","itemSubMenu":[{"itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[{"itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[]}]}]}]'
         var component = Qt.createComponent("ActualMenu.qml");
-        var menu = component.createObject(fullscreen_bg, {"x": 400, "y": 100,
-                                                          "width": 200,
-                                                          "height": 400,
-                                                          "menuItems": test_menu});
+		console.log(_menu_view.x)
+		console.log(_menu_view.y)
+		console.log(_menu_view.menuJsonContent)
+        var menu = component.createObject(fullscreen_bg, {"x": _menu_view.x, "y": _menu_view.y,
+                                                          "menuItems": _menu_view.menuJsonContent});
     }
 }

@@ -5,8 +5,8 @@ from PyQt5 import QtCore, QtQuick
 from PyQt5.QtWidgets import QApplication, qApp
 from PyQt5.QtQuick import QQuickView
 from PyQt5.QtGui import QSurfaceFormat, QColor, QCursor, QFont, QFontMetrics
-from PyQt5.QtCore import QSize, pyqtSlot, QObject, Q_CLASSINFO#, QCoreApplication
-from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection
+from PyQt5.QtCore import QSize, QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal
+from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusMessage
 import os
 import sys
 import signal
@@ -21,14 +21,17 @@ class MenuService(QObject):
     def __init__(self):
         super(MenuService, self).__init__()
         self.__dbusAdaptor = MenuServiceAdaptor(self)
-        
+
         self.__view = None
         self.__injection = None
 
     def showMenu(self, x, y, content):
-        self.__view = Menu()
+        if content == "":
+            content = '[{"itemId":"1","itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-driver.png","itemText":"Driver(<u>D</u>)","itemSubMenu":[{"itemId":"2", "itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[{"itemId":"3", "itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[]}]}]},{},{"itemId":"4", "itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[]}, {"itemId":"5", "itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-driver.png","itemText":"Driver(<u>D</u>)","itemSubMenu":[{"itemId":"6", "itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[{"itemId":"7", "itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[]}]}]}]'
+
+        self.__view = Menu(x, y, content)
         self.__injection = Injection()
-        
+
         show_menu(self.__view, self.__injection)
 
 class MenuServiceAdaptor(QDBusAbstractAdaptor):
@@ -42,7 +45,12 @@ class MenuServiceAdaptor(QDBusAbstractAdaptor):
                 '      <arg direction="in" type="i" name="y"/>\n'
                 '      <arg direction="in" type="s" name="content"/>\n'
                 '    </method>\n'
+                '    <signal name="ItemInvoked">\n'
+                '      <arg direction="out" type="i" name="itemId"/>\n'
+                '    </signal>\n'
                 '  </interface>\n')
+    
+    ItemInvoked = pyqtSignal(int)
 
     def __init__(self, parent):
         super(MenuServiceAdaptor, self).__init__(parent)
@@ -50,7 +58,7 @@ class MenuServiceAdaptor(QDBusAbstractAdaptor):
     @pyqtSlot(int, int, str)
     def ShowMenu(self, x, y, content):
         self.parent().showMenu(x, y, content)
-
+        
 class Injection(QObject):
     def __init__(self):
         super(QObject, self).__init__()
@@ -92,8 +100,30 @@ class Injection(QObject):
 
 class Menu(QQuickView):
 
-    def __init__(self, menuItems=None):
+    def __init__(self, x, y, menuJsonContent):
         QQuickView.__init__(self)
+
+        self.__x = x
+        self.__y = y
+        self.__menuJsonContent = menuJsonContent
+
+    @pyqtProperty(int)
+    def x(self):
+        return self.__x
+
+    @pyqtProperty(int)
+    def y(self):
+        return self.__y
+
+    @pyqtProperty(str)
+    def menuJsonContent(self):
+        return self.__menuJsonContent
+    
+    @pyqtSlot(int)
+    def invokeItem(self, id):
+        msg = QDBusMessage.createSignal('/com/deepin/menu', 'com.deepin.menu.Menu', 'ItemInvoked')
+        msg << id
+        QDBusConnection.sessionBus().send(msg)
 
 def show_menu(view, injection):
     qml_context = view.rootContext()
@@ -129,6 +159,6 @@ if __name__ == "__main__":
     screenGeometry = desktopWidget.screenGeometry()
     SCREEN_WIDTH = screenGeometry.width()
     SCREEN_HEIGHT = screenGeometry.height()
-    
+
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     sys.exit(app.exec_())

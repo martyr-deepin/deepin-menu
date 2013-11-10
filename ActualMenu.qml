@@ -31,7 +31,8 @@ Rectangle{
             var _height = 0
             for (var i in items) {
 				console.log(i)
-                menuItemModel.append({"itemIcon":items[i].itemIcon,
+                menuItemModel.append({"itemId": items[i].itemId,
+									  "itemIcon":items[i].itemIcon,
                                       "itemText":items[i].itemText,
                                       "itemSubMenu":JSON.stringify(items[i].itemSubMenu)})
                 if (_injection.getStringWidth(items[i].itemText, 12)
