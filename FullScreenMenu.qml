@@ -7,7 +7,7 @@ Rectangle {
 	focus: true
     width: _injection.getScreenWidth()
     height: _injection.getScreenHeight()
-    color: Qt.rgba(0, 0, 0, 0)
+    color: Qt.rgba(1, 1, 1, 1)
 
     MouseArea {
         id: mouseArea
@@ -25,13 +25,10 @@ Rectangle {
             _application.quit()
         }
     }
-
-    Component.onCompleted: {
-        var component = Qt.createComponent("ActualMenu.qml");
-		console.log(_menu_view.x)
-		console.log(_menu_view.y)
-		console.log(_menu_view.menuJsonContent)
-        var menu = component.createObject(fullscreen_bg, {"x": _menu_view.x, "y": _menu_view.y,
-                                                          "menuItems": _menu_view.menuJsonContent});
-    }
+	
+	Component.onCompleted: {
+		var component = Qt.createComponent("DockMenu.qml")
+        component.createObject(fullscreen_bg, {"x": _menu_view.x, "y": _menu_view.y,
+                                               "menuItems": _menu_view.menuJsonContent, "fullscreenBg": fullscreen_bg});
+	}
 }

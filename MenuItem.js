@@ -10,7 +10,7 @@ function onReleased(menuItem, menu) {
     menuItem.color = Qt.rgba(1, 1, 1, 0)
 }
 
-function onEntered(menuItem, menu) {
+function onEntered(menuItem, menu, fullscreen_bg) {
     menuItem.color = Qt.rgba(0, 100, 0, 0.7)
 
 	// Destroy old subMenu
@@ -22,10 +22,13 @@ function onEntered(menuItem, menu) {
 	// Create new subMenu
     if (menuItem.componentSubMenu != "[]") {
         if (menuItem.componentSubMenu != null) {
-            var component = Qt.createComponent("ActualMenu.qml");
+            var component = Qt.createComponent("RectMenu.qml");
             var component_menuItems = menuItem.componentSubMenu
-            var component_width = 200
-            var component_height = 400
+			
+			var component_size = menuItem.ListView.view.getSize(component_menuItems)
+            var component_width = component_size.width
+            var component_height = component_size.height
+
             var component_x = menu.x + menu.width
             var component_y = menu.y + menuItem.y
 
@@ -38,9 +41,8 @@ function onEntered(menuItem, menu) {
             }
 
             var obj = component.createObject(fullscreen_bg, {"x": component_x, "y": component_y,
-                                                             "width": component_width, "height": component_height,
-                                                             "menuItems": component_menuItems});
-
+                                                             // "width": component_width, "height": component_height,
+                                                             "menuItems": component_menuItems, "fullscreenBg": fullscreenBg});
             menu.subMenuObj = obj
         }
     }
@@ -48,13 +50,4 @@ function onEntered(menuItem, menu) {
 
 function onExited(menuItem, menu) {
     menuItem.color = Qt.rgba(1, 1, 1, 0)
-}
-
-
-function getMenuWidthByLabelLen(len) {
-    return len * 12
-}
-
-function getMenuHeightByItemsNum(num) {
-    return num * 12
 }

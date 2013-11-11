@@ -159,6 +159,6 @@ if __name__ == "__main__":
     screenGeometry = desktopWidget.screenGeometry()
     SCREEN_WIDTH = screenGeometry.width()
     SCREEN_HEIGHT = screenGeometry.height()
-
+    
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     sys.exit(app.exec_())

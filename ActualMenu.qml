@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtGraphicalEffects 1.0
 
 import "MenuItem.js" as MenuItemJs
 
@@ -11,10 +12,12 @@ Rectangle{
     property int picWidth: 16
     property int picTextSpacing: 2
     property int menuPadding: 5
-	property int menuItemPadding: 2
+    property int menuItemPadding: 2
 
     property string menuItems: null
     property var subMenuObj: null
+
+    anchors.centerIn: parent
 
     Component.onDestruction: {
         if (menu.subMenuObj != null) {
@@ -30,9 +33,8 @@ Rectangle{
             var _width = 0
             var _height = 0
             for (var i in items) {
-				console.log(i)
                 menuItemModel.append({"itemId": items[i].itemId,
-									  "itemIcon":items[i].itemIcon,
+                                      "itemIcon":items[i].itemIcon,
                                       "itemText":items[i].itemText,
                                       "itemSubMenu":JSON.stringify(items[i].itemSubMenu)})
                 if (_injection.getStringWidth(items[i].itemText, 12)
@@ -40,21 +42,21 @@ Rectangle{
                     _width = _injection.getStringWidth(items[i].itemText, 12)
                     + menu.picWidth + menu.picTextSpacing + menu.menuPadding * 2
                 }
-				
-				if (items[i].itemText == undefined) {
-					_height += menu.menuItemPadding * 2 + 1
-				} else {
-					
-					_height += Math.max(_injection.getStringHeight(items[i].itemText, 12) + menu.menuItemPadding * 2 + 5,
-										menu.picWidth + menu.menuItemPadding * 2 + 5)
-				}
 
-				/* if (_injection.getStringHeight(items)) */
+                if (items[i].itemText == undefined) {
+                    _height += menu.menuItemPadding * 2 + 1
+                } else {
+
+                    _height += Math.max(_injection.getStringHeight(items[i].itemText, 12) + menu.menuItemPadding * 2 + 5,
+                                        menu.picWidth + menu.menuItemPadding * 2 + 5)
+                }
+
+            /* if (_injection.getStringHeight(items)) */
             }
             menu.width = (Math.max(_width, menu.minWidth))
-			/* console.log(_height) */
+            /* console.log(_height) */
             menu.height = _height + 2 * menu.menuPadding - 5
-            /* menu.height = 100 */
+        /* menu.height = 100 */
         }
     }
 
@@ -67,8 +69,8 @@ Rectangle{
         /* currentIndex: 0 */
         anchors {
             fill: parent
-			topMargin: menu.menuPadding
-			bottomMargin: menu.menuPadding
+            topMargin: menu.menuPadding
+            bottomMargin: menu.menuPadding
         }
     }
 }
