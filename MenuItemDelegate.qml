@@ -21,6 +21,8 @@ Component {
         property color textColor: ListView.view.textColor
         property string componentSubMenu: itemSubMenu
         property string componentId: itemId
+		
+		property alias itemTextColor: componentText.color
 
         Image {
             id: componentImage

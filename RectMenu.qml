@@ -5,6 +5,7 @@ Rect {
     rectWidth: listview.width + blurWidth * 2
     rectHeight: listview.height + blurWidth * 2 + 2 * topBottomPadding
 
+	property alias fontColor: listview.textColor
 	property alias currentMenuIndex: listview.currentIndex
     property int topBottomPadding: 3
     property string menuItems: ""

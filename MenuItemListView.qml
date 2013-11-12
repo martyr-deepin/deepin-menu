@@ -6,7 +6,7 @@ ListView {
     currentIndex: -1
     model: MenuItemListModel { menuItems: listview.menuItems}
     delegate: MenuItemDelegate {}
-    highlight: Rectangle { color: "lightsteelblue" }
+    /* highlight: Rectangle { color: "lightsteelblue" } */
     /* keyNavigationWraps: true */
     /* interactive: false */
 
@@ -23,6 +23,7 @@ ListView {
     property string menuItems: ""
 
     property int lastCurrentIndex: 0
+	property var lastCurrentItem: null
     onCurrentItemChanged: {
         /* console.log(currentItem.isSep) */
         if (currentItem.isSep) {
@@ -34,7 +35,18 @@ ListView {
             }
             lastCurrentIndex = currentIndex
         }
-
+		
+		/* clear selection effect */
+		if (lastCurrentItem != null) {
+			lastCurrentItem.itemTextColor = textColor
+		}
+		
+		/* selection effect */
+		if (currentItem != null) {
+			currentItem.itemTextColor = "#00A4E2"
+		}
+		lastCurrentItem = currentItem
+		
         // Destroy old subMenu
         if (menu.subMenuObj != null) {
             menu.subMenuObj.destroy(10)
@@ -51,11 +63,11 @@ ListView {
                 var component_width = component_size.width
                 var component_height = component_size.height
 
-                var component_x = menu.x + menu.width
+                var component_x = menu.x + menu.width - menu.blurWidth * 2
                 var component_y = menu.y + currentItem.y
 
                 if (component_x + component_width> fullscreen_bg.width) {
-                    component_x = menu.x - component_width
+                    component_x = menu.x - component_width + menu.blurWidth
                 }
 
                 if (component_y + component_height > fullscreen_bg.height) {
@@ -63,7 +75,7 @@ ListView {
                 }
 
                 var obj = component.createObject(fullscreen_bg, {"x": component_x, "y": component_y,
-                                                                 // "width": component_width, "height": component_height,
+																 "fillColor": menu.fillColor, "fontColor": menu.textColor,
                                                                  "menuItems": component_menuItems, "fullscreenBg": fullscreenBg});
                 menu.subMenuObj = obj
             }
