@@ -5,6 +5,7 @@ RectWithCorner {
     rectWidth: listview.width + blurWidth * 2
     rectHeight: listview.height + blurWidth * 2 + cornerHeight + 2 * topBottomPadding
 	
+	property alias currentMenuIndex: listview.currentIndex	
 	property int topBottomPadding: 3
 	property string menuItems: ""
 

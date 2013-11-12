@@ -4,12 +4,13 @@ Rect {
     id: menu
     rectWidth: listview.width + blurWidth * 2
     rectHeight: listview.height + blurWidth * 2 + 2 * topBottomPadding
-	
-	property int topBottomPadding: 3
-	property string menuItems: ""
+
+	property alias currentMenuIndex: listview.currentIndex
+    property int topBottomPadding: 3
+    property string menuItems: ""
 
     property var subMenuObj: null
-	property var fullscreenBg: null
+    property var fullscreenBg: null
 
     Component.onDestruction: {
         if (menu.subMenuObj != null) {
@@ -20,13 +21,13 @@ Rect {
     MenuItemListView {
         id: listview
 
-		fullscreenBg: parent.fullscreenBg
+        fullscreenBg: parent.fullscreenBg
         menuItems: parent.menuItems
 
         anchors {
-			horizontalCenter: parent.horizontalCenter
-			top: parent.top
-			topMargin: parent.blurWidth + topBottomPadding
-		}
+            horizontalCenter: parent.horizontalCenter
+            top: parent.top
+            topMargin: parent.blurWidth + topBottomPadding
+        }
     }
 }

@@ -12,6 +12,7 @@ Component {
 																		  + verticalPadding * 2)
         color: Qt.rgba(0, 0, 0, 0)
 		
+		property bool isSep: itemText == ""
 		property var fullscreenBg: ListView.view.fullscreenBg
 		property int verticalPadding: ListView.view.verticalPadding
 		property int horizontalPadding: ListView.view.horizontalPadding
@@ -45,7 +46,7 @@ Component {
         Rectangle {
 			/* visible: itemArea.ListView.view.model.count == 0 */
 			id: itemSeparator
-			visible: componentText.text == ""
+			visible: parent.isSep
 			width: 1
 			height: itemArea.ListView.view.width 
 			transformOrigin: Item.Center
@@ -65,9 +66,7 @@ Component {
             hoverEnabled: true
 
             onPressed: MenuItemJs.onPressed(parent, menu)
-            onReleased: MenuItemJs.onReleased(parent, menu)
-            onEntered: MenuItemJs.onEntered(parent, menu, fullscreenBg)
-            onExited: MenuItemJs.onExited(parent, menu)
+            onEntered: MenuItemJs.onEntered(index, menu)
         }
     }
 }
