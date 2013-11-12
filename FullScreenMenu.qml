@@ -47,7 +47,7 @@ Rectangle {
 			component = Qt.createComponent("RectMenu.qml")
 			component_bg = Qt.rgba(1, 1, 1, 0.9)			
 			component_border_color = Qt.rgba(0, 0, 0, 0.15)
-			component_blur_radius = 8			
+			component_blur_radius = 16
 			component_font_color = Qt.rgba(0, 0, 0, 1)			
 		}
         component.createObject(fullscreen_bg, {"x": _menu_view.x, "y": _menu_view.y,

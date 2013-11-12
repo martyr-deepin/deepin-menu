@@ -67,7 +67,7 @@ ListView {
                 var component_y = menu.y + currentItem.y
 
                 if (component_x + component_width> fullscreen_bg.width) {
-                    component_x = menu.x - component_width + menu.blurWidth
+                    component_x = menu.x - component_width
                 }
 
                 if (component_y + component_height > fullscreen_bg.height) {
@@ -75,7 +75,7 @@ ListView {
                 }
 
                 var obj = component.createObject(fullscreen_bg, {"x": component_x, "y": component_y,
-																 "fillColor": menu.fillColor, "fontColor": menu.textColor,
+																 "fillColor": menu.fillColor, "fontColor": menu.fontColor,
                                                                  "menuItems": component_menuItems, "fullscreenBg": fullscreenBg});
                 menu.subMenuObj = obj
             }

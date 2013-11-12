@@ -15,8 +15,8 @@ Rectangle {
     property int blurWidth: 16
     property int borderWidth: 2
     property int rectRadius: 4
-    property int rectWidth: 100
-    property int rectHeight: 100
+    property int rectWidth: 200
+    property int rectHeight: 200
 
     Canvas {
         id: canvas
