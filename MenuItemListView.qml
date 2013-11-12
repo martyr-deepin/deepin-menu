@@ -54,7 +54,7 @@ ListView {
                 var component_x = menu.x + menu.width
                 var component_y = menu.y + currentItem.y
 
-                if (component_x > fullscreen_bg.width) {
+                if (component_x + component_width> fullscreen_bg.width) {
                     component_x = menu.x - component_width
                 }
 
@@ -82,7 +82,7 @@ ListView {
             }
 
             if (items[i].itemText == undefined) {
-                _height += verticalPadding * 2 + 1
+                _height += verticalPadding * 2 + 2
             } else {
                 _height += Math.max(_injection.getStringHeight(items[i].itemText, textSize) + verticalPadding * 2,
                                     pictureSize + verticalPadding * 2)
