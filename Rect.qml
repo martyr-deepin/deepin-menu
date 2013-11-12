@@ -40,6 +40,7 @@ Rectangle {
             ctx.lineWidth = borderWidth
             ctx.strokeStyle = borderColor
             ctx.stroke()
+			
             ctx.fillStyle = fillColor
             ctx.fill()
 

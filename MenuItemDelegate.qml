@@ -49,7 +49,7 @@ Component {
             Rectangle {
                 id: itemSeparator1
                 width: 1
-                height: itemArea.ListView.view.width
+                height: itemArea.ListView.view.width - 4
                 transformOrigin: Item.Center
                 rotation: 90
                 gradient: Gradient {
@@ -62,7 +62,7 @@ Component {
             Rectangle {
                 id: itemSeparator
                 width: 1
-                height: itemArea.ListView.view.width
+                height: itemArea.ListView.view.width - 4
                 transformOrigin: Item.Center
                 rotation: 90
                 gradient: Gradient {
