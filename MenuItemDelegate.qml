@@ -55,7 +55,7 @@ Component {
                 transformOrigin: Item.Center
                 rotation: 90
                 gradient: Gradient {
-                    GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.1) }
+                    GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.1)} 
                     GradientStop { position: 0.5; color: Qt.rgba(1, 1, 1, 0.15) }
                     GradientStop { position: 1.0; color: Qt.rgba(1, 1, 1, 0.1) }
                 }

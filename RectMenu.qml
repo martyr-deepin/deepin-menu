@@ -7,6 +7,8 @@ Rect {
 
 	property alias fontColor: listview.textColor
 	property alias currentMenuIndex: listview.currentIndex
+	
+	property bool isDockMenu: false
     property int topBottomPadding: 3
     property string menuItems: ""
 
@@ -22,6 +24,7 @@ Rect {
     MenuItemListView {
         id: listview
 
+		isDockMenu: parent.isDockMenu
         fullscreenBg: parent.fullscreenBg
         menuItems: parent.menuItems
 

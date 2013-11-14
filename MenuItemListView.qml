@@ -6,7 +6,6 @@ ListView {
     currentIndex: -1
     model: MenuItemListModel { menuItems: listview.menuItems}
     delegate: MenuItemDelegate {}
-    /* highlight: Rectangle { color: "lightsteelblue" } */
     /* keyNavigationWraps: true */
     /* interactive: false */
 
@@ -22,8 +21,11 @@ ListView {
 
     property string menuItems: ""
 
+    property bool isDockMenu: false
+
+    /* below two property is specialized for onCurrentItemChanged method. */
     property int lastCurrentIndex: 0
-	property var lastCurrentItem: null
+    property var lastCurrentItem: null
     onCurrentItemChanged: {
         /* console.log(currentItem.isSep) */
         if (currentItem.isSep) {
@@ -35,18 +37,21 @@ ListView {
             }
             lastCurrentIndex = currentIndex
         }
-		
-		/* clear selection effect */
-		if (lastCurrentItem != null) {
-			lastCurrentItem.itemTextColor = textColor
-		}
-		
-		/* selection effect */
-		if (currentItem != null) {
-			currentItem.itemTextColor = "#00A4E2"
-		}
-		lastCurrentItem = currentItem
-		
+
+        if (isDockMenu) { /* we needn't to handle selection effect if it's not dock menu,
+                             because highlight property will handle it for us. */
+            /* clear selection effect */
+            if (lastCurrentItem != null) {
+                lastCurrentItem.itemTextColor = textColor
+            }
+
+            /* selection effect */
+            if (currentItem != null) {
+                currentItem.itemTextColor = "#00A4E2"
+            }
+        }
+        lastCurrentItem = currentItem
+
         // Destroy old subMenu
         if (menu.subMenuObj != null) {
             menu.subMenuObj.destroy(10)
@@ -75,7 +80,10 @@ ListView {
                 }
 
                 var obj = component.createObject(fullscreen_bg, {"x": component_x, "y": component_y,
-																 "fillColor": menu.fillColor, "fontColor": menu.fontColor,
+                                                                 "borderColor": menu.borderColor,
+                                                                 "blurWidth": menu.blurWidth,
+                                                                 "fillColor": menu.fillColor, "fontColor": menu.fontColor,
+                                                                 "isDockMenu": menu.isDockMenu,
                                                                  "menuItems": component_menuItems, "fullscreenBg": fullscreenBg});
                 menu.subMenuObj = obj
             }
@@ -109,5 +117,12 @@ ListView {
 
         listview.width = (Math.max(size.width, minWidth))
         listview.height = size.height
+
+        if (!isDockMenu) {
+            /* highlight = Qt.createQmlObject("import QtQuick 2.0; MenuSelection{}" */
+            /*                                listview, "highlight"); */
+            var component = Qt.createComponent("MenuSelection.qml");
+			highlight = component.createObject(listview, {})
+        }
     }
 }
