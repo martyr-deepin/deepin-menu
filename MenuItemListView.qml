@@ -23,7 +23,7 @@ ListView {
 
     property bool isDockMenu: false
 
-    /* below two property is specialized for onCurrentItemChanged method. */
+    /* below two property is created for onCurrentItemChanged method. */
     property int lastCurrentIndex: 0
     property var lastCurrentItem: null
     onCurrentItemChanged: {
@@ -91,6 +91,7 @@ ListView {
     }
 
     function getSize() {
+		console.log(menuItems)
         var items = JSON.parse(menuItems)
         var _width = 0
         var _height = 0
@@ -101,7 +102,7 @@ ListView {
                 + textLeftMargin + horizontalPadding
             }
 
-            if (items[i].itemText == undefined) {
+            if (items[i].itemText == undefined || items[i].itemText == "") {
                 _height += verticalPadding * 2 + 2
             } else {
                 _height += Math.max(_injection.getStringHeight(items[i].itemText, textSize) + verticalPadding * 2,
