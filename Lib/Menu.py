@@ -35,7 +35,7 @@ def parseMenuItem(menuItem):
     assert len(menuItem) >= 2
     result = MenuItem(menuItem[0], menuItem[1])
     if len(menuItem) > 2:
-        result.setSubMenu(parseMenu(Menu(), menuItem[2]))
+        result.setSubMenu(parseMenu(Menu(is_root=False), menuItem[2]))
     return result
 
 def parseMenu(obj, menu):
@@ -67,7 +67,7 @@ class MenuItem(QObject):
         self.id = id
         self.text = text
         self.icon = icon or ""
-        self.subMenu = subMenu or Menu()
+        self.subMenu = subMenu or Menu(is_root=False)
 
     @property
     def serializableContent(self):
@@ -96,7 +96,7 @@ class MenuSeparator(QObject):
 class Menu(QObject):
     itemClicked = pyqtSignal(str)
 
-    def __init__(self, items=None, is_root=False):
+    def __init__(self, items=None, is_root=True):
         super(Menu, self).__init__()
         self.items = []
         if items:
