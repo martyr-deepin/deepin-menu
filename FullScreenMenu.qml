@@ -8,11 +8,6 @@ Rectangle {
     width: _injection.getScreenWidth()
     height: _injection.getScreenHeight()
 	
-	Image {
-		anchors.fill: parent
-		source: "/home/hualet/Pictures/wallpapers-collect/test.jpg"
-	}
-
     MouseArea {
         id: mouseArea
         anchors.fill: parent
