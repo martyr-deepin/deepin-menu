@@ -25,11 +25,14 @@ class MenuService(QObject):
         self.__view = None
         self.__injection = None
 
-    def showMenu(self, x, y, content, withCorner):
-        if content == "":
-            content = '[{"itemId":"1","itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-driver.png","itemText":"Driver(<u>D</u>)","itemSubMenu":[{"itemId":"2", "itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[{"itemId":"3", "itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[]}]}]},{},{"itemId":"4", "itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[]}, {"itemId":"5", "itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-driver.png","itemText":"Driver(<u>D</u>)","itemSubMenu":[{"itemId":"6", "itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[{"itemId":"7", "itemIcon":"/usr/share/icons/Deepin/apps/16/preferences-display.png","itemText":"Display this this this this ", "itemSubMenu":[]}]}]}]'
+    def showMenu(self, x, y, content):
+        self.__view = Menu(x, y, content, True)
+        self.__injection = Injection()
 
-        self.__view = Menu(x, y, content, withCorner)
+        show_menu(self.__view, self.__injection)
+
+    def showDockMenu(self, x, y, content):
+        self.__view = Menu(x, y, content, False)
         self.__injection = Injection()
 
         show_menu(self.__view, self.__injection)
@@ -44,21 +47,29 @@ class MenuServiceAdaptor(QDBusAbstractAdaptor):
                 '      <arg direction="in" type="i" name="x"/>\n'
                 '      <arg direction="in" type="i" name="y"/>\n'
                 '      <arg direction="in" type="s" name="content"/>\n'
-                '      <arg direction="in" type="b" name="withCorner"/>\n'
+                '    </method>\n'
+                '    <method name="ShowDockMenu">\n'
+                '      <arg direction="in" type="i" name="x"/>\n'
+                '      <arg direction="in" type="i" name="y"/>\n'
+                '      <arg direction="in" type="s" name="content"/>\n'
                 '    </method>\n'
                 '    <signal name="ItemInvoked">\n'
-                '      <arg direction="out" type="i" name="itemId"/>\n'
+                '      <arg direction="out" type="s" name="itemId"/>\n'
                 '    </signal>\n'
                 '  </interface>\n')
     
-    ItemInvoked = pyqtSignal(int)
+    ItemInvoked = pyqtSignal(str)
 
     def __init__(self, parent):
         super(MenuServiceAdaptor, self).__init__(parent)
 
-    @pyqtSlot(int, int, str, bool)
-    def ShowMenu(self, x, y, content, withCorner):
-        self.parent().showMenu(x, y, content, withCorner)
+    @pyqtSlot(int, int, str)
+    def ShowMenu(self, x, y, content):
+        self.parent().showMenu(x, y, content)
+        
+    @pyqtSlot(int, int, str)
+    def ShowDockMenu(self, x, y, content):
+        self.parent().showDockMenu(x, y, content)
         
 class Injection(QObject):
     def __init__(self):
@@ -125,7 +136,7 @@ class Menu(QQuickView):
     def menuJsonContent(self):
         return self.__menuJsonContent
     
-    @pyqtSlot(int)
+    @pyqtSlot(str)
     def invokeItem(self, id):
         msg = QDBusMessage.createSignal('/com/deepin/menu', 'com.deepin.menu.Menu', 'ItemInvoked')
         msg << id

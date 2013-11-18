@@ -22,7 +22,7 @@
 
 import json
 
-from PyQt5.QtCore import pyqtSlot, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from PyQt5.QtDBus import QDBusAbstractInterface, QDBusConnection
 
 idIndex = 0
@@ -31,32 +31,43 @@ DBUS_SERVICE = "com.deepin.menu"
 DBUS_PATH = "/com/deepin/menu"
 DBUS_INTERFACE = "com.deepin.menu.Menu"
 
+def parseMenuItem(menuItem):
+    assert len(menuItem) >= 2
+    result = MenuItem(menuItem[0], menuItem[1])
+    if len(menuItem) > 2:
+        result.setSubMenu(parseMenu(Menu(), menuItem[2]))
+    return result
+
+def parseMenu(obj, menu):
+    result = obj
+    for menuItem in menu:
+        if menuItem == None:
+            result.addMenuItem(MenuSeparator())
+        else:
+            result.addMenuItem(parseMenuItem(menuItem))
+    return result
+
 class MenuServiceInterface(QDBusAbstractInterface):
 
-    ItemInvoked = pyqtSignal(int)
+    ItemInvoked = pyqtSignal(str)
 
     def __init__(self, ):
         super(MenuServiceInterface, self).__init__(DBUS_SERVICE, DBUS_PATH, DBUS_INTERFACE,
                                                    QDBusConnection.sessionBus(), None)
 
     def showMenu(self, x, y, content):
-        self.call('ShowMenu', x, y, content, True)
+        self.call('ShowMenu', x, y, content)
 
-class MenuItem(object):
-    def __init__(self, text, icon=None, node=None, *rest):
-        self.id = None
+    def showDockmenu(self, x, y, content):
+        self.call('ShowDockMenu', x, y, content)
 
-        self.text = text or ""
+class MenuItem(QObject):
+    def __init__(self, id, text, icon=None, subMenu=None):
+        super(MenuItem, self).__init__()
+        self.id = id
+        self.text = text
         self.icon = icon or ""
-        self.node = node or Menu()
-        
-        if isinstance(self.node, Menu):
-            self.subMenu = self.node
-        else:
-            self.callback = self.node
-            self.subMenu = Menu()
-        
-        self.rest = rest
+        self.subMenu = subMenu or Menu()
 
     @property
     def serializableContent(self):
@@ -68,31 +79,28 @@ class MenuItem(object):
     def setSubMenu(self, menu):
         self.subMenu = menu
 
-    def setCallBack(self, callback):
-        self.call = callback
-
     def __str__(self):
         return json.dumps(self.serializableContent)
 
-class MenuSeparator(object):
-    
+class MenuSeparator(QObject):
     def __init__(self):
-        self.callback = None
-    
+        super(MenuSeparator, self).__init__()
+
     @property
     def serializableContent(self):
-        return {"itemId": self.id,
+        return {"itemId": "",
                 "itemIcon": "",
                 "itemText": "",
                 "itemSubMenu": "[]"}
 
-class Menu(object):
+class Menu(QObject):
+    itemClicked = pyqtSignal(str)
 
     def __init__(self, items=None, is_root=False):
-        # self.__items = items or []
+        super(Menu, self).__init__()
         self.items = []
         if items:
-            self.addMenuItems(items)
+            parseMenu(self, items)
         if is_root:
             self.iface = MenuServiceInterface()
 
@@ -104,25 +112,23 @@ class Menu(object):
         return result
 
     def addMenuItem(self, item):
-        global idIndex
-        idIndex += 1
-        item.id = idIndex
         self.items.append(item)
 
     def addMenuItems(self, items):
         for item in items:
             self.addMenuItem(item)
 
-    def show(self, x, y):
+    def showMenu(self, x, y):
         self.iface.showMenu(x, y, str(self))
         self.iface.ItemInvoked.connect(self.itemInvokedSlot)
 
-    @pyqtSlot(int)
+    def showDockmenu(self, x, y):
+        self.iface.showDockMenu(x, y, str(self))
+        self.iface.ItemInvoked.connect(self.itemInvokedSlot)
+
+    @pyqtSlot(str)
     def itemInvokedSlot(self, itemId):
-        for item in self.items:
-            if item.id == itemId:
-                if hasattr(item, "callback"):
-                    item.callback(item.rest)
+        self.itemClicked.emit(itemId)
 
     def __str__(self):
         return json.dumps(self.serializableItemList)
@@ -132,15 +138,26 @@ if __name__ == "__main__":
     from PyQt5.QtCore import QCoreApplication
 
     app = QCoreApplication([])
-    
-    def test(x):
-        print x
-    
-    driver = MenuItem("Driver", "/usr/share/icons/Deepin/apps/16/preferences-driver.png", test, "hello")
-    display = MenuItem("Display", "/usr/share/icons/Deepin/apps/16/preferences-display.png")
-    show = Menu([MenuItem("Display", "/usr/share/icons/Deepin/apps/16/preferences-display.png")])
-    display.setSubMenu(show)
-    menu = Menu([driver, MenuSeparator(), display], True)
-    menu.show(200, 200)
+
+    @pyqtSlot(str)
+    def test(s):
+        print s
+
+    # 1)
+    # driver = MenuItem("id_driver", "Driver", "/usr/share/icons/Deepin/apps/16/preferences-driver.png")
+    # display = MenuItem("id_display", "Display", "/usr/share/icons/Deepin/apps/16/preferences-display.png")
+    # show = Menu()
+    # show.addMenuItem(MenuItem("id_sub_display", "Display", "/usr/share/icons/Deepin/apps/16/preferences-display.png"))
+    # display.setSubMenu(show)
+    # menu = Menu(is_root=True)
+    # menu.addMenuItems([driver, display])
+    # menu.showMenu(200, 200)
+
+    # 2)
+    menu = Menu([("id_driver", "Driver", [("id_sub1", "SubMenu1"), ("id_sub2", "SubMenu2")]),
+                 None, 
+                 ("id_display", "Display")], is_root=True)
+    menu.itemClicked.connect(test)
+    menu.showMenu(200, 200)
 
     sys.exit(app.exec_())

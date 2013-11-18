@@ -12,10 +12,16 @@ ListView {
     property var fullscreenBg: null
     property int textSize: 12
     property int textLeftMargin: 22
+    property int textRightMargin: 22
     property int horizontalPadding: 3
     property int verticalPadding: 3
     property int pictureSize: 16
     property int minWidth: 100
+
+    property string arrowDark: "images/arrow-dark.png"
+    property string arrowDarkHover: "images/arrow-dark-hover.png"
+    property string arrowLight: "images/arrow-light.png"
+    property string arrowLightHover: "images/arrow-light-hover.png"
 
     property color textColor: Qt.rgba(1, 1, 1, 1)
 
@@ -38,17 +44,29 @@ ListView {
             lastCurrentIndex = currentIndex
         }
 
-        if (isDockMenu) { /* we needn't to handle selection effect if it's not dock menu,
-                             because highlight property will handle it for us. */
+        if (isDockMenu) {
             /* clear selection effect */
             if (lastCurrentItem != null) {
                 lastCurrentItem.itemTextColor = textColor
+				lastCurrentItem.itemArrowPic = listview.arrowDark
             }
 
             /* selection effect */
             if (currentItem != null) {
                 currentItem.itemTextColor = "#00A4E2"
+				currentItem.itemArrowPic = listview.arrowDarkHover
             }
+        } else {
+            /* clear selection effect */
+            if (lastCurrentItem != null) {
+				lastCurrentItem.itemArrowPic = listview.arrowLight
+            }
+
+            /* selection effect */
+            if (currentItem != null) {
+				currentItem.itemArrowPic = listview.arrowLightHover									
+            }
+
         }
         lastCurrentItem = currentItem
 
@@ -91,15 +109,14 @@ ListView {
     }
 
     function getSize() {
-		console.log(menuItems)
         var items = JSON.parse(menuItems)
         var _width = 0
         var _height = 0
         for (var i in items) {
             if (_injection.getStringWidth(items[i].itemText, textSize)
-                + textLeftMargin + horizontalPadding > _width) {
+                + textLeftMargin + textRightMargin + horizontalPadding > _width) {
                 _width = _injection.getStringWidth(items[i].itemText, textSize)
-                + textLeftMargin + horizontalPadding
+                + textLeftMargin + textRightMargin + horizontalPadding
             }
 
             if (items[i].itemText == undefined || items[i].itemText == "") {
@@ -120,10 +137,8 @@ ListView {
         listview.height = size.height
 
         if (!isDockMenu) {
-            /* highlight = Qt.createQmlObject("import QtQuick 2.0; MenuSelection{}" */
-            /*                                listview, "highlight"); */
             var component = Qt.createComponent("MenuSelection.qml");
-			highlight = component.createObject(listview, {})
+            highlight = component.createObject(listview, {})
         }
     }
 }
