@@ -43,25 +43,33 @@ class MenuServiceInterface(QDBusAbstractInterface):
         self.call('ShowMenu', x, y, content, True)
 
 class MenuItem(object):
-    def __init__(self, text, icon=None):
+    def __init__(self, text, icon=None, node=None, *rest):
         self.id = None
-        self.subMenu = Menu()
 
-        self.text = text
-        self.icon = icon
+        self.text = text or ""
+        self.icon = icon or ""
+        self.node = node or Menu()
+        
+        if isinstance(self.node, Menu):
+            self.subMenu = self.node
+        else:
+            self.callback = self.node
+            self.subMenu = Menu()
+        
+        self.rest = rest
 
     @property
     def serializableContent(self):
         return {"itemId": self.id,
                 "itemIcon": self.icon,
                 "itemText": self.text,
-                "itemSubMenu": self.subMenu.serializableItemList}
+                "itemSubMenu": self.subMenu.serializableItemList }
 
     def setSubMenu(self, menu):
         self.subMenu = menu
 
-    def setCallBack(self, cb):
-        self.cb = cb
+    def setCallBack(self, callback):
+        self.call = callback
 
     def __str__(self):
         return json.dumps(self.serializableContent)
@@ -69,7 +77,7 @@ class MenuItem(object):
 class MenuSeparator(object):
     
     def __init__(self):
-        pass
+        self.callback = None
     
     @property
     def serializableContent(self):
@@ -77,11 +85,6 @@ class MenuSeparator(object):
                 "itemIcon": "",
                 "itemText": "",
                 "itemSubMenu": "[]"}
-
-
-@pyqtSlot(int)
-def itemInvoked(itemId):
-    print itemId
 
 class Menu(object):
 
@@ -112,14 +115,14 @@ class Menu(object):
 
     def show(self, x, y):
         self.iface.showMenu(x, y, str(self))
-        self.iface.ItemInvoked.connect(itemInvoked)
+        self.iface.ItemInvoked.connect(self.itemInvokedSlot)
 
     @pyqtSlot(int)
     def itemInvokedSlot(self, itemId):
-        print "itemId: ", itemId
         for item in self.items:
             if item.id == itemId:
-                pass            # invoke callback function here
+                if hasattr(item, "callback"):
+                    item.callback(item.rest)
 
     def __str__(self):
         return json.dumps(self.serializableItemList)
@@ -130,7 +133,10 @@ if __name__ == "__main__":
 
     app = QCoreApplication([])
     
-    driver = MenuItem("Driver", "/usr/share/icons/Deepin/apps/16/preferences-driver.png")
+    def test(x):
+        print x
+    
+    driver = MenuItem("Driver", "/usr/share/icons/Deepin/apps/16/preferences-driver.png", test, "hello")
     display = MenuItem("Display", "/usr/share/icons/Deepin/apps/16/preferences-display.png")
     show = Menu([MenuItem("Display", "/usr/share/icons/Deepin/apps/16/preferences-display.png")])
     display.setSubMenu(show)
