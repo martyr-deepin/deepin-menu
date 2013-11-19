@@ -36,7 +36,7 @@ Rectangle {
 		
 		if (_menu_view.withCorner) {
 			component = Qt.createComponent("DockMenu.qml")
-			component_bg = Qt.rgba(0, 0, 0, 0.8)
+			component_bg = Qt.rgba(0, 0, 0, 0.6)
 			component_border_color = Qt.rgba(1, 1, 1, 0.15)
 			component_blur_radius = 16
 			component_font_color = Qt.rgba(1, 1, 1, 1)

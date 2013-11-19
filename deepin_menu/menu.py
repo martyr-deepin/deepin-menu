@@ -159,7 +159,7 @@ if __name__ == "__main__":
                  None, 
                  ("id_display", "Display")], is_root=True)
     menu.itemClicked.connect(test)
-    # menu.showDockMenu(200, 300)
-    menu.showMenu(1300, 300)
+    menu.showDockMenu(1366, 768)
+    # menu.showMenu(1300, 300)
 
     sys.exit(app.exec_())
