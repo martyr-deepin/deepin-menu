@@ -1,7 +1,0 @@
-setup.py
-deepin_menu/main.py
-deepin_menu/menu.py
-deepin_menu.egg-info/PKG-INFO
-deepin_menu.egg-info/SOURCES.txt
-deepin_menu.egg-info/dependency_links.txt
-deepin_menu.egg-info/top_level.txt
