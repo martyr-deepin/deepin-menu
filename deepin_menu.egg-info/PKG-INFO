@@ -1,0 +1,11 @@
+Metadata-Version: 1.1
+Name: deepin-menu
+Version: 0.1
+Summary: Menu Service for Linux Deepin.
+Home-page: https://github.com/linuxdeepin/deepin-menu
+Author: Linux Deepin Team
+Author-email: wangyaohua@linuxdeepin.com
+License: GPL-3
+Download-URL: git://github.com/linuxdeepin/deepin-menu.git
+Description: Menu Service for Linux Deepin.
+Platform: Linux
