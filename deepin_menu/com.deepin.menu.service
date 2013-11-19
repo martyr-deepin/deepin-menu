@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=com.deepin.menu
-Exec=/usr/share/deepin-menu/main.py

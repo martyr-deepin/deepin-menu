@@ -25,6 +25,6 @@ setup(name='deepin_menu',
       download_url="git://github.com/linuxdeepin/deepin-menu.git",
       platforms = ['Linux'],
       packages = ['deepin_menu',],
-      data_files = list_files("deepin_menu","deepin_menu")
+      data_files = list_files("deepin_menu","deepin_menu") + [('/usr/share/dbus-1/services/', ['com.deepin.menu.service']),]
       )
 
