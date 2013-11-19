@@ -28,8 +28,10 @@ Rectangle {
         id: canvas
         width: rectWidth
         height: rectHeight
-        /* antialiasing: true */
-
+        
+        onWidthChanged: requestPaint()        
+        onHeightChanged: requestPaint()
+        
         onPaint: {
             var ctx = getContext("2d")
 
@@ -68,8 +70,7 @@ Rectangle {
                 ctx.lineTo(x,y+rectRadius);                 // left side
                 // draw top left corner
                 ctx.arcTo(x,y,x+rectRadius,y,rectRadius);
-            }
-            if (cornerDirection == "up") {
+            } else if (cornerDirection == "up") {
                 var x = blurWidth
                 var y = blurWidth + cornerHeight
                 var w = rectWidth - 2 * blurWidth
@@ -101,9 +102,7 @@ Rectangle {
                 ctx.lineTo(x,y+rectRadius);                 // left side
                 // draw top left corner
                 ctx.arcTo(x,y,x+rectRadius,y,rectRadius);
-            }
-
-            if (cornerDirection == "left") {
+            } else if (cornerDirection == "left") {
                 var x = blurWidth + cornerHeight
                 var y = blurWidth
                 var w = rectWidth - 2 * blurWidth - cornerHeight
@@ -135,9 +134,7 @@ Rectangle {
                 ctx.lineTo(x,y+rectRadius);                 // left side
                 // draw top left corner
                 ctx.arcTo(x,y,x+rectRadius,y,rectRadius);
-            }
-
-            if (cornerDirection == "right") {
+            } else if (cornerDirection == "right") {
                 var x = blurWidth
                 var y = blurWidth
                 var w = rectWidth - 2 * blurWidth - cornerHeight
@@ -178,15 +175,14 @@ Rectangle {
             ctx.strokeStyle = borderColor
             ctx.stroke()
 
-            ctx.clip()
             var gradient = ctx.createLinearGradient(rectWidth / 2, 0, rectWidth / 2, rectHeight);
             gradient.addColorStop(0.0, Qt.rgba(0, 0, 0, 0.55));
             gradient.addColorStop(1.0, Qt.rgba(0, 0, 0, 0.65));
             ctx.fillStyle = gradient
-            /* ctx.fillStyle = fillColor */
             ctx.fill()
 
-            ctx.restore()}
+            ctx.restore()
+        }
     }
 
     Glow {
