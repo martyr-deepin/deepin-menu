@@ -26,13 +26,13 @@ class MenuService(QObject):
         self.__injection = None
 
     def showMenu(self, x, y, content):
-        self.__view = Menu(x, y, content, True)
+        self.__view = Menu(x, y, content, False)
         self.__injection = Injection()
 
         show_menu(self.__view, self.__injection)
 
     def showDockMenu(self, x, y, content):
-        self.__view = Menu(x, y, content, False)
+        self.__view = Menu(x, y, content, True)
         self.__injection = Injection()
 
         show_menu(self.__view, self.__injection)

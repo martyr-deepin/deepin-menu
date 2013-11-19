@@ -58,7 +58,7 @@ class MenuServiceInterface(QDBusAbstractInterface):
     def showMenu(self, x, y, content):
         self.call('ShowMenu', x, y, content)
 
-    def showDockmenu(self, x, y, content):
+    def showDockMenu(self, x, y, content):
         self.call('ShowDockMenu', x, y, content)
 
 class MenuItem(QObject):
