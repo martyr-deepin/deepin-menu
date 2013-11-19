@@ -7,6 +7,7 @@ Rectangle {
 	/* focus: true */
     width: _injection.getScreenWidth()
     height: _injection.getScreenHeight()
+	color: Qt.rgba(0, 0, 0, 0)
 	
     MouseArea {
         id: mouseArea
