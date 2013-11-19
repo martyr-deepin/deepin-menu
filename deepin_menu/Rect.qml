@@ -13,7 +13,7 @@ Rectangle {
     property color borderColor: Qt.rgba(1, 1, 1, 0.15)
 
     property int blurRadius: 16
-    property int blurWidth: 5
+    property int blurWidth: 10
     property int borderWidth: 2
     property int rectRadius: 4
     property int rectWidth: 200

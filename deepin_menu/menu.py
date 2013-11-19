@@ -160,5 +160,6 @@ if __name__ == "__main__":
                  ("id_display", "Display")], is_root=True)
     menu.itemClicked.connect(test)
     menu.showDockMenu(200, 300)
+    # menu.showMenu(200, 300)
 
     sys.exit(app.exec_())
