@@ -138,6 +138,7 @@ class Menu(QQuickView):
     
     @pyqtSlot(str)
     def invokeItem(self, id):
+        print "invokdeItem", id
         msg = QDBusMessage.createSignal('/com/deepin/menu', 'com.deepin.menu.Menu', 'ItemInvoked')
         msg << id
         QDBusConnection.sessionBus().send(msg)

@@ -14,6 +14,11 @@ RectWithCorner {
 
     property var subMenuObj: null
 	property var fullscreenBg: null
+	
+	Component.onCompleted: {
+		menu.x = menu.x - menu.cornerPos
+		menu.y = menu.y - menu.rectHeight
+	}
 
     Component.onDestruction: {
         if (menu.subMenuObj != null) {

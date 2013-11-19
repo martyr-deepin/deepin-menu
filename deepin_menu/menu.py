@@ -122,12 +122,13 @@ class Menu(QObject):
         self.iface.showMenu(x, y, str(self))
         self.iface.ItemInvoked.connect(self.itemInvokedSlot)
 
-    def showDockmenu(self, x, y):
+    def showDockMenu(self, x, y):
         self.iface.showDockMenu(x, y, str(self))
         self.iface.ItemInvoked.connect(self.itemInvokedSlot)
 
     @pyqtSlot(str)
     def itemInvokedSlot(self, itemId):
+        print "emit", itemId
         self.itemClicked.emit(itemId)
 
     def __str__(self):
@@ -141,7 +142,7 @@ if __name__ == "__main__":
 
     @pyqtSlot(str)
     def test(s):
-        print s
+        print "test", s
 
     # 1)
     # driver = MenuItem("id_driver", "Driver", "/usr/share/icons/Deepin/apps/16/preferences-driver.png")
@@ -158,6 +159,6 @@ if __name__ == "__main__":
                  None, 
                  ("id_display", "Display")], is_root=True)
     menu.itemClicked.connect(test)
-    menu.showMenu(200, 200)
+    menu.showDockMenu(200, 200)
 
     sys.exit(app.exec_())
