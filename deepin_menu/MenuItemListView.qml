@@ -108,7 +108,7 @@ ListView {
         }
     }
 
-    function getSize() {
+    function getSize(menuItems) {
         var items = JSON.parse(menuItems)
         var _width = 0
         var _height = 0
@@ -131,7 +131,7 @@ ListView {
     }
 
     Component.onCompleted: {
-        var size = getSize()
+        var size = getSize(menuItems)
 
         listview.width = (Math.max(size.width, minWidth))
         listview.height = size.height
