@@ -12,7 +12,8 @@ Rectangle {
     property color blurColor: Qt.rgba(0, 0, 0, 1)
     property color borderColor: Qt.rgba(1, 1, 1, 0.15)
 
-    property int blurWidth: 16
+	property int blurRadius: 16
+    property int blurWidth: 5
     property int borderWidth: 2
     property int rectRadius: 4
     property int rectWidth: 200
@@ -20,6 +21,13 @@ Rectangle {
     property int cornerPos: rectWidth / 2
     property int cornerWidth: 24
     property int cornerHeight: 12
+	
+	Component.onCompleted: {
+		console.log("rectWidth", rectWidth)
+		console.log("rectHeight", rectHeight)
+		console.log("width", width)
+		console.log("height", height)
+	}
 
     Canvas {
         id: canvas
@@ -71,7 +79,7 @@ Rectangle {
     Glow {
         anchors.fill: canvas
 		visible: rect.withBlur
-        radius: blurWidth
+        radius: blurRadius
         samples: 16
         color: rect.blurColor
         source: canvas

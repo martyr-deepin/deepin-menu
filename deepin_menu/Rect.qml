@@ -12,7 +12,8 @@ Rectangle {
     property color blurColor: Qt.rgba(0, 0, 0, 1)
     property color borderColor: Qt.rgba(1, 1, 1, 0.15)
 
-    property int blurWidth: 16
+    property int blurRadius: 16
+    property int blurWidth: 5
     property int borderWidth: 2
     property int rectRadius: 4
     property int rectWidth: 200
