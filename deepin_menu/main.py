@@ -158,7 +158,7 @@ def show_menu(view, injection):
     view.setFormat(surface_format)
 
     view.setColor(QColor(0, 0, 0, 0))
-    view.setFlags(QtCore.Qt.FramelessWindowHint)
+    view.setFlags(QtCore.Qt.Popup)
     view.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'FullScreenMenu.qml')))
 
     view.show()
