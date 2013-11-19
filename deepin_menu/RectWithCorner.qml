@@ -22,13 +22,6 @@ Rectangle {
     property int cornerWidth: 24
     property int cornerHeight: 12
 	
-	Component.onCompleted: {
-		console.log("rectWidth", rectWidth)
-		console.log("rectHeight", rectHeight)
-		console.log("width", width)
-		console.log("height", height)
-	}
-
     Canvas {
         id: canvas
         width: rectWidth
