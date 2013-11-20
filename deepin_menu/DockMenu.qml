@@ -2,8 +2,9 @@ import QtQuick 2.0
 
 RectWithCorner {
     id: menu
-    rectWidth: listview.width + blurWidth * 2
-    rectHeight: listview.height + blurWidth * 2 + 2 * topBottomPadding + cornerHeight
+    rectWidth: listview.width + blurWidth * 2 + cornerHeight
+    rectHeight: listview.height + blurWidth * 2 + 2 * topBottomPadding
+	cornerDirection: "left"
 
     property alias fontColor: listview.textColor
     property alias currentMenuIndex: listview.currentIndex
@@ -29,9 +30,21 @@ RectWithCorner {
         menuItems: parent.menuItems
 
         anchors {
-            horizontalCenter: parent.horizontalCenter
-            top: parent.top
-            topMargin: parent.blurWidth + topBottomPadding
+            /* horizontalCenter: parent.horizontalCenter */
+			
+            /* top: parent.top */
+            /* topMargin: parent.blurWidth + topBottomPadding */
+			
+			/* bottom: parent.bottom */
+			/* bottomMargin: parent.blurWidth + topBottomPadding */
+			
+			verticalCenter: parent.verticalCenter
+			
+			/* left: parent.left */
+			/* leftMargin: parent.blurWidth */
+			
+			right: parent.right
+			rightMargin: parent.blurWidth
         }
 
         Component.onCompleted: {
