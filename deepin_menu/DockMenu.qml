@@ -3,8 +3,8 @@ import QtQuick 2.0
 RectWithCorner {
     id: menu
     rectWidth: listview.width + blurWidth * 2
-    rectHeight: listview.height + blurWidth * 2 + 2 * topBottomPadding + cornerHeight
-	cornerDirection: "down"
+    rectHeight: listview.height + blurWidth * 2 + 2 * topBottomPadding
+    cornerDirection: _menu_view.cornerDirection
 
     property alias fontColor: listview.textColor
     property alias currentMenuIndex: listview.currentIndex
@@ -29,30 +29,23 @@ RectWithCorner {
         fullscreenBg: parent.fullscreenBg
         menuItems: parent.menuItems
 
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-			
-            top: parent.top
-            topMargin: parent.blurWidth + topBottomPadding
-			
-			/* bottom: parent.bottom */
-			/* bottomMargin: parent.blurWidth + topBottomPadding */
-			
-			/* verticalCenter: parent.verticalCenter */
-			
-			/* left: parent.left */
-			/* leftMargin: parent.blurWidth */
-			
-			/* right: parent.right */
-			/* rightMargin: parent.blurWidth */
-        }
-
         Component.onCompleted: {
+			console.log(_menu_view.cornerDirection)
             if (menu.cornerDirection == "down" || menu.cornerDirection == "up") {
+				
+				rectHeight += cornerHeight
+                anchors.horizontalCenter = parent.horizontalCenter
+				
                 menu.x = menu.x - menu.cornerPos
 
                 if (menu.cornerDirection == "down"){
+                    anchors.top = parent.top
+                    anchors.topMargin = parent.blurWidth + topBottomPadding
+
                     menu.y = menu.y - menu.rectHeight
+                } else {
+                    anchors.bottom = parent.bottom
+                    anchors.bottomMargin = parent.blurWidth + topBottomPadding
                 }
 
                 var distance
@@ -72,10 +65,19 @@ RectWithCorner {
             }
 
             if (menu.cornerDirection == "left" || menu.cornerDirection == "right") {
+				rectWidth += cornerHeight
+                anchors.verticalCenter = parent.verticalCenter
+				
                 menu.y = menu.y - menu.cornerPos
 
                 if (menu.cornerDirection == "right") {
+                    anchors.left = parent.left
+                    anchors.leftMargin = parent.blurWidth
+
                     menu.x = menu.x + menu.rectWidth
+                } else {
+                    anchors.right = parent.right
+                    anchors.rightMargin = parent.blurWidth
                 }
 
                 var distance

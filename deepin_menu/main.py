@@ -31,9 +31,10 @@ class MenuService(QObject):
 
         show_menu(self.__view, self.__injection)
 
-    def showDockMenu(self, x, y, content):
+    def showDockMenu(self, x, y, content, direction):
         self.__view = Menu(x, y, content, True)
         self.__injection = Injection()
+        self.__view._cornerDirection = direction
 
         show_menu(self.__view, self.__injection)
 
@@ -52,6 +53,7 @@ class MenuServiceAdaptor(QDBusAbstractAdaptor):
                 '      <arg direction="in" type="i" name="x"/>\n'
                 '      <arg direction="in" type="i" name="y"/>\n'
                 '      <arg direction="in" type="s" name="content"/>\n'
+                '      <arg direction="in" type="s" name="cornerDirection"/>\n'
                 '    </method>\n'
                 '    <signal name="ItemInvoked">\n'
                 '      <arg direction="out" type="s" name="itemId"/>\n'
@@ -67,9 +69,9 @@ class MenuServiceAdaptor(QDBusAbstractAdaptor):
     def ShowMenu(self, x, y, content):
         self.parent().showMenu(x, y, content)
         
-    @pyqtSlot(int, int, str)
-    def ShowDockMenu(self, x, y, content):
-        self.parent().showDockMenu(x, y, content)
+    @pyqtSlot(int, int, str, str)
+    def ShowDockMenu(self, x, y, content, cornerDirection):
+        self.parent().showDockMenu(x, y, content, cornerDirection)
         
 class Injection(QObject):
     def __init__(self):
@@ -119,6 +121,7 @@ class Menu(QQuickView):
         self.__y = y
         self.__menuJsonContent = menuJsonContent
         self.__withCorner = withCorner
+        self._cornerDirection = "down"
 
     @pyqtProperty(int)
     def x(self):
@@ -135,6 +138,10 @@ class Menu(QQuickView):
     @pyqtProperty(str)
     def menuJsonContent(self):
         return self.__menuJsonContent
+    
+    @pyqtProperty(str)
+    def cornerDirection(self):
+        return self._cornerDirection
     
     @pyqtSlot(str)
     def invokeItem(self, id):

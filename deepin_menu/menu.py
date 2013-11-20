@@ -58,8 +58,8 @@ class MenuServiceInterface(QDBusAbstractInterface):
     def showMenu(self, x, y, content):
         self.call('ShowMenu', x, y, content)
 
-    def showDockMenu(self, x, y, content):
-        self.call('ShowDockMenu', x, y, content)
+    def showDockMenu(self, x, y, content, cornerDirection):
+        self.call('ShowDockMenu', x, y, content, cornerDirection)
 
 class MenuItem(QObject):
     def __init__(self, id, text, icon=None, subMenu=None):
@@ -122,8 +122,8 @@ class Menu(QObject):
         self.iface.showMenu(x, y, str(self))
         self.iface.ItemInvoked.connect(self.itemInvokedSlot)
 
-    def showDockMenu(self, x, y):
-        self.iface.showDockMenu(x, y, str(self))
+    def showDockMenu(self, x, y, cornerDirection="down"):
+        self.iface.showDockMenu(x, y, str(self), cornerDirection)
         self.iface.ItemInvoked.connect(self.itemInvokedSlot)
 
     @pyqtSlot(str)
