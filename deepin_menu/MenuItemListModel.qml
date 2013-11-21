@@ -12,6 +12,7 @@ ListModel {
         for (var i in items) {
             menuItemModel.append({"itemId": items[i].itemId,
                                   "itemIcon":items[i].itemIcon,
+                                  "itemIconHover":items[i].itemIconHover,
                                   "itemText":items[i].itemText,
                                   "itemSubMenu":JSON.stringify(items[i].itemSubMenu)})
 		}

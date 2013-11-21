@@ -49,12 +49,14 @@ ListView {
             if (lastCurrentItem != null) {
                 lastCurrentItem.itemTextColor = textColor
 				lastCurrentItem.itemArrowPic = listview.arrowDark
+				lastCurrentItem.itemIconPic = lastCurrentItem.iconNormal
             }
 
             /* selection effect */
             if (currentItem != null) {
                 currentItem.itemTextColor = "#00A4E2"
 				currentItem.itemArrowPic = listview.arrowDarkHover
+				currentItem.itemIconPic = currentItem.iconHover
             }
         } else {
             /* clear selection effect */

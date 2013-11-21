@@ -35,7 +35,9 @@ def parseMenuItem(menuItem):
     assert len(menuItem) >= 2
     result = MenuItem(menuItem[0], menuItem[1])
     if len(menuItem) > 2:
-        result.setSubMenu(parseMenu(Menu(is_root=False), menuItem[2]))
+        result.setIcons(menuItem[2])
+    if len(menuItem) > 3:
+        result.setSubMenu(parseMenu(Menu(is_root=False), menuItem[3]))
     return result
 
 def parseMenu(obj, menu):
@@ -62,25 +64,45 @@ class MenuServiceInterface(QDBusAbstractInterface):
         self.call('ShowDockMenu', x, y, content, cornerDirection)
 
 class MenuItem(QObject):
-    def __init__(self, id, text, icon=None, subMenu=None):
+    def __init__(self, id, text, icons=None, subMenu=None):
         super(MenuItem, self).__init__()
         self.id = id
         self.text = text
-        self.icon = icon or ""
+        self.icons = icons or ()
         self.subMenu = subMenu or Menu(is_root=False)
 
     @property
     def serializableContent(self):
+        iconNormal = ""
+        iconHover = ""
+        
+        if len(self.icons) > 0:
+            iconNormal = self.icons[0]
+            iconHover = self.icons[0]
+        if len(self.icons) > 1:
+            iconHover = self.icons[1]
+            
         return {"itemId": self.id,
-                "itemIcon": self.icon,
+                "itemIcon": iconNormal,
+                "itemIconHover": iconHover,
                 "itemText": self.text,
                 "itemSubMenu": self.subMenu.serializableItemList }
 
     def setSubMenu(self, menu):
         self.subMenu = menu
-
+        
+    def setIcons(self, icons):
+        self.icons = icons
+        
+    def hasSubMenu(self):
+        return str(self.subMenu) == "[]"
+        
     def __str__(self):
         return json.dumps(self.serializableContent)
+
+class CheckboxMenuItem(MenuItem):
+    def __init__(self, id, text):
+        super(MenuItem, self).__init__(id, text)
 
 class MenuSeparator(QObject):
     def __init__(self):
@@ -90,6 +112,7 @@ class MenuSeparator(QObject):
     def serializableContent(self):
         return {"itemId": "",
                 "itemIcon": "",
+                "itemIconHover": "",
                 "itemText": "",
                 "itemSubMenu": "[]"}
 
@@ -125,7 +148,7 @@ class Menu(QObject):
     def showDockMenu(self, x, y, cornerDirection="down"):
         self.iface.showDockMenu(x, y, str(self), cornerDirection)
         self.iface.ItemInvoked.connect(self.itemInvokedSlot)
-
+        
     @pyqtSlot(str)
     def itemInvokedSlot(self, itemId):
         print "emit", itemId
@@ -155,10 +178,11 @@ if __name__ == "__main__":
     # menu.showMenu(200, 200)
 
     # 2)
-    menu = Menu([("id_driver", "Driver", [("id_sub1", "SubMenu1"), ("id_sub2", "SubMenu2")]),
+    menu = Menu([("id_driver", "Driver", ("/usr/share/icons/Deepin/apps/16/preferences-display.png",), [("id_sub1", "SubMenu1"), ("id_sub2", "SubMenu2")]),
                  None, 
                  ("id_display", "Display")], is_root=True)
     menu.itemClicked.connect(test)
+    print menu
     menu.showDockMenu(200, 200)
     # menu.showMenu(1300, 300)
 

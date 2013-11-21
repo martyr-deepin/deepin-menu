@@ -22,16 +22,19 @@ Component {
         property color textColor: ListView.view.textColor
 		property bool isDockMenu: ListView.view.isDockMenu
 
-        property string componentSubMenu: itemSubMenu
         property string componentId: itemId
+        property string componentSubMenu: itemSubMenu
+		property string iconNormal: itemIcon
+		property string iconHover: itemIconHover
 
         property alias itemTextColor: componentText.color
 		property alias itemArrowPic: componentIndicator.source
+		property alias itemIconPic: componentImage.source
 
         Image {
             id: componentImage
             visible: itemIcon != ""
-            source: itemIcon
+            source: iconNormal
             anchors.left: parent.left
             anchors.leftMargin: horizontalPadding
             anchors.rightMargin: horizontalPadding
