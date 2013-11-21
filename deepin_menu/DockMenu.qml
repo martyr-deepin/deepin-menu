@@ -10,6 +10,8 @@ RectWithCorner {
 	property alias fontColorHover: listview.textColorHover
 	property alias fontColorNotActive: listview.textColorNotActive
     property alias currentMenuIndex: listview.currentIndex
+	property alias isCheckableMenu: listview.isCheckableMenu
+	property alias isSingleCheck: listview.isSingleCheck
 
     property bool isDockMenu: true
     property int topBottomPadding: 3
@@ -23,6 +25,7 @@ RectWithCorner {
             menu.subMenuObj.destroy()
         }
     }
+	
 
     MenuItemListView {
         id: listview
@@ -32,7 +35,6 @@ RectWithCorner {
         menuItems: parent.menuItems
 
         Component.onCompleted: {
-			console.log(_menu_view.cornerDirection)
             if (menu.cornerDirection == "down" || menu.cornerDirection == "up") {
 				
 				rectHeight += cornerHeight

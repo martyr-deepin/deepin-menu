@@ -6,7 +6,8 @@ ListModel {
 	property string menuItems: ""
 	
     Component.onCompleted: {
-        var items = JSON.parse(menuItems)
+        var menu = JSON.parse(menuItems)
+		var items = menu.items
         var _width = 0
         var _height = 0
         for (var i in items) {

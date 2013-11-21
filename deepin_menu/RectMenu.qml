@@ -5,12 +5,14 @@ Rect {
     rectWidth: listview.width + blurWidth * 2
     rectHeight: listview.height + blurWidth * 2 + 2 * topBottomPadding
 
-	property alias fontColor: listview.textColor
-	property alias fontColorHover: listview.textColorHover
-	property alias fontColorNotActive: listview.textColorNotActive
-	property alias currentMenuIndex: listview.currentIndex
-	
-	property bool isDockMenu: false
+    property alias fontColor: listview.textColor
+    property alias fontColorHover: listview.textColorHover
+    property alias fontColorNotActive: listview.textColorNotActive
+    property alias currentMenuIndex: listview.currentIndex
+    property alias isCheckableMenu: listview.isCheckableMenu
+    property alias isSingleCheck: listview.isSingleCheck
+
+    property bool isDockMenu: false
     property int topBottomPadding: 3
     property string menuItems: ""
 
@@ -22,11 +24,11 @@ Rect {
             menu.subMenuObj.destroy()
         }
     }
-
+	
     MenuItemListView {
         id: listview
 
-		isDockMenu: parent.isDockMenu
+        isDockMenu: parent.isDockMenu
         fullscreenBg: parent.fullscreenBg
         menuItems: parent.menuItems
 

@@ -24,7 +24,7 @@ Component {
 
         property string componentId: itemId
         property string componentSubMenu: itemSubMenu
-		property bool componentActive: isActive
+        property bool componentActive: isActive
         property bool componentCheckable: isCheckable
         property bool componentChecked: checked
         property string iconNormal: itemIcon
@@ -34,20 +34,38 @@ Component {
         property alias itemArrowPic: componentIndicator.source
         property alias itemIconPic: componentImage.source
 
+        Connections {
+            target: itemArea.ListView.view
+            onItemChecked: {
+				if (idx != index) {
+					componentChecked = false
+					itemIconPic = iconNormal
+				}
+            }
+        }
+
+        function checkThis() {
+            if (isDockMenu) {
+                iconNormal = "images/check_dark.png"
+                iconHover = "images/check_dark_hover.png"
+            } else {
+                iconNormal = "images/check_light.png"
+                iconHover = "images/check_light_hover.png"
+            }
+        }
+
+        function undoCheckThis() {
+            iconNormal = ""
+            iconHover = ""
+        }
+
         onComponentCheckedChanged: {
             if (componentCheckable) {
                 if (componentChecked ) {
-                    if (isDockMenu) {
-                        iconNormal = "images/check_dark.png"
-                        iconHover = "images/check_dark_hover.png"
-                    } else {
-                        iconNormal = "images/check_light.png"
-                        iconHover = "images/check_light_hover.png"
-                    }
+                    checkThis()
                 } else {
-					iconNormal = ""
-					iconHover = ""
-				}
+                    undoCheckThis()
+                }
             }
         }
 
@@ -77,7 +95,7 @@ Component {
 
         Image {
             id: componentIndicator
-            visible: componentSubMenu != "[]" && componentSubMenu != undefined && !isSep
+            visible: JSON.parse(componentSubMenu).items.length != 0 && componentSubMenu != undefined && !isSep
             source: parent.isDockMenu ? parent.ListView.view.arrowDark : parent.ListView.view.arrowLight
 
             anchors.verticalCenter: parent.verticalCenter
@@ -121,7 +139,7 @@ Component {
             anchors.fill: parent
             hoverEnabled: true
 
-            onPressed: MenuItemJs.onPressed(parent, menu)
+            onPressed: MenuItemJs.onPressed(index, parent, menu)
             onEntered: MenuItemJs.onEntered(index, parent, menu)
         }
     }

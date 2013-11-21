@@ -30,6 +30,10 @@ ListView {
     property string menuItems: ""
 
     property bool isDockMenu: false
+	property bool isCheckableMenu: false
+	property bool isSingleCheck: false
+	
+	signal itemChecked(int idx)
 
     /* below two property is created for onCurrentItemChanged method. */
     property int lastCurrentIndex: 0
@@ -91,7 +95,7 @@ ListView {
         }
 
         // Create new subMenu
-        if (currentItem.componentSubMenu != "[]") {
+        if (hasSubMenu(currentItem.componentSubMenu)) {
             if (currentItem.componentSubMenu != null) {
                 var component = Qt.createComponent("RectMenu.qml");
                 var component_menuItems = currentItem.componentSubMenu
@@ -99,6 +103,8 @@ ListView {
                 var component_size = currentItem.ListView.view.getSize(component_menuItems)
                 var component_width = component_size.width
                 var component_height = component_size.height
+				var component_is_checkable_menu = currentItem.ListView.view.isCheckableMenuTest(component_menuItems)
+				var component_is_single_check = currentItem.ListView.view.isSingleCheckTest(component_menuItems)
 
                 var component_x = menu.x + menu.width - menu.blurWidth * 2
                 var component_y = menu.y + currentItem.y
@@ -119,14 +125,32 @@ ListView {
                                                                  "fontColorHover": menu.fontColorHover,
                                                                  "fontColorNotActive": menu.fontColorNotActive,
                                                                  "isDockMenu": menu.isDockMenu,
+																 "isCheckableMenu": component_is_checkable_menu,
+																 "isSingleCheck": component_is_single_check,
                                                                  "menuItems": component_menuItems, "fullscreenBg": fullscreenBg});
                 menu.subMenuObj = obj
             }
         }
     }
+	
+	function hasSubMenu(menuItems) {
+		var menu = JSON.parse(menuItems)
+		return menu.items.length != 0
+	}
+	
+	function isCheckableMenuTest(menuItems) {
+        var menu = JSON.parse(menuItems)		
+		return menu.checkableMenu
+	}
+	
+	function isSingleCheckTest(menuItems) {
+        var menu = JSON.parse(menuItems)		
+		return menu.singleCheck
+	}
 
     function getSize(menuItems) {
-        var items = JSON.parse(menuItems)
+        var menu = JSON.parse(menuItems)
+		var items = menu.items
         var _width = 0
         var _height = 0
         for (var i in items) {
@@ -143,7 +167,6 @@ ListView {
                                     pictureSize + verticalPadding * 2)
             }
         }
-
         return {"width": _width, "height": _height}
     }
 
