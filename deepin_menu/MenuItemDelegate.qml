@@ -20,20 +20,39 @@ Component {
         property int textRightMargin: ListView.view.textRightMargin
         property int textSize: ListView.view.textSize
         property color textColor: ListView.view.textColor
-		property bool isDockMenu: ListView.view.isDockMenu
+        property bool isDockMenu: ListView.view.isDockMenu
 
         property string componentId: itemId
         property string componentSubMenu: itemSubMenu
-		property string iconNormal: itemIcon
-		property string iconHover: itemIconHover
+        property bool componentCheckable: isCheckable
+        property bool componentChecked: checked
+        property string iconNormal: itemIcon
+        property string iconHover: itemIconHover
 
         property alias itemTextColor: componentText.color
-		property alias itemArrowPic: componentIndicator.source
-		property alias itemIconPic: componentImage.source
+        property alias itemArrowPic: componentIndicator.source
+        property alias itemIconPic: componentImage.source
+
+        onComponentCheckedChanged: {
+            if (componentCheckable) {
+                if (componentChecked ) {
+                    if (isDockMenu) {
+                        iconNormal = "images/check_dark.png"
+                        iconHover = "images/check_dark_hover.png"
+                    } else {
+                        iconNormal = "images/check_light.png"
+                        iconHover = "images/check_light_hover.png"
+                    }
+                } else {
+					iconNormal = ""
+					iconHover = ""
+				}
+            }
+        }
 
         Image {
             id: componentImage
-            visible: itemIcon != ""
+            /* visible: itemIcon != "" */
             source: iconNormal
             anchors.left: parent.left
             anchors.leftMargin: horizontalPadding
@@ -47,20 +66,20 @@ Component {
             text: itemText
             color: textColor
             font.pixelSize: 12
-			
+
             anchors.left: parent.left
-			anchors.right: parent.right
+            anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             anchors.leftMargin: parent.textLeftMargin
-			anchors.rightMargin: parent.textRightMargin
+            anchors.rightMargin: parent.textRightMargin
         }
 
         Image {
             id: componentIndicator
             visible: componentSubMenu != "[]" && componentSubMenu != undefined && !isSep
-			source: parent.isDockMenu ? parent.ListView.view.arrowDark : parent.ListView.view.arrowLight
+            source: parent.isDockMenu ? parent.ListView.view.arrowDark : parent.ListView.view.arrowLight
 
-			anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             anchors.rightMargin: parent.horizontalPadding
         }

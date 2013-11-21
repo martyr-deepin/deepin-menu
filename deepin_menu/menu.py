@@ -45,6 +45,8 @@ def parseMenu(obj, menu):
     for menuItem in menu:
         if menuItem == None:
             result.addMenuItem(MenuSeparator())
+        elif isinstance(menuItem, MenuItem):
+            result.addMenuItem(menuItem)
         else:
             result.addMenuItem(parseMenuItem(menuItem))
     return result
@@ -64,12 +66,15 @@ class MenuServiceInterface(QDBusAbstractInterface):
         self.call('ShowDockMenu', x, y, content, cornerDirection)
 
 class MenuItem(QObject):
-    def __init__(self, id, text, icons=None, subMenu=None):
+    def __init__(self, id, text, icons=None, subMenu=None, isActive=True, isCheckable=False, checked=False): 
         super(MenuItem, self).__init__()
         self.id = id
         self.text = text
         self.icons = icons or ()
         self.subMenu = subMenu or Menu(is_root=False)
+        self.isActive = isActive
+        self.isCheckable = isCheckable
+        self.checked = checked
 
     @property
     def serializableContent(self):
@@ -86,7 +91,10 @@ class MenuItem(QObject):
                 "itemIcon": iconNormal,
                 "itemIconHover": iconHover,
                 "itemText": self.text,
-                "itemSubMenu": self.subMenu.serializableItemList }
+                "itemSubMenu": self.subMenu.serializableItemList,
+                "isActive": self.isActive,
+                "isCheckable": self.isCheckable, 
+                "checked": self.checked}
 
     def setSubMenu(self, menu):
         self.subMenu = menu
@@ -101,20 +109,12 @@ class MenuItem(QObject):
         return json.dumps(self.serializableContent)
 
 class CheckboxMenuItem(MenuItem):
-    def __init__(self, id, text):
-        super(MenuItem, self).__init__(id, text)
+    def __init__(self, id, text, checked=False):
+        super(CheckboxMenuItem, self).__init__(id, text, isCheckable=True, checked=checked)
 
-class MenuSeparator(QObject):
+class MenuSeparator(MenuItem):
     def __init__(self):
-        super(MenuSeparator, self).__init__()
-
-    @property
-    def serializableContent(self):
-        return {"itemId": "",
-                "itemIcon": "",
-                "itemIconHover": "",
-                "itemText": "",
-                "itemSubMenu": "[]"}
+        super(MenuSeparator, self).__init__("", "", isActive=False)
 
 class Menu(QObject):
     itemClicked = pyqtSignal(str)
@@ -180,7 +180,10 @@ if __name__ == "__main__":
     # 2)
     menu = Menu([("id_driver", "Driver", ("/usr/share/icons/Deepin/apps/16/preferences-display.png",), [("id_sub1", "SubMenu1"), ("id_sub2", "SubMenu2")]),
                  None, 
-                 ("id_display", "Display")], is_root=True)
+                 ("id_display", "Display"),
+                 MenuSeparator(),
+                 MenuItem("id_nonactive", "NotActive"),
+                 CheckboxMenuItem("id_check", "CheckMe", True)], is_root=True,)
     menu.itemClicked.connect(test)
     print menu
     menu.showDockMenu(200, 200)

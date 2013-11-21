@@ -14,7 +14,10 @@ ListModel {
                                   "itemIcon":items[i].itemIcon,
                                   "itemIconHover":items[i].itemIconHover,
                                   "itemText":items[i].itemText,
-                                  "itemSubMenu":JSON.stringify(items[i].itemSubMenu)})
+                                  "itemSubMenu":JSON.stringify(items[i].itemSubMenu),
+								  "isActive": items[i].isActive,
+								  "isCheckable": items[i].isCheckable,
+								  "checked": items[i].checked})
 		}
     }
 }

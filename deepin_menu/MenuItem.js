@@ -1,8 +1,12 @@
 function onPressed(menuItem, menu) {
 	if (menuItem.componentSubMenu == "[]") {
-		// menuItem.color = Qt.rgba(0, 100, 0, 0.9)
-		console.log(menuItem.componentId)
 		_menu_view.invokeItem(menuItem.componentId)
+		
+		if (menuItem.componentCheckable) {
+			menuItem.componentChecked = !menuItem.componentChecked
+			menuItem.itemIconPic = menuItem.iconHover
+			return
+		}
 		_application.quit()
 	}
 }
