@@ -74,7 +74,6 @@ ListView {
 
             /* selection effect */
             if (!currentItem.componentActive) {
-				console.log(currentItem.componentActive)
                 setNoSelection()
             } else {
                 setHasSelection()

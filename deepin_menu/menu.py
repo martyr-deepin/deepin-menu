@@ -166,7 +166,6 @@ class Menu(QObject):
         
     @pyqtSlot(str)
     def itemInvokedSlot(self, itemId):
-        print "emit", itemId
         self.itemClicked.emit(itemId)
 
     def __str__(self):
@@ -219,7 +218,6 @@ if __name__ == "__main__":
     sub = RadioButtonMenu([("id_radio1", "Radio1"), ("id_radio2", "Radio2"),])
     menu.getItemById("id_checkbox").setSubMenu(sub)
     menu.itemClicked.connect(test)
-    print menu
     menu.showDockMenu(200, 200)
     # menu.showMenu(300, 300)
 

@@ -43,7 +43,7 @@ Rectangle {
 			component_blur_radius = 16
 			component_font_color = Qt.rgba(1, 1, 1, 1)
 			component_font_color_hover = "#00A4E2"
-			component_font_color_not_active = Qt.rgba(0.5, 0.5, 0.5, 1)
+			component_font_color_not_active = "#646464"
 			component_is_dock_menu = true
 		} else {
 			component = Qt.createComponent("RectMenu.qml")
@@ -52,7 +52,7 @@ Rectangle {
 			component_blur_radius = 16
 			component_font_color = Qt.rgba(0, 0, 0, 1)			
 			component_font_color_hover = Qt.rgba(0, 0, 0, 1)			
-			component_font_color_not_active = Qt.rgba(0.5, 0.5, 0.5, 1)			
+			component_font_color_not_active = "#b4b4b4"
 			component_is_dock_menu = false
 		}
         component.createObject(fullscreen_bg, {"x": _menu_view.x, "y": _menu_view.y,
