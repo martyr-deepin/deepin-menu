@@ -24,6 +24,7 @@ Component {
 
         property string componentId: itemId
         property string componentSubMenu: itemSubMenu
+		property bool componentActive: isActive
         property bool componentCheckable: isCheckable
         property bool componentChecked: checked
         property string iconNormal: itemIcon
@@ -64,7 +65,7 @@ Component {
             id: componentText
             visible: itemText != ""
             text: itemText
-            color: textColor
+            color: componentActive ? textColor : textColorNotActive
             font.pixelSize: 12
 
             anchors.left: parent.left
@@ -121,7 +122,7 @@ Component {
             hoverEnabled: true
 
             onPressed: MenuItemJs.onPressed(parent, menu)
-            onEntered: MenuItemJs.onEntered(index, menu)
+            onEntered: MenuItemJs.onEntered(index, parent, menu)
         }
     }
 }

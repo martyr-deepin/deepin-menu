@@ -11,6 +11,6 @@ function onPressed(menuItem, menu) {
 	}
 }
 
-function onEntered(index, menu) {
-	menu.currentMenuIndex = index
+function onEntered(index, menuItem, menu) {
+	menu.currentMenuIndex = index	
 }

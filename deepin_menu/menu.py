@@ -182,11 +182,11 @@ if __name__ == "__main__":
                  None, 
                  ("id_display", "Display"),
                  MenuSeparator(),
-                 MenuItem("id_nonactive", "NotActive"),
+                 MenuItem("id_nonactive", "NotActive", isActive=False),
                  CheckboxMenuItem("id_check", "CheckMe", True)], is_root=True,)
     menu.itemClicked.connect(test)
     print menu
     menu.showDockMenu(200, 200)
-    # menu.showMenu(1300, 300)
+    # menu.showMenu(300, 300)
 
     sys.exit(app.exec_())

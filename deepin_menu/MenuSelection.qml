@@ -2,7 +2,6 @@ import QtQuick 2.1
 
 Component {
 	id: component
-	
 	Rectangle {
 		Rectangle {
 			id: topShader

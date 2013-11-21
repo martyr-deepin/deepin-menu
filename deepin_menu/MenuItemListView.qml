@@ -24,6 +24,8 @@ ListView {
     property string arrowLightHover: "images/arrow-light-hover.png"
 
     property color textColor: Qt.rgba(1, 1, 1, 1)
+    property color textColorHover: Qt.rgba(0, 0, 0, 1)
+    property color textColorNotActive: Qt.rgba(0.5, 0.5, 0.5, 1)
 
     property string menuItems: ""
 
@@ -47,26 +49,36 @@ ListView {
         if (isDockMenu) {
             /* clear selection effect */
             if (lastCurrentItem != null) {
-                lastCurrentItem.itemTextColor = textColor
-				lastCurrentItem.itemArrowPic = listview.arrowDark
-				lastCurrentItem.itemIconPic = lastCurrentItem.iconNormal
+                lastCurrentItem.itemTextColor = lastCurrentItem.componentActive ? textColor : textColorNotActive
+                lastCurrentItem.itemArrowPic = listview.arrowDark
+                lastCurrentItem.itemIconPic = lastCurrentItem.iconNormal
             }
 
             /* selection effect */
-            if (currentItem != null) {
-                currentItem.itemTextColor = "#00A4E2"
-				currentItem.itemArrowPic = listview.arrowDarkHover
-				currentItem.itemIconPic = currentItem.iconHover
+            if (currentItem != null && currentItem.componentActive) {
+                currentItem.itemTextColor = textColorHover
+                currentItem.itemArrowPic = listview.arrowDarkHover
+                currentItem.itemIconPic = currentItem.iconHover
             }
         } else {
             /* clear selection effect */
             if (lastCurrentItem != null) {
-				lastCurrentItem.itemArrowPic = listview.arrowLight
+                lastCurrentItem.itemTextColor = lastCurrentItem.componentActive ? textColor : textColorNotActive
+                lastCurrentItem.itemArrowPic = listview.arrowLight
+                lastCurrentItem.itemIconPic = lastCurrentItem.iconNormal
             }
 
             /* selection effect */
-            if (currentItem != null) {
-				currentItem.itemArrowPic = listview.arrowLightHover									
+            if (!currentItem.componentActive) {
+				console.log(currentItem.componentActive)
+                setNoSelection()
+            } else {
+                setHasSelection()
+            }
+            if (currentItem != null && currentItem.componentActive) {
+                currentItem.itemTextColor = textColorHover
+                currentItem.itemArrowPic = listview.arrowLightHover
+                currentItem.itemIconPic = currentItem.iconHover
             }
 
         }
@@ -102,7 +114,10 @@ ListView {
                 var obj = component.createObject(fullscreen_bg, {"x": component_x, "y": component_y,
                                                                  "borderColor": menu.borderColor,
                                                                  "blurWidth": menu.blurWidth,
-                                                                 "fillColor": menu.fillColor, "fontColor": menu.fontColor,
+                                                                 "fillColor": menu.fillColor,
+                                                                 "fontColor": menu.fontColor,
+                                                                 "fontColorHover": menu.fontColorHover,
+                                                                 "fontColorNotActive": menu.fontColorNotActive,
                                                                  "isDockMenu": menu.isDockMenu,
                                                                  "menuItems": component_menuItems, "fullscreenBg": fullscreenBg});
                 menu.subMenuObj = obj
@@ -132,6 +147,17 @@ ListView {
         return {"width": _width, "height": _height}
     }
 
+    function setHasSelection() {
+        var component = Qt.createComponent("MenuSelection.qml");
+        listview.highlight = component.createObject(listview, {})
+    }
+
+    function setNoSelection() {
+        var component = Qt.createQmlObject('import QtQuick 2.1; Component {Rectangle {visible:false}}',
+                                           listview, "highlight");
+        listview.highlight = component
+    }
+
     Component.onCompleted: {
         var size = getSize(menuItems)
 
@@ -139,8 +165,7 @@ ListView {
         listview.height = size.height
 
         if (!isDockMenu) {
-            var component = Qt.createComponent("MenuSelection.qml");
-            highlight = component.createObject(listview, {})
+            setHasSelection()
         }
     }
 }

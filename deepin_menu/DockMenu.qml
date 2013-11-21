@@ -7,6 +7,8 @@ RectWithCorner {
     cornerDirection: _menu_view.cornerDirection
 
     property alias fontColor: listview.textColor
+	property alias fontColorHover: listview.textColorHover
+	property alias fontColorNotActive: listview.textColorNotActive
     property alias currentMenuIndex: listview.currentIndex
 
     property bool isDockMenu: true
