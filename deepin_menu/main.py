@@ -165,7 +165,7 @@ def show_menu(view, injection):
 
     view.setColor(QColor(0, 0, 0, 0))
     view.setFlags(QtCore.Qt.Popup)
-    view.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'FullScreenMenu.qml')))
+    view.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'DockMenu.qml')))
 
     view.show()
 

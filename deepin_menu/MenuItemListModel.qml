@@ -3,10 +3,10 @@ import QtQuick 2.0
 ListModel {
     id: menuItemModel
 	
-	property string menuItems: ""
+	property string menuJsonContent: ""
 	
     Component.onCompleted: {
-        var menu = JSON.parse(menuItems)
+        var menu = JSON.parse(menuJsonContent)
 		var items = menu.items
         var _width = 0
         var _height = 0

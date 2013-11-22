@@ -1,105 +1,14 @@
-import QtQuick 2.0
+import QtQuick 2.1
 
-RectWithCorner {
+DockMenuWidget {
     id: menu
-    rectWidth: listview.width + blurWidth * 2
-    rectHeight: listview.height + blurWidth * 2 + 2 * topBottomPadding
-    cornerDirection: _menu_view.cornerDirection
 
-    property alias fontColor: listview.textColor
-	property alias fontColorHover: listview.textColorHover
-	property alias fontColorNotActive: listview.textColorNotActive
-    property alias currentMenuIndex: listview.currentIndex
-	property alias isCheckableMenu: listview.isCheckableMenu
-	property alias isSingleCheck: listview.isSingleCheck
-
-    property bool isDockMenu: true
-    property int topBottomPadding: 3
-    property string menuItems: ""
-
-    property var subMenuObj: null
-    property var fullscreenBg: null
-
-    Component.onDestruction: {
-        if (menu.subMenuObj != null) {
-            menu.subMenuObj.destroy()
-        }
-    }
-	
-
-    MenuItemListView {
-        id: listview
-
-        isDockMenu: parent.isDockMenu
-        fullscreenBg: parent.fullscreenBg
-        menuItems: parent.menuItems
-
-        Component.onCompleted: {
-            if (menu.cornerDirection == "down" || menu.cornerDirection == "up") {
-				
-				rectHeight += cornerHeight
-                anchors.horizontalCenter = parent.horizontalCenter
-				
-                menu.x = menu.x - menu.cornerPos
-
-                if (menu.cornerDirection == "down"){
-                    anchors.top = parent.top
-                    anchors.topMargin = parent.blurWidth + topBottomPadding
-
-                    menu.y = menu.y - menu.rectHeight
-                } else {
-                    anchors.bottom = parent.bottom
-                    anchors.bottomMargin = parent.blurWidth + topBottomPadding
-                }
-
-                var distance
-                distance = 0 - menu.x
-                if (distance > 0) {
-                    distance = Math.min(distance, menu.rectWidth - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
-                    menu.x += distance
-                    menu.cornerPos -= distance
-                }
-
-                var distance = menu.x + menu.width - fullscreenBg.width
-                if (distance > 0) {
-                    distance = Math.min(distance, menu.rectWidth - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
-                    menu.x -= distance
-                    menu.cornerPos += distance
-                }
-            }
-
-            if (menu.cornerDirection == "left" || menu.cornerDirection == "right") {
-				rectWidth += cornerHeight
-                anchors.verticalCenter = parent.verticalCenter
-				
-                menu.y = menu.y - menu.cornerPos
-
-                if (menu.cornerDirection == "right") {
-                    anchors.left = parent.left
-                    anchors.leftMargin = parent.blurWidth
-
-                    menu.x = menu.x + menu.rectWidth
-                } else {
-                    anchors.right = parent.right
-                    anchors.rightMargin = parent.blurWidth
-                }
-
-                var distance
-                distance = 0 - menu.y
-                if (distance > 0) {
-                    distance = Math.min(distance, menu.rectHeight - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
-                    menu.y += distance
-                    menu.cornerPos -= distance
-                }
-
-                var distance = menu.y + menu.height - fullscreenBg.height
-                if (distance > 0) {
-                    distance = Math.min(distance, menu.rectHeight - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
-                    menu.y -= distance
-                    menu.cornerPos += distance
-                }
-            }
-
-        }
-    }
+    fillColor: Qt.rgba(0, 0, 0, 0.6)
+    fontColor: Qt.rgba(1, 1, 1, 1)
+    fontColorHover: "#00A4E2"
+    fontColorNotActive: "#646464"
+    borderColor: Qt.rgba(1, 1, 1, 0.15)
+    blurRadius: 16
+    isDockMenu: true
+    menuJsonContent: _menu_view.menuJsonContent
 }

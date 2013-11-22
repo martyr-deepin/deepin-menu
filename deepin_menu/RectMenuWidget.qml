@@ -11,26 +11,13 @@ Rect {
     property alias currentMenuIndex: listview.currentIndex
     property alias isCheckableMenu: listview.isCheckableMenu
     property alias isSingleCheck: listview.isSingleCheck
+    property alias menuJsonContent: listview.menuJsonContent	
+	property alias isDockMenu: listview.isDockMenu
 
-    property bool isDockMenu: false
     property int topBottomPadding: 3
-    property string menuItems: ""
 
-    property var subMenuObj: null
-    property var fullscreenBg: null
-
-    Component.onDestruction: {
-        if (menu.subMenuObj != null) {
-            menu.subMenuObj.destroy()
-        }
-    }
-	
     MenuItemListView {
         id: listview
-
-        isDockMenu: parent.isDockMenu
-        fullscreenBg: parent.fullscreenBg
-        menuItems: parent.menuItems
 
         anchors {
             horizontalCenter: parent.horizontalCenter
