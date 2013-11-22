@@ -37,10 +37,10 @@ Component {
         Connections {
             target: itemArea.ListView.view
             onItemChecked: {
-				if (idx != index) {
-					componentChecked = false
-					itemIconPic = iconNormal
-				}
+                if (idx != index) {
+                    componentChecked = false
+                    itemIconPic = iconNormal
+                }
             }
         }
 
@@ -103,33 +103,55 @@ Component {
             anchors.rightMargin: parent.horizontalPadding
         }
 
-        Row {
+		Rectangle{
             visible: parent.isSep
             anchors.centerIn: parent
+            width: parent.width
+            height: 2
+			color: Qt.rgba(0, 0, 0, 0)
             Rectangle {
-                id: itemSeparator1
-                width: 1
-                height: itemArea.ListView.view.width - 4
-                transformOrigin: Item.Center
-                rotation: 90
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.1)}
-                    GradientStop { position: 0.5; color: Qt.rgba(1, 1, 1, 0.15) }
-                    GradientStop { position: 1.0; color: Qt.rgba(1, 1, 1, 0.1) }
-                }
-            }
+				width: parent.width
+				height: 1
+				color: Qt.rgba(0, 0, 0, 0)
+                Rectangle {
+                    id: itemSeparator1
+                    width: 1
+                    height: itemArea.ListView.view.width - 4
 
-            Rectangle {
-                id: itemSeparator
-                width: 1
-                height: itemArea.ListView.view.width - 4
-                transformOrigin: Item.Center
-                rotation: 90
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.1) }
-                    GradientStop { position: 0.5; color: Qt.rgba(0, 0, 0, 0.15) }
-                    GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.1) }
+                    transformOrigin: Item.Center
+                    rotation: 90
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.2) }
+                        GradientStop { position: 0.5; color: Qt.rgba(0, 0, 0, 0.25) }
+                        GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.2) }
+                    }
+
+                    anchors.centerIn: parent
                 }
+				anchors.top: parent.top
+				anchors.horizontalCenter: parent.horizontalCenter
+            }
+            Rectangle {
+				width: parent.width
+				height: 1
+				color: Qt.rgba(0, 0, 0, 0)				
+                Rectangle {
+                    id: itemSeparator
+                    width: 1
+                    height: itemArea.ListView.view.width - 4
+
+                    transformOrigin: Item.Center
+                    rotation: 90
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.1)}
+                        GradientStop { position: 0.5; color: Qt.rgba(1, 1, 1, 0.15) }
+                        GradientStop { position: 1.0; color: Qt.rgba(1, 1, 1, 0.1) }
+                    }
+
+                    anchors.centerIn: parent
+                }
+				anchors.bottom: parent.bottom
+				anchors.horizontalCenter: parent.horizontalCenter				
             }
         }
 
