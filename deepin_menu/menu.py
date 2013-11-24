@@ -22,6 +22,7 @@
 
 import json
 
+from PyQt5.QtGui import QColor
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from PyQt5.QtDBus import QDBusAbstractInterface, QDBusConnection, QDBusReply
 
@@ -45,6 +46,11 @@ def parseMenu(obj, menu):
             result.addMenuItem(parseMenuItem(menuItem))
     return result
 
+def getRgbaF(r, g, b, a):
+    color = QColor()
+    color.setRgbF(r, g, b, a)
+    return color.name()
+
 class MenuManagerInterface(QDBusAbstractInterface):
 
     MenuUnregistered = pyqtSignal(str)
@@ -66,7 +72,7 @@ class MenuObjectInterface(QDBusAbstractInterface):
     ItemInvoked = pyqtSignal(str)
 
     def __init__(self, path):
-        super(MenuObjectInterface, self).__init__("com.deepin.menu", 
+        super(MenuObjectInterface, self).__init__("com.deepin.menu",
                                                   path,
                                                   "com.deepin.menu.Menu",
                                                   QDBusConnection.sessionBus(), None)
@@ -171,6 +177,12 @@ class Menu(QObject):
         self.menuIface = MenuObjectInterface(reply.value())
         self.menuIface.showMenu(json.dumps({"x": x,
                                             "y": y,
+                                            "fillColor": "#00000099",
+                                            "fontColor": "#000000",
+                                            "fontColorHover": "000000",
+                                            "fontColorNotActive": "#b4b4b4",
+                                            "borderColor": "#00000026",
+                                            "blurRadius": 16,
                                             "isDockMenu": False,
                                             "menuJsonContent": str(self)}))
         self.menuIface.ItemInvoked.connect(self.itemInvokedSlot)
@@ -181,6 +193,12 @@ class Menu(QObject):
         self.menuIface = MenuObjectInterface(reply.value())
         self.menuIface.showMenu(json.dumps({"x": x,
                                             "y": y,
+                                            "fillColor": "#FFFFFF99",
+                                            "fontColor": "#FFFFFF",
+                                            "fontColorHover": "#00A4E2",
+                                            "fontColorNotActive": "#646464",
+                                            "borderColor": "#00000026",
+                                            "blurRadius": 16,
                                             "isDockMenu": True,
                                             "cornerDirection": cornerDirection,
                                             "menuJsonContent": str(self)}))
@@ -240,7 +258,7 @@ if __name__ == "__main__":
     sub = RadioButtonMenu([("id_radio1", "Radio1"), ("id_radio2", "Radio2"),])
     menu.getItemById("id_checkbox").setSubMenu(sub)
     menu.itemClicked.connect(test)
-    menu.showRectMenu(300, 300)
-    # menu.showDockMenu(300, 300)
+    # menu.showRectMenu(300, 300)
+    menu.showDockMenu(300, 300)
 
     sys.exit(app.exec_())

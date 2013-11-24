@@ -111,7 +111,7 @@ ListView {
                                                    "fontColor": menu.fontColor,
                                                    "fontColorHover": menu.fontColorHover,
                                                    "fontColorNotActive": menu.fontColorNotActive,
-                                                   "isDockMenu": menu.isDockMenu,
+                                                   "isDockMenu": false,
                                                    "isCheckableMenu": component_is_checkable_menu,
                                                    "isSingleCheck": component_is_single_check,
                                                    "menuJsonContent": component_menuJsonContent}))

@@ -1,13 +1,12 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 
-from PyQt5 import QtCore, QtQuick
+from PyQt5 import QtCore 
 from PyQt5.QtWidgets import QApplication, qApp
 from PyQt5.QtQuick import QQuickView
 from PyQt5.QtGui import QSurfaceFormat, QColor, QCursor, QFont, QFontMetrics
-from PyQt5.QtCore import QSize, QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal
+from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal
 from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusMessage
-import os
 import sys
 import json
 import signal
@@ -169,10 +168,8 @@ class Menu(QQuickView):
         self.setColor(QColor(0, 0, 0, 0))
         self.setFlags(QtCore.Qt.Popup)
         if self.menuJsonObj["isDockMenu"]:
-            print "dockmenu"
             self.setSource(QtCore.QUrl.fromLocalFile('DockMenu.qml'))
         else:
-            print "rectmenu"
             self.setSource(QtCore.QUrl.fromLocalFile('RectMenu.qml'))
 
         self.setX(self.menuJsonObj["x"])
