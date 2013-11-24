@@ -9,7 +9,6 @@ ListView {
     /* keyNavigationWraps: true */
     /* interactive: false */
 
-    property var fullscreenBg: null
     property int textSize: 12
     property int textLeftMargin: 22
     property int textRightMargin: 22
@@ -30,16 +29,15 @@ ListView {
     property string menuJsonContent: ""
 
     property bool isDockMenu: false
-	property bool isCheckableMenu: false
-	property bool isSingleCheck: false
-	
-	signal itemChecked(int idx)
+    property bool isCheckableMenu: false
+    property bool isSingleCheck: false
+
+    signal itemChecked(int idx)
 
     /* below two property is created for onCurrentItemChanged method. */
     property int lastCurrentIndex: 0
     property var lastCurrentItem: null
     onCurrentItemChanged: {
-        /* console.log(currentItem.isSep) */
         if (currentItem.isSep) {
             if (currentIndex > lastCurrentIndex) {
                 currentIndex += 1
@@ -83,73 +81,65 @@ ListView {
                 currentItem.itemArrowPic = listview.arrowLightHover
                 currentItem.itemIconPic = currentItem.iconHover
             }
-
         }
         lastCurrentItem = currentItem
 
-        // Destroy old subMenu
-        if (menu.subMenuObj != null) {
-            menu.subMenuObj.destroy(10)
-            menu.subMenuObj = null
-        }
-
         // Create new subMenu
         if (hasSubMenu(currentItem.componentSubMenu)) {
-            if (currentItem.componentSubMenu != null) {
-                var component = Qt.createComponent("RectMenu.qml");
-                var component_menuJsonContent = currentItem.componentSubMenu
+            var component_menuJsonContent = currentItem.componentSubMenu
 
-                var component_size = currentItem.ListView.view.getSize(component_menuJsonContent)
-                var component_width = component_size.width
-                var component_height = component_size.height
-				var component_is_checkable_menu = currentItem.ListView.view.isCheckableMenuTest(component_menuJsonContent)
-				var component_is_single_check = currentItem.ListView.view.isSingleCheckTest(component_menuJsonContent)
+            var component_size = currentItem.ListView.view.getSize(component_menuJsonContent)
+            var component_is_checkable_menu = currentItem.ListView.view.isCheckableMenuTest(component_menuJsonContent)
+            var component_is_single_check = currentItem.ListView.view.isSingleCheckTest(component_menuJsonContent)
+            var component_width = component_size.width
+            var component_height = component_size.height
 
-                var component_x = menu.x + menu.width - menu.blurWidth * 2
-                var component_y = menu.y + currentItem.y
+            var component_x = _menu_view.x + menu.x + menu.width - menu.blurWidth * 2
+            var component_y = _menu_view.y + menu.y + currentItem.y
 
-                if (component_x + component_width> fullscreen_bg.width) {
-                    component_x = menu.x - component_width
-                }
-
-                if (component_y + component_height > fullscreen_bg.height) {
-                    component_y = fullscreen_bg.height - component_height
-                }
-
-                var obj = component.createObject(fullscreen_bg, {"x": component_x, "y": component_y,
-                                                                 "borderColor": menu.borderColor,
-                                                                 "blurWidth": menu.blurWidth,
-                                                                 "fillColor": menu.fillColor,
-                                                                 "fontColor": menu.fontColor,
-                                                                 "fontColorHover": menu.fontColorHover,
-                                                                 "fontColorNotActive": menu.fontColorNotActive,
-                                                                 "isDockMenu": menu.isDockMenu,
-																 "isCheckableMenu": component_is_checkable_menu,
-																 "isSingleCheck": component_is_single_check,
-                                                                 "menuJsonContent": component_menuJsonContent, "fullscreenBg": fullscreenBg});
-                menu.subMenuObj = obj
+            if (component_x + component_width> _injection.getScreenWidth()) {
+                component_x = menu.x - component_width
             }
+
+            if (component_y + component_height > _injection.getScreenHeight()) {
+                component_y = _injection.getScreenHeight() - component_height
+            }
+
+            _menu_view.showSubMenu(JSON.stringify({"x": component_x, "y": component_y,
+                                                   "borderColor": menu.borderColor,
+                                                   "fillColor": menu.fillColor,
+                                                   "fontColor": menu.fontColor,
+                                                   "fontColorHover": menu.fontColorHover,
+                                                   "fontColorNotActive": menu.fontColorNotActive,
+                                                   "isDockMenu": menu.isDockMenu,
+                                                   "isCheckableMenu": component_is_checkable_menu,
+                                                   "isSingleCheck": component_is_single_check,
+                                                   "menuJsonContent": component_menuJsonContent}))
         }
     }
-	
-	function hasSubMenu(menuJsonContent) {
-		var menu = JSON.parse(menuJsonContent)
-		return menu.items.length != 0
-	}
-	
-	function isCheckableMenuTest(menuJsonContent) {
-        var menu = JSON.parse(menuJsonContent)		
-		return menu.checkableMenu
-	}
-	
-	function isSingleCheckTest(menuJsonContent) {
-        var menu = JSON.parse(menuJsonContent)		
-		return menu.singleCheck
-	}
+
+    function hasSubMenu(menuJsonContent) {
+        if (menuJsonContent == null) {
+            return false
+        }
+
+        var menu = JSON.parse(menuJsonContent)
+        return menu.items.length != 0
+    }
+
+    function isCheckableMenuTest(menuJsonContent) {
+        var menu = JSON.parse(menuJsonContent)
+        return menu.checkableMenu
+    }
+
+    function isSingleCheckTest(menuJsonContent) {
+        var menu = JSON.parse(menuJsonContent)
+        return menu.singleCheck
+    }
 
     function getSize(menuJsonContent) {
         var menu = JSON.parse(menuJsonContent)
-		var items = menu.items
+        var items = menu.items
         var _width = 0
         var _height = 0
         for (var i in items) {

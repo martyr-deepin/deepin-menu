@@ -42,7 +42,7 @@ RectWithCorner {
                     menu.cornerPos -= distance
                 }
 
-                var distance = menu.x + menu.width - fullscreenBg.width
+                var distance = menu.x + menu.width - _injection.getScreenWidth()
                 if (distance > 0) {
                     distance = Math.min(distance, menu.rectWidth - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
                     menu.x -= distance
@@ -71,7 +71,7 @@ RectWithCorner {
                     menu.cornerPos -= distance
                 }
 
-                var distance = menu.y + menu.height - fullscreenBg.height
+                var distance = menu.y + menu.height - _injection.getScreenHeight()
                 if (distance > 0) {
                     distance = Math.min(distance, menu.rectHeight - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
                     menu.y -= distance

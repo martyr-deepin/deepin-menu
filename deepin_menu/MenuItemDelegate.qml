@@ -13,7 +13,6 @@ Component {
         color: Qt.rgba(0, 0, 0, 0)
 
         property bool isSep: itemText == ""
-        property var fullscreenBg: ListView.view.fullscreenBg
         property int verticalPadding: ListView.view.verticalPadding
         property int horizontalPadding: ListView.view.horizontalPadding
         property int textLeftMargin: ListView.view.textLeftMargin

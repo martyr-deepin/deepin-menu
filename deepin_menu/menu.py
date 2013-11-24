@@ -23,13 +23,7 @@
 import json
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
-from PyQt5.QtDBus import QDBusAbstractInterface, QDBusConnection
-
-idIndex = 0
-
-DBUS_SERVICE = "com.deepin.menu"
-DBUS_PATH = "/com/deepin/menu"
-DBUS_INTERFACE = "com.deepin.menu.Menu"
+from PyQt5.QtDBus import QDBusAbstractInterface, QDBusConnection, QDBusReply
 
 def parseMenuItem(menuItem):
     assert len(menuItem) >= 2
@@ -51,22 +45,37 @@ def parseMenu(obj, menu):
             result.addMenuItem(parseMenuItem(menuItem))
     return result
 
-class MenuServiceInterface(QDBusAbstractInterface):
+class MenuManagerInterface(QDBusAbstractInterface):
+
+    MenuUnregistered = pyqtSignal(str)
+
+    def __init__(self):
+        super(MenuManagerInterface, self).__init__("com.deepin.menu",
+                                                   "/com/deepin/menu",
+                                                   "com.deepin.menu.Manager",
+                                                   QDBusConnection.sessionBus(), None)
+
+    def registerMenu(self):
+        return self.call('RegisterMenu')
+
+    def unregisterMenu(self, objPath):
+        self.call('UnregisterMenu', objPath)
+
+class MenuObjectInterface(QDBusAbstractInterface):
 
     ItemInvoked = pyqtSignal(str)
 
-    def __init__(self, ):
-        super(MenuServiceInterface, self).__init__(DBUS_SERVICE, DBUS_PATH, DBUS_INTERFACE,
-                                                   QDBusConnection.sessionBus(), None)
+    def __init__(self, path):
+        super(MenuObjectInterface, self).__init__("com.deepin.menu", 
+                                                  path,
+                                                  "com.deepin.menu.Menu",
+                                                  QDBusConnection.sessionBus(), None)
 
-    def showMenu(self, x, y, content):
-        self.call('ShowMenu', x, y, content)
-
-    def showDockMenu(self, x, y, content, cornerDirection):
-        self.call('ShowDockMenu', x, y, content, cornerDirection)
+    def showMenu(self, jsonContent):
+        self.call('ShowMenu', jsonContent)
 
 class MenuItem(QObject):
-    def __init__(self, id, text, icons=None, subMenu=None, isActive=True, isCheckable=False, checked=False): 
+    def __init__(self, id, text, icons=None, subMenu=None, isActive=True, isCheckable=False, checked=False):
         super(MenuItem, self).__init__()
         self.id = id
         self.text = text
@@ -80,32 +89,32 @@ class MenuItem(QObject):
     def serializableContent(self):
         iconNormal = ""
         iconHover = ""
-        
+
         if len(self.icons) > 0:
             iconNormal = self.icons[0]
             iconHover = self.icons[0]
         if len(self.icons) > 1:
             iconHover = self.icons[1]
-            
+
         return {"itemId": self.id,
                 "itemIcon": iconNormal,
                 "itemIconHover": iconHover,
                 "itemText": self.text,
                 "itemSubMenu": self.subMenu.serializableItemList,
                 "isActive": self.isActive,
-                "isCheckable": self.isCheckable, 
+                "isCheckable": self.isCheckable,
                 "checked": self.checked}
 
     def setSubMenu(self, menu):
         self.subMenu = menu
-        
+
     def setIcons(self, icons):
         self.icons = icons
-        
+
     @property
     def hasSubMenu(self):
         return len(self.subMenu.items) != 0
-        
+
     def __str__(self):
         return json.dumps(self.serializableContent)
 
@@ -126,7 +135,7 @@ class Menu(QObject):
         if items:
             parseMenu(self, items)
         if is_root:
-            self.iface = MenuServiceInterface()
+            self.managerIface = MenuManagerInterface()
         self.checkableMenu = checkableMenu
         self.singleCheck = singleCheck
 
@@ -145,7 +154,7 @@ class Menu(QObject):
     def addMenuItems(self, items):
         for item in items:
             self.addMenuItem(item)
-            
+
     def getItemById(self, id):
         for item in self.items:
             if item.hasSubMenu:
@@ -156,33 +165,46 @@ class Menu(QObject):
                     return item
         return None
 
-    def showMenu(self, x, y):
-        self.iface.showMenu(x, y, str(self))
-        self.iface.ItemInvoked.connect(self.itemInvokedSlot)
+    def showRectMenu(self, x, y):
+        msg = self.managerIface.registerMenu()
+        reply = QDBusReply(msg)
+        self.menuIface = MenuObjectInterface(reply.value())
+        self.menuIface.showMenu(json.dumps({"x": x,
+                                            "y": y,
+                                            "isDockMenu": False,
+                                            "menuJsonContent": str(self)}))
+        self.menuIface.ItemInvoked.connect(self.itemInvokedSlot)
 
     def showDockMenu(self, x, y, cornerDirection="down"):
-        self.iface.showDockMenu(x, y, str(self), cornerDirection)
-        self.iface.ItemInvoked.connect(self.itemInvokedSlot)
-        
+        msg = self.managerIface.registerMenu()
+        reply = QDBusReply(msg)
+        self.menuIface = MenuObjectInterface(reply.value())
+        self.menuIface.showMenu(json.dumps({"x": x,
+                                            "y": y,
+                                            "isDockMenu": True,
+                                            "cornerDirection": cornerDirection,
+                                            "menuJsonContent": str(self)}))
+        self.menuIface.ItemInvoked.connect(self.itemInvokedSlot)
+
     @pyqtSlot(str)
     def itemInvokedSlot(self, itemId):
         self.itemClicked.emit(itemId)
 
     def __str__(self):
         return json.dumps(self.serializableItemList)
-    
+
 class CheckboxMenu(Menu):
     def __init__(self, items):
         super(CheckboxMenu, self).__init__(items, checkableMenu=True, singleCheck=False)
-        
+
     def addMenuItem(self, item):
         item.isCheckable = True
         self.items.append(item)
-        
+
 class RadioButtonMenu(Menu):
     def __init__(self, items):
         super(RadioButtonMenu, self).__init__(items, checkableMenu=True, singleCheck=True)
-        
+
     def addMenuItem(self, item):
         item.isCheckable = True
         self.items.append(item)
@@ -209,7 +231,7 @@ if __name__ == "__main__":
 
     # 2)
     menu = Menu([("id_driver", "Driver", ("/usr/share/icons/Deepin/apps/16/preferences-display.png",), [("id_sub1", "SubMenu1"), ("id_sub2", "SubMenu2")]),
-                 None, 
+                 None,
                  ("id_display", "Display"),
                  ("id_checkbox", "CheckBoxMenu"),
                  MenuSeparator(),
@@ -218,7 +240,7 @@ if __name__ == "__main__":
     sub = RadioButtonMenu([("id_radio1", "Radio1"), ("id_radio2", "Radio2"),])
     menu.getItemById("id_checkbox").setSubMenu(sub)
     menu.itemClicked.connect(test)
-    menu.showDockMenu(200, 200)
-    # menu.showMenu(300, 300)
+    menu.showRectMenu(300, 300)
+    # menu.showDockMenu(300, 300)
 
     sys.exit(app.exec_())

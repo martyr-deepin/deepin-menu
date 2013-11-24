@@ -9,6 +9,7 @@ from PyQt5.QtCore import QSize, QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, py
 from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusMessage
 import os
 import sys
+import json
 import signal
 
 SCREEN_WIDTH = 0
@@ -21,58 +22,86 @@ class MenuService(QObject):
     def __init__(self):
         super(MenuService, self).__init__()
         self.__dbusAdaptor = MenuServiceAdaptor(self)
+        self._sessionBus = QDBusConnection.sessionBus()
 
-        self.__view = None
-        self.__injection = None
+        self.__count = -1
 
-    def showMenu(self, x, y, content):
-        self.__view = Menu(x, y, content, False)
-        self.__injection = Injection()
+    def registerMenu(self):
+        self.__count += 1
+        objPath = "/com/deepin/menu/%s" % self.__count
+        objPathHolder= objPath.replace("/", "_")
+        setattr(self, objPathHolder, MenuObject(objPath))
+        self._sessionBus.registerObject(objPath, getattr(self, objPathHolder))
+        return objPath
 
-        show_menu(self.__view, self.__injection)
-
-    def showDockMenu(self, x, y, content, direction):
-        self.__view = Menu(x, y, content, True)
-        self.__injection = Injection()
-        self.__view._cornerDirection = direction
-
-        show_menu(self.__view, self.__injection)
+    def unregisterMenu(self, objPath):
+        self._sessionBus.unregisterObject(objPath)
+        msg = QDBusMessage.createSignal('/com/deepin/menu', 'com.deepin.menu.Manager', 'MenuUnregistered')
+        msg << objPath
+        QDBusConnection.sessionBus().send(msg)
 
 class MenuServiceAdaptor(QDBusAbstractAdaptor):
     """DBus service for creating beautiful menus."""
+
+    Q_CLASSINFO("D-Bus Interface", "com.deepin.menu.Manager")
+    Q_CLASSINFO("D-Bus Introspection",
+                '  <interface name="com.deepin.menu.Manager">\n'
+                '    <method name="RegisterMenu">\n'
+                '      <arg direction="out" type="o" name="menuObjectPath"/>\n'
+                '    </method>\n'
+                '    <method name="UnregisterMenu">\n'
+                '      <arg direction="in" type="s" name="menuObjectPath"/>\n'
+                '    </method>\n'
+                '    <signal name="MenuUnregistered">\n'
+                '      <arg direction="out" type="o" name="menuObjectPath"/>\n'
+                '    </signal>\n'
+                '  </interface>\n')
+
+    MenuUnregistered = pyqtSignal(str)
+
+    def __init__(self, parent):
+        super(MenuServiceAdaptor, self).__init__(parent)
+
+    @pyqtSlot(result=str)
+    def RegisterMenu(self):
+        return self.parent().registerMenu()
+
+    @pyqtSlot(str)
+    def UnregisterMenu(self, objPath):
+        return self.parent().unregisterMenu(objPath)
+
+class MenuObject(QObject):
+    def __init__(self, objPath):
+        super(MenuObject, self).__init__()
+        self.__dbusAdaptor = MenuObjectAdaptor(self)
+        self.objPath = objPath
+
+    def showMenu(self, menuJsonContent):
+        self.menu = Menu(self.objPath, menuJsonContent)
+        self.menu.showMenu()
+
+class MenuObjectAdaptor(QDBusAbstractAdaptor):
 
     Q_CLASSINFO("D-Bus Interface", "com.deepin.menu.Menu")
     Q_CLASSINFO("D-Bus Introspection",
                 '  <interface name="com.deepin.menu.Menu">\n'
                 '    <method name="ShowMenu">\n'
-                '      <arg direction="in" type="i" name="x"/>\n'
-                '      <arg direction="in" type="i" name="y"/>\n'
-                '      <arg direction="in" type="s" name="content"/>\n'
-                '    </method>\n'
-                '    <method name="ShowDockMenu">\n'
-                '      <arg direction="in" type="i" name="x"/>\n'
-                '      <arg direction="in" type="i" name="y"/>\n'
-                '      <arg direction="in" type="s" name="content"/>\n'
-                '      <arg direction="in" type="s" name="cornerDirection"/>\n'
+                '      <arg direction="in" type="s" name="menuJsonContent"/>\n'
                 '    </method>\n'
                 '    <signal name="ItemInvoked">\n'
                 '      <arg direction="out" type="s" name="itemId"/>\n'
                 '    </signal>\n'
                 '  </interface>\n')
-    
+
     ItemInvoked = pyqtSignal(str)
 
     def __init__(self, parent):
-        super(MenuServiceAdaptor, self).__init__(parent)
+        super(MenuObjectAdaptor, self).__init__(parent)
 
-    @pyqtSlot(int, int, str)
-    def ShowMenu(self, x, y, content):
-        self.parent().showMenu(x, y, content)
-        
-    @pyqtSlot(int, int, str, str)
-    def ShowDockMenu(self, x, y, content, cornerDirection):
-        self.parent().showDockMenu(x, y, content, cornerDirection)
-        
+    @pyqtSlot(str)
+    def ShowMenu(self, menuJsonContent):
+        self.parent().showMenu(menuJsonContent)
+
 class Injection(QObject):
     def __init__(self):
         super(QObject, self).__init__()
@@ -88,101 +117,82 @@ class Injection(QObject):
     @pyqtSlot(str,int,result=int)
     def getStringWidth(self, string, pixelSize):
         font = QFont()
-        font.setPixelSize(12)
+        font.setPixelSize(pixelSize)
         fm = QFontMetrics(font)
         return fm.width(string)
 
     @pyqtSlot(str,int,result=int)
     def getStringHeight(self, string, pixelSize):
         font = QFont()
-        font.setPixelSize(12)
+        font.setPixelSize(pixelSize)
         fm = QFontMetrics(font)
-        fm.width(string)
         return fm.height()
-
-    # @pyqtSlot(int,int,int)
-    # def postMouseEvent(self, x, y, button):
-    #     print x, y, button
-    #     mouseReleaseEvent = QMouseEvent(
-    #         QEvent.MouseButtonPress,
-    #         QPointF(x, y),
-    #         QtCore.Qt.LeftButton,
-    #         QtCore.Qt.LeftButton,
-    #         QtCore.Qt.NoModifier,
-    #         )
-    #     QApplication.postEvent(self, mouseReleaseEvent)
 
 class Menu(QQuickView):
 
-    def __init__(self, x, y, menuJsonContent, withCorner):
+    def __init__(self, objPath, menuJsonContent):
         QQuickView.__init__(self)
-
-        self.__x = x
-        self.__y = y
+        
+        self.objPath = objPath
         self.__menuJsonContent = menuJsonContent
-        self.__withCorner = withCorner
-        self._cornerDirection = "down"
-
-    @pyqtProperty(int)
-    def x(self):
-        return self.__x
-
-    @pyqtProperty(int)
-    def y(self):
-        return self.__y
-
-    @pyqtProperty(bool)
-    def withCorner(self):
-        return self.__withCorner
+        self.__injection = Injection()
 
     @pyqtProperty(str)
     def menuJsonContent(self):
         return self.__menuJsonContent
-    
-    @pyqtProperty(str)
-    def cornerDirection(self):
-        return self._cornerDirection
-    
+
+    @pyqtProperty("QVariant")
+    def menuJsonObj(self):
+        return json.loads(self.__menuJsonContent)
+
     @pyqtSlot(str)
     def invokeItem(self, id):
-        msg = QDBusMessage.createSignal('/com/deepin/menu', 'com.deepin.menu.Menu', 'ItemInvoked')
+        msg = QDBusMessage.createSignal(self.objPath, 'com.deepin.menu.Menu', 'ItemInvoked')
         msg << id
         QDBusConnection.sessionBus().send(msg)
         
-def show_menu(view, injection):
-    qml_context = view.rootContext()
-    # qml_context.setContextProperty("_menu_items", )
-    qml_context.setContextProperty("_menu_view", view)
-    qml_context.setContextProperty("_application", qApp)
-    qml_context.setContextProperty("_injection", injection)
+    @pyqtSlot(str)
+    def showSubMenu(self, menuJsonContent):
+        self.subMenu = Menu(self.objPath, menuJsonContent)
+        self.subMenu.showMenu()
 
-    view.setResizeMode(QtQuick.QQuickView.SizeRootObjectToView)
-    view.setMinimumSize(QSize(70, 50))
+    def showMenu(self):
+        qml_context = self.rootContext()
+        qml_context.setContextProperty("_menu_view", self)
+        qml_context.setContextProperty("_application", qApp)
+        qml_context.setContextProperty("_injection", self.__injection)
 
-    surface_format = QSurfaceFormat()
-    surface_format.setAlphaBufferSize(8)
-    view.setFormat(surface_format)
+        surface_format = QSurfaceFormat()
+        surface_format.setAlphaBufferSize(8)
+        self.setFormat(surface_format)
 
-    view.setColor(QColor(0, 0, 0, 0))
-    view.setFlags(QtCore.Qt.Popup)
-    view.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'DockMenu.qml')))
+        self.setColor(QColor(0, 0, 0, 0))
+        self.setFlags(QtCore.Qt.Popup)
+        if self.menuJsonObj["isDockMenu"]:
+            print "dockmenu"
+            self.setSource(QtCore.QUrl.fromLocalFile('DockMenu.qml'))
+        else:
+            print "rectmenu"
+            self.setSource(QtCore.QUrl.fromLocalFile('RectMenu.qml'))
 
-    view.show()
+        self.setX(self.menuJsonObj["x"])
+        self.setY(self.menuJsonObj["y"])
+        
+        self.show()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    # app = QCoreApplication([])
     bus = QDBusConnection.sessionBus()
     menuService = MenuService()
-    bus.registerObject('/com/deepin/menu', menuService)
     bus.registerService('com.deepin.menu')
+    bus.registerObject('/com/deepin/menu', menuService)
 
     # retrieve the geometry of the screen
     desktopWidget = app.desktop()
     screenGeometry = desktopWidget.screenGeometry()
     SCREEN_WIDTH = screenGeometry.width()
     SCREEN_HEIGHT = screenGeometry.height()
-    
+
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     sys.exit(app.exec_())
