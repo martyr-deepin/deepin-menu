@@ -3,13 +3,13 @@ import QtQuick 2.1
 DockMenuWidget {
     id: menu
 
-    fillColor: _menu_view.menuJsonObj.fillColor
-    fontColor: _menu_view.menuJsonObj.fontColor
-    fontColorHover: _menu_view.menuJsonObj.fontColorHover
-    fontColorNotActive: _menu_view.menuJsonObj.fontColorNotActive
-    borderColor: _menu_view.menuJsonObj.borderColor
-    blurRadius: _menu_view.menuJsonObj.blurRadius
+    fillColor: Qt.rgba(0, 0, 0, 0.6)
+    fontColor: Qt.rgba(1, 1, 1, 1)
+    fontColorHover: "#00A4E2"
+    fontColorNotActive: "#646464"
+    borderColor: Qt.rgba(1, 1, 1, 0.15)
+    blurRadius: 16
     isDockMenu: true
-	cornerDirection: _menu_view.menuJsonObj.cornerDirection
+	cornerDirection: _menu_view.menuJsonObj.cornerDirection || "down"
     menuJsonContent: _menu_view.menuJsonObj.menuJsonContent
 }

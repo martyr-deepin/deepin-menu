@@ -129,10 +129,11 @@ class Injection(QObject):
 
 class Menu(QQuickView):
 
-    def __init__(self, objPath, menuJsonContent):
+    def __init__(self, objPath, menuJsonContent, isSubMenu=False):
         QQuickView.__init__(self)
         
         self.objPath = objPath
+        self.isSubMenu = isSubMenu
         self.__menuJsonContent = menuJsonContent
         self.__injection = Injection()
 
@@ -152,7 +153,7 @@ class Menu(QQuickView):
         
     @pyqtSlot(str)
     def showSubMenu(self, menuJsonContent):
-        self.subMenu = Menu(self.objPath, menuJsonContent)
+        self.subMenu = Menu(self.objPath, menuJsonContent, True)
         self.subMenu.showMenu()
 
     def showMenu(self):
@@ -167,7 +168,7 @@ class Menu(QQuickView):
 
         self.setColor(QColor(0, 0, 0, 0))
         self.setFlags(QtCore.Qt.Popup)
-        if self.menuJsonObj["isDockMenu"]:
+        if self.menuJsonObj["isDockMenu"] and not self.isSubMenu:
             self.setSource(QtCore.QUrl.fromLocalFile('DockMenu.qml'))
         else:
             self.setSource(QtCore.QUrl.fromLocalFile('RectMenu.qml'))

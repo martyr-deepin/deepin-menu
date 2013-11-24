@@ -4,7 +4,7 @@ RectWithCorner {
     id: menu
     rectWidth: listview.width + blurWidth * 2
     rectHeight: listview.height + blurWidth * 2 + 2 * topBottomPadding
-    cornerDirection: _menu_view.cornerDirection
+    cornerDirection: "down"
 
     property alias fontColor: listview.textColor
 	property alias fontColorHover: listview.textColorHover

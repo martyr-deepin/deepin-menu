@@ -104,14 +104,9 @@ ListView {
             if (component_y + component_height > _injection.getScreenHeight()) {
                 component_y = _injection.getScreenHeight() - component_height
             }
-
+			
             _menu_view.showSubMenu(JSON.stringify({"x": component_x, "y": component_y,
-                                                   "borderColor": menu.borderColor,
-                                                   "fillColor": menu.fillColor,
-                                                   "fontColor": menu.fontColor,
-                                                   "fontColorHover": menu.fontColorHover,
-                                                   "fontColorNotActive": menu.fontColorNotActive,
-                                                   "isDockMenu": false,
+												   "isDockMenu": menu.isDockMenu,
                                                    "isCheckableMenu": component_is_checkable_menu,
                                                    "isSingleCheck": component_is_single_check,
                                                    "menuJsonContent": component_menuJsonContent}))

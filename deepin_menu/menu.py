@@ -177,12 +177,6 @@ class Menu(QObject):
         self.menuIface = MenuObjectInterface(reply.value())
         self.menuIface.showMenu(json.dumps({"x": x,
                                             "y": y,
-                                            "fillColor": "#00000099",
-                                            "fontColor": "#000000",
-                                            "fontColorHover": "000000",
-                                            "fontColorNotActive": "#b4b4b4",
-                                            "borderColor": "#00000026",
-                                            "blurRadius": 16,
                                             "isDockMenu": False,
                                             "menuJsonContent": str(self)}))
         self.menuIface.ItemInvoked.connect(self.itemInvokedSlot)
@@ -193,12 +187,6 @@ class Menu(QObject):
         self.menuIface = MenuObjectInterface(reply.value())
         self.menuIface.showMenu(json.dumps({"x": x,
                                             "y": y,
-                                            "fillColor": "#FFFFFF99",
-                                            "fontColor": "#FFFFFF",
-                                            "fontColorHover": "#00A4E2",
-                                            "fontColorNotActive": "#646464",
-                                            "borderColor": "#00000026",
-                                            "blurRadius": 16,
                                             "isDockMenu": True,
                                             "cornerDirection": cornerDirection,
                                             "menuJsonContent": str(self)}))
