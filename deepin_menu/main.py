@@ -155,7 +155,7 @@ class Menu(QQuickView):
     def menuJsonContent(self):
         return self.__menuJsonContent
 
-    @pyqtProperty("QVariant")
+    @pyqtProperty("QVariant", constant=True)
     def menuJsonObj(self):
         return json.loads(self.__menuJsonContent)
     
