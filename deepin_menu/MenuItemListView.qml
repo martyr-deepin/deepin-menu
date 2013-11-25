@@ -40,14 +40,14 @@ ListView {
     }
 
     onItemUnchecked: {
-        _menu_view.updateCheckableItem(item.componentId, false)		
+        _menu_view.updateCheckableItem(item.componentId, false)
     }
-	
+
     /* below two property is created for onCurrentItemChanged method. */
     property int lastCurrentIndex: 0
     property var lastCurrentItem: null
     onCurrentItemChanged: {
-        if (currentItem.isSep) {
+        if (currentItem.isSep || !currentItem.componentActive) {
             if (currentIndex > lastCurrentIndex) {
                 currentIndex += 1
             }
@@ -92,7 +92,7 @@ ListView {
             }
         }
         lastCurrentItem = currentItem
-
+		
         // Create new subMenu
         if (hasSubMenu(currentItem.componentSubMenu)) {
             var component_menuJsonContent = currentItem.componentSubMenu
@@ -120,8 +120,8 @@ ListView {
                                                    "isSingleCheck": component_is_single_check,
                                                    "menuJsonContent": component_menuJsonContent}))
         } else {
-			_menu_view.showSubMenu(null)
-		}
+            _menu_view.showSubMenu(null)
+        }
     }
 
     function hasSubMenu(menuJsonContent) {
@@ -178,7 +178,7 @@ ListView {
 
     function updateCheckableItem(menuJsonContent, id, value) {
         var json = JSON.parse(menuJsonContent)
-		
+
         for (var item in json.items) {
             if (json.items[item].itemSubMenu.items.length != 0) {
                 updateCheckableItem(JSON.stringify(json.items[item].itemSubMenu), id, value)
@@ -187,7 +187,7 @@ ListView {
             }
         }
 
-		return JSON.stringify(json)
+        return JSON.stringify(json)
     }
 
     Component.onCompleted: {
@@ -200,15 +200,15 @@ ListView {
             setHasSelection()
         }
     }
-	
-	Keys.onEscapePressed: {
-		_menu_view.destroyMenu()
-	}
-	
-	Keys.onLeftPressed: {
-		_menu_view.activateParent()
-	}
-	Keys.onRightPressed: {
-		_menu_view.activateSubMenu()
-	}
+
+    Keys.onEscapePressed: {
+        _menu_view.destroyMenu()
+    }
+
+    Keys.onLeftPressed: {
+        _menu_view.activateParent()
+    }
+    Keys.onRightPressed: {
+        _menu_view.activateSubMenu()
+    }
 }
