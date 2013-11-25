@@ -3,10 +3,14 @@ function onPressed(index, menuItem, menu) {
 		_menu_view.invokeItem(menuItem.componentId)
 		
 		if (menuItem.componentCheckable) {
-			if (menu.isSingleCheck) {
-				menuItem.ListView.view.itemChecked(index)
-			}
+			
 			menuItem.componentChecked = !menuItem.componentChecked
+			if (menuItem.componentChecked) {
+				menuItem.ListView.view.itemChecked(index, menuItem)
+			} else {
+				menuItem.ListView.view.itemUnchecked(index, menuItem)
+			}
+			
 			menuItem.itemIconPic = menuItem.iconHover
 			return
 		}

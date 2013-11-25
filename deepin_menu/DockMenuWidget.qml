@@ -16,7 +16,11 @@ RectWithCorner {
 	property alias isDockMenu: listview.isDockMenu
 
     property int topBottomPadding: 3
-
+	
+	function updateCheckableItem(id, value) {
+		listview.currentItem.componentSubMenu = listview.updateCheckableItem(listview.currentItem.componentSubMenu, id, value)		
+	}
+	
     MenuItemListView {
         id: listview
 

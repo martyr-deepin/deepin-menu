@@ -10,6 +10,6 @@ DockMenuWidget {
     borderColor: Qt.rgba(1, 1, 1, 0.15)
     blurRadius: 16
     isDockMenu: true
-	cornerDirection: _menu_view.menuJsonObj.cornerDirection || "down"
+    cornerDirection: _menu_view.menuJsonObj.cornerDirection || "down"
     menuJsonContent: _menu_view.menuJsonObj.menuJsonContent
 }

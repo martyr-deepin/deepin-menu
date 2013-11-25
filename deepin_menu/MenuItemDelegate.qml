@@ -35,10 +35,12 @@ Component {
 
         Connections {
             target: itemArea.ListView.view
+			
             onItemChecked: {
-                if (idx != index) {
+                if (itemArea.ListView.view.isSingleCheck && idx != index) {
                     componentChecked = false
                     itemIconPic = iconNormal
+					itemArea.ListView.view.itemUnchecked(idx, itemArea)
                 }
             }
         }

@@ -1,7 +1,7 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 
-from PyQt5 import QtCore 
+from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, qApp
 from PyQt5.QtQuick import QQuickView
 from PyQt5.QtGui import QSurfaceFormat, QColor, QCursor, QFont, QFontMetrics
@@ -68,7 +68,7 @@ class MenuServiceAdaptor(QDBusAbstractAdaptor):
     @pyqtSlot(str)
     def UnregisterMenu(self, objPath):
         return self.parent().unregisterMenu(objPath)
-
+    
 class MenuObject(QObject):
     def __init__(self, objPath):
         super(MenuObject, self).__init__()
@@ -76,9 +76,9 @@ class MenuObject(QObject):
         self.objPath = objPath
 
     def showMenu(self, menuJsonContent):
-        self.menu = Menu(self.objPath, menuJsonContent)
+        self.menu = Menu(self, menuJsonContent)
         self.menu.showMenu()
-
+        
 class MenuObjectAdaptor(QDBusAbstractAdaptor):
 
     Q_CLASSINFO("D-Bus Interface", "com.deepin.menu.Menu")
@@ -100,7 +100,7 @@ class MenuObjectAdaptor(QDBusAbstractAdaptor):
     @pyqtSlot(str)
     def ShowMenu(self, menuJsonContent):
         self.parent().showMenu(menuJsonContent)
-
+        
 class Injection(QObject):
     def __init__(self):
         super(QObject, self).__init__()
@@ -129,13 +129,25 @@ class Injection(QObject):
 
 class Menu(QQuickView):
 
-    def __init__(self, objPath, menuJsonContent, isSubMenu=False):
+    def __init__(self, dbusObj, menuJsonContent, parent=None):
         QQuickView.__init__(self)
-        
-        self.objPath = objPath
-        self.isSubMenu = isSubMenu
+
+        self.dbusObj = dbusObj
+        self.parent = parent
         self.__menuJsonContent = menuJsonContent
         self.__injection = Injection()
+        
+    # def focusOutEvent(self, e):
+        # menuService.unregisterMenu(self.dbusObj.objPath)
+        # self.destroy()
+        
+    def __destroy(self):
+        menuService.unregisterMenu(self.dbusObj.objPath)
+        self.destroy()
+        
+    @pyqtProperty(bool)
+    def isSubMenu(self):
+        return not self.parent == None
 
     @pyqtProperty(str)
     def menuJsonContent(self):
@@ -144,16 +156,22 @@ class Menu(QQuickView):
     @pyqtProperty("QVariant")
     def menuJsonObj(self):
         return json.loads(self.__menuJsonContent)
+    
+    @pyqtSlot(str, bool)
+    def updateCheckableItem(self, id, value):
+        self.rootObject().updateCheckableItem(id, value)
+        if self.parent:
+            self.parent.updateCheckableItem(id, value)
 
     @pyqtSlot(str)
     def invokeItem(self, id):
-        msg = QDBusMessage.createSignal(self.objPath, 'com.deepin.menu.Menu', 'ItemInvoked')
+        msg = QDBusMessage.createSignal(self.dbusObj.objPath, 'com.deepin.menu.Menu', 'ItemInvoked')
         msg << id
         QDBusConnection.sessionBus().send(msg)
-        
+
     @pyqtSlot(str)
     def showSubMenu(self, menuJsonContent):
-        self.subMenu = Menu(self.objPath, menuJsonContent, True)
+        self.subMenu = Menu(self.dbusObj, menuJsonContent, self)
         self.subMenu.showMenu()
 
     def showMenu(self):
@@ -167,7 +185,7 @@ class Menu(QQuickView):
         self.setFormat(surface_format)
 
         self.setColor(QColor(0, 0, 0, 0))
-        self.setFlags(QtCore.Qt.Popup)
+        self.setFlags(QtCore.Qt.FramelessWindowHint)
         if self.menuJsonObj["isDockMenu"] and not self.isSubMenu:
             self.setSource(QtCore.QUrl.fromLocalFile('DockMenu.qml'))
         else:
@@ -175,7 +193,7 @@ class Menu(QQuickView):
 
         self.setX(self.menuJsonObj["x"])
         self.setY(self.menuJsonObj["y"])
-        
+
         self.show()
 
 if __name__ == "__main__":

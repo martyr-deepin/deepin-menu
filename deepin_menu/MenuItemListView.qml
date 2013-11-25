@@ -32,7 +32,16 @@ ListView {
     property bool isCheckableMenu: false
     property bool isSingleCheck: false
 
-    signal itemChecked(int idx)
+    signal itemChecked(int idx, var item)
+    signal itemUnchecked(int idx, var item)
+
+    onItemChecked: {
+        _menu_view.updateCheckableItem(item.componentId, true)
+    }
+
+    onItemUnchecked: {
+        _menu_view.updateCheckableItem(item.componentId, false)		
+    }
 
     /* below two property is created for onCurrentItemChanged method. */
     property int lastCurrentIndex: 0
@@ -104,9 +113,9 @@ ListView {
             if (component_y + component_height > _injection.getScreenHeight()) {
                 component_y = _injection.getScreenHeight() - component_height
             }
-			
+
             _menu_view.showSubMenu(JSON.stringify({"x": component_x, "y": component_y,
-												   "isDockMenu": menu.isDockMenu,
+                                                   "isDockMenu": menu.isDockMenu,
                                                    "isCheckableMenu": component_is_checkable_menu,
                                                    "isSingleCheck": component_is_single_check,
                                                    "menuJsonContent": component_menuJsonContent}))
@@ -163,6 +172,22 @@ ListView {
         var component = Qt.createQmlObject('import QtQuick 2.1; Component {Rectangle {visible:false}}',
                                            listview, "highlight");
         listview.highlight = component
+    }
+
+    function updateCheckableItem(menuJsonContent, id, value) {
+        var json = JSON.parse(menuJsonContent)
+        for (var item in json.items) {
+            console.log(json.items[item].itemText)
+            if (json.items[item].itemSubMenu.items.length != 0) {
+                console.log("has subment")
+                updateCheckableItem(JSON.stringify(json.items[item].itemSubMenu), id, value)
+            } else if (json.items[item].itemId == id){
+				console.log("it's there", value)
+                json.items[item].checked = value
+            }
+        }
+
+		return JSON.stringify(json)
     }
 
     Component.onCompleted: {
