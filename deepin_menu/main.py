@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, qApp
+from PyQt5.QtWidgets import QApplication
 from PyQt5.QtQuick import QQuickView
 from PyQt5.QtGui import QSurfaceFormat, QColor, QCursor, QFont, QFontMetrics
 from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal
@@ -136,16 +136,14 @@ class Menu(QQuickView):
         self.dbusObj = dbusObj
         self.parent = parent
         self.subMenu = None
+
         self.__menuJsonContent = menuJsonContent
         self.__injection = Injection()
         
-    # def focusOutEvent(self, e):
-        # menuService.unregisterMenu(self.dbusObj.objPath)
-        # self.destroy()
-        
-    def __destroy(self):
-        menuService.unregisterMenu(self.dbusObj.objPath)
-        self.destroy()
+    def focusOutEvent(self, e):
+        if (self.parent and self.parent.isActive()) or (self.subMenu and self.subMenu.isActive()):
+            return
+        self.destroyMenu()
         
     @pyqtProperty(bool)
     def isSubMenu(self):
@@ -180,16 +178,19 @@ class Menu(QQuickView):
     def activateSubMenu(self):
         if self.subMenu != None:
             self.subMenu.requestActivate()
+            self.subMenu.rootObject().selectItem(0)
             
     @pyqtSlot(str)
     def showSubMenu(self, menuJsonContent):
-        self.subMenu = Menu(self.dbusObj, menuJsonContent, self)
-        self.subMenu.showMenu()
+        if menuJsonContent:
+            self.subMenu = Menu(self.dbusObj, menuJsonContent, self)
+            self.subMenu.showMenu()
+        else:
+            self.subMenu = None
 
     def showMenu(self):
         qml_context = self.rootContext()
         qml_context.setContextProperty("_menu_view", self)
-        qml_context.setContextProperty("_application", qApp)
         qml_context.setContextProperty("_injection", self.__injection)
 
         surface_format = QSurfaceFormat()
@@ -207,7 +208,12 @@ class Menu(QQuickView):
         self.setY(self.menuJsonObj["y"])
 
         self.show()
-
+        
+    @pyqtSlot()
+    def destroyMenu(self):
+        menuService.unregisterMenu(self.dbusObj.objPath)
+        self.destroy()
+        
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 

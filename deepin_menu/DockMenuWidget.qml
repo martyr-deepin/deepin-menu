@@ -21,6 +21,10 @@ RectWithCorner {
 		listview.currentItem.componentSubMenu = listview.updateCheckableItem(listview.currentItem.componentSubMenu, id, value)		
 	}
 	
+	function selectItem(idx) {
+		listview.currentIndex = idx
+	}
+	
     MenuItemListView {
         id: listview
 

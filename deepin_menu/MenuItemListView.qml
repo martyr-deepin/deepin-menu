@@ -119,7 +119,9 @@ ListView {
                                                    "isCheckableMenu": component_is_checkable_menu,
                                                    "isSingleCheck": component_is_single_check,
                                                    "menuJsonContent": component_menuJsonContent}))
-        }
+        } else {
+			_menu_view.showSubMenu(null)
+		}
     }
 
     function hasSubMenu(menuJsonContent) {
@@ -198,4 +200,15 @@ ListView {
             setHasSelection()
         }
     }
+	
+	Keys.onEscapePressed: {
+		_menu_view.destroyMenu()
+	}
+	
+	Keys.onLeftPressed: {
+		_menu_view.activateParent()
+	}
+	Keys.onRightPressed: {
+		_menu_view.activateSubMenu()
+	}
 }
