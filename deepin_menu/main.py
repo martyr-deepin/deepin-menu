@@ -78,6 +78,7 @@ class MenuObject(QObject):
     def showMenu(self, menuJsonContent):
         self.menu = Menu(self, menuJsonContent)
         self.menu.showMenu()
+        self.menu.requestActivate()
         
 class MenuObjectAdaptor(QDBusAbstractAdaptor):
 
@@ -134,6 +135,7 @@ class Menu(QQuickView):
 
         self.dbusObj = dbusObj
         self.parent = parent
+        self.subMenu = None
         self.__menuJsonContent = menuJsonContent
         self.__injection = Injection()
         
@@ -168,7 +170,17 @@ class Menu(QQuickView):
         msg = QDBusMessage.createSignal(self.dbusObj.objPath, 'com.deepin.menu.Menu', 'ItemInvoked')
         msg << id
         QDBusConnection.sessionBus().send(msg)
-
+        
+    @pyqtSlot()
+    def activateParent(self):
+        if self.parent != None:
+            self.parent.requestActivate()
+        
+    @pyqtSlot()
+    def activateSubMenu(self):
+        if self.subMenu != None:
+            self.subMenu.requestActivate()
+            
     @pyqtSlot(str)
     def showSubMenu(self, menuJsonContent):
         self.subMenu = Menu(self.dbusObj, menuJsonContent, self)
@@ -185,7 +197,7 @@ class Menu(QQuickView):
         self.setFormat(surface_format)
 
         self.setColor(QColor(0, 0, 0, 0))
-        self.setFlags(QtCore.Qt.FramelessWindowHint)
+        self.setFlags(QtCore.Qt.Popup)
         if self.menuJsonObj["isDockMenu"] and not self.isSubMenu:
             self.setSource(QtCore.QUrl.fromLocalFile('DockMenu.qml'))
         else:

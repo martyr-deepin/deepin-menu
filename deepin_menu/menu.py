@@ -245,7 +245,6 @@ if __name__ == "__main__":
                  CheckboxMenuItem("id_check", "CheckMe", True)], is_root=True,)
     sub = RadioButtonMenu([("id_radio1", "Radio1"), ("id_radio2", "Radio2"),])
     menu.getItemById("id_checkbox").setSubMenu(sub)
-    print menu
     menu.itemClicked.connect(test)
     # menu.showRectMenu(300, 300)
     menu.showDockMenu(300, 300)

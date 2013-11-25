@@ -42,7 +42,7 @@ ListView {
     onItemUnchecked: {
         _menu_view.updateCheckableItem(item.componentId, false)		
     }
-
+	
     /* below two property is created for onCurrentItemChanged method. */
     property int lastCurrentIndex: 0
     property var lastCurrentItem: null
@@ -176,13 +176,11 @@ ListView {
 
     function updateCheckableItem(menuJsonContent, id, value) {
         var json = JSON.parse(menuJsonContent)
+		
         for (var item in json.items) {
-            console.log(json.items[item].itemText)
             if (json.items[item].itemSubMenu.items.length != 0) {
-                console.log("has subment")
                 updateCheckableItem(JSON.stringify(json.items[item].itemSubMenu), id, value)
             } else if (json.items[item].itemId == id){
-				console.log("it's there", value)
                 json.items[item].checked = value
             }
         }

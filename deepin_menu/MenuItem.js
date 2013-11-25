@@ -1,5 +1,5 @@
 function onPressed(index, menuItem, menu) {
-	if (JSON.parse(menuItem.componentSubMenu).items.length == 0) {
+	if (JSON.parse(menuItem.componentSubMenu).items.length == 0 && menuItem.componentActive == true) {
 		_menu_view.invokeItem(menuItem.componentId)
 		
 		if (menuItem.componentCheckable) {
