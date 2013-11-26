@@ -144,6 +144,7 @@ class Menu(QQuickView):
     def focusOutEvent(self, e):
         if (self.parent and self.parent.isActive()) or (self.subMenu and self.subMenu.isActive()):
             return
+        # self.destroyForward(True)
 
     @pyqtProperty(bool)
     def isSubMenu(self):

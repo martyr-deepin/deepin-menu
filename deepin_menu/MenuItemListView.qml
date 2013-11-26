@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import "MenuItem.js" as MenuItemJs
 
 ListView {
     id: listview
@@ -213,6 +214,6 @@ ListView {
         _menu_view.activateSubMenu()
     }
     Keys.onReturnPressed: {
-        _menu_view.invokeItem(currentItem.componentId, currentItem.componentChecked)
+		MenuItemJs.onPressed(currentIndex, currentItem, parent)
     }
 }
