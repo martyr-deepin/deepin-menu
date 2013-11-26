@@ -26,6 +26,7 @@ Component {
         property bool componentActive: isActive
         property bool componentCheckable: isCheckable
         property bool componentChecked: checked
+		property string componentShortcut: itemShortcut
         property string iconNormal: itemIcon
         property string iconHover: itemIconHover
 
@@ -43,6 +44,15 @@ Component {
 					itemArea.ListView.view.itemUnchecked(idx, itemArea)
                 }
             }
+			
+			onKeyDownSignal: {
+				console.log("==============")
+				console.log(keyCode)
+				console.log(_injection.keyStringToCode(componentShortcut))
+				if (keyCode == _injection.keyStringToCode(componentShortcut)) {
+					MenuItemJs.onPressed(index, itemArea, menu)					
+				}
+			}
         }
 
         function checkThis() {
@@ -132,6 +142,7 @@ Component {
 				anchors.top: parent.top
 				anchors.horizontalCenter: parent.horizontalCenter
             }
+			
             Rectangle {
 				width: parent.width
 				height: 1

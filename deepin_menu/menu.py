@@ -237,9 +237,9 @@ if __name__ == "__main__":
     # menu.showMenu(200, 200)
 
     # 2)
-    menu = Menu([("id_driver", "Driver", ("/usr/share/icons/Deepin/apps/16/preferences-display.png",), [("id_sub1", "SubMenu1"), ("id_sub2", "SubMenu2", (), [("id_sub1", "SubMenu1"), ("id_sub2", "SubMenu2")])]),
+    menu = Menu([("id_driver", "Driver", ("/usr/share/icons/Deepin/apps/16/preferences-display.png",), [("id_sub1", "SubMenu1"), ("id_sub2", "SubMenu2", (), [("id_sub1", "SubMenu1"), ("id_sub2", "_SubMenu2")])]),
                  None,
-                 ("id_display", "Display"),
+                 ("id_display", "_Display"),
                  ("id_checkbox", "CheckBoxMenu"),
                  MenuSeparator(),
                  MenuItem("id_nonactive", "NotActive", isActive=False),

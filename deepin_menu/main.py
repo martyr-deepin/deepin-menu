@@ -4,7 +4,7 @@
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtQuick import QQuickView
-from PyQt5.QtGui import QSurfaceFormat, QColor, QCursor, QFont, QFontMetrics
+from PyQt5.QtGui import QSurfaceFormat, QColor, QKeySequence, QCursor, QFont, QFontMetrics
 from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal
 from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusMessage
 import sys
@@ -128,6 +128,13 @@ class Injection(QObject):
         font.setPixelSize(pixelSize)
         fm = QFontMetrics(font)
         return fm.height()
+    
+    @pyqtSlot(str, result=int)
+    def keyStringToCode(self, s):
+        seq = QKeySequence(s)
+        if len(seq) > 0:
+            return seq[0]
+        return -1
 
 class Menu(QQuickView):
 

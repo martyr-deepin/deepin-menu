@@ -35,6 +35,7 @@ ListView {
 
     signal itemChecked(int idx, var item)
     signal itemUnchecked(int idx, var item)
+    signal keyDownSignal(int keyCode)
 
     onItemChecked: {
         _menu_view.updateCheckableItem(item.componentId, true)
@@ -202,18 +203,43 @@ ListView {
         }
     }
 
-    Keys.onEscapePressed: {
-        _menu_view.destroyForward(false)
-        _menu_view.destroyBackward(true)
-    }
+    /* Keys.onEscapePressed: { */
+    /*     _menu_view.destroyForward(false) */
+    /*     _menu_view.destroyBackward(true) */
+    /* } */
 
-    Keys.onLeftPressed: {
-        _menu_view.activateParent()
-    }
-    Keys.onRightPressed: {
-        _menu_view.activateSubMenu()
-    }
-    Keys.onReturnPressed: {
-		MenuItemJs.onPressed(currentIndex, currentItem, parent)
+    /* Keys.onLeftPressed: { */
+    /*     _menu_view.activateParent() */
+    /* } */
+    /* Keys.onRightPressed: { */
+    /*     _menu_view.activateSubMenu() */
+    /* } */
+    /* Keys.onReturnPressed: { */
+    /*     MenuItemJs.onPressed(currentIndex, currentItem, parent) */
+    /* } */
+
+    Keys.onPressed: {
+        switch(event.key) {
+			
+            case Qt.Key_Escape:
+            _menu_view.destroyForward(false)
+            _menu_view.destroyBackward(true)
+			break;
+			
+			case Qt.Key_Left:
+			_menu_view.activateParent()			
+			break;
+			
+			case Qt.Key_Right:
+			_menu_view.activateSubMenu()
+			break;
+			
+			case Qt.Key_Return:
+			MenuItemJs.onPressed(currentIndex, currentItem, parent)			
+			break;
+			
+			default:
+			keyDownSignal(event.key)
+        }
     }
 }
