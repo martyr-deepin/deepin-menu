@@ -46,9 +46,6 @@ Component {
             }
 			
 			onKeyDownSignal: {
-				console.log("==============")
-				console.log(keyCode)
-				console.log(_injection.keyStringToCode(componentShortcut))
 				if (keyCode == _injection.keyStringToCode(componentShortcut)) {
 					MenuItemJs.onPressed(index, itemArea, menu)					
 				}
