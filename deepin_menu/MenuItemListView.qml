@@ -120,7 +120,7 @@ ListView {
                                                    "isSingleCheck": component_is_single_check,
                                                    "menuJsonContent": component_menuJsonContent}))
         } else {
-            _menu_view.showSubMenu(null)
+            _menu_view.destroyForward(false)
         }
     }
 
@@ -202,7 +202,8 @@ ListView {
     }
 
     Keys.onEscapePressed: {
-        _menu_view.destroyMenu()
+        _menu_view.destroyForward(false)
+        _menu_view.destroyBackward(true)
     }
 
     Keys.onLeftPressed: {

@@ -68,7 +68,7 @@ class MenuServiceAdaptor(QDBusAbstractAdaptor):
     @pyqtSlot(str)
     def UnregisterMenu(self, objPath):
         return self.parent().unregisterMenu(objPath)
-    
+
 class MenuObject(QObject):
     def __init__(self, objPath):
         super(MenuObject, self).__init__()
@@ -79,7 +79,7 @@ class MenuObject(QObject):
         self.menu = Menu(self, menuJsonContent)
         self.menu.showMenu()
         self.menu.requestActivate()
-        
+
 class MenuObjectAdaptor(QDBusAbstractAdaptor):
 
     Q_CLASSINFO("D-Bus Interface", "com.deepin.menu.Menu")
@@ -102,7 +102,7 @@ class MenuObjectAdaptor(QDBusAbstractAdaptor):
     @pyqtSlot(str)
     def ShowMenu(self, menuJsonContent):
         self.parent().showMenu(menuJsonContent)
-        
+
 class Injection(QObject):
     def __init__(self):
         super(QObject, self).__init__()
@@ -140,14 +140,11 @@ class Menu(QQuickView):
 
         self.__menuJsonContent = menuJsonContent
         self.__injection = Injection()
-        
+
     def focusOutEvent(self, e):
         if (self.parent and self.parent.isActive()) or (self.subMenu and self.subMenu.isActive()):
             return
-        if self.parent: self.parent.destroyMenu()
-        if self.subMenu: self.subMenu.destroyMenu()
-        # self.destroyMenu()
-        
+
     @pyqtProperty(bool)
     def isSubMenu(self):
         return not self.parent == None
@@ -159,7 +156,7 @@ class Menu(QQuickView):
     @pyqtProperty("QVariant", constant=True)
     def menuJsonObj(self):
         return json.loads(self.__menuJsonContent)
-    
+
     @pyqtSlot(str, bool)
     def updateCheckableItem(self, id, value):
         self.rootObject().updateCheckableItem(id, value)
@@ -171,18 +168,18 @@ class Menu(QQuickView):
         msg = QDBusMessage.createSignal(self.dbusObj.objPath, 'com.deepin.menu.Menu', 'ItemInvoked')
         msg << id << checked
         QDBusConnection.sessionBus().send(msg)
-        
+
     @pyqtSlot()
     def activateParent(self):
         if self.parent != None:
             self.parent.requestActivate()
-        
+
     @pyqtSlot()
     def activateSubMenu(self):
         if self.subMenu != None:
             self.subMenu.requestActivate()
             self.subMenu.rootObject().selectItem(0)
-            
+
     @pyqtSlot(str)
     def showSubMenu(self, menuJsonContent):
         if menuJsonContent:
@@ -211,14 +208,25 @@ class Menu(QQuickView):
         self.setY(self.menuJsonObj["y"])
 
         self.show()
-        
-    @pyqtSlot()
-    def destroyMenu(self):
-        menuService.unregisterMenu(self.dbusObj.objPath)
-        if self.parent: self.activateParent()
-        if self.subMenu: self.subMenu.destroyMenu()
-        self.destroy()
-        
+
+    @pyqtSlot(bool)
+    def destroyBackward(self, includingSelf):
+        if includingSelf: 
+            self.destroy()
+            if not self.parent:
+                menuService.unregisterMenu(self.dbusObj.objPath)  
+        if self.parent:
+            self.parent.destroyBackward(True)
+
+    @pyqtSlot(bool)
+    def destroyForward(self, includingSelf):
+        if includingSelf: 
+            self.destroy()        
+            if not self.parent:
+                menuService.unregisterMenu(self.dbusObj.objPath)
+        if self.subMenu:
+            self.subMenu.destroyForward(True)
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
