@@ -92,7 +92,7 @@ ListView {
             }
         }
         lastCurrentItem = currentItem
-		
+
         // Create new subMenu
         if (hasSubMenu(currentItem.componentSubMenu)) {
             var component_menuJsonContent = currentItem.componentSubMenu
@@ -211,5 +211,8 @@ ListView {
     }
     Keys.onRightPressed: {
         _menu_view.activateSubMenu()
+    }
+    Keys.onReturnPressed: {
+        _menu_view.invokeItem(currentItem.componentId, currentItem.componentChecked)
     }
 }

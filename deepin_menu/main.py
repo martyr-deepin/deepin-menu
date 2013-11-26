@@ -215,6 +215,8 @@ class Menu(QQuickView):
             self.destroy()
             if not self.parent:
                 menuService.unregisterMenu(self.dbusObj.objPath)  
+        else:
+            self.requestActivate()
         if self.parent:
             self.parent.destroyBackward(True)
 
@@ -224,6 +226,8 @@ class Menu(QQuickView):
             self.destroy()        
             if not self.parent:
                 menuService.unregisterMenu(self.dbusObj.objPath)
+        else:
+            self.requestActivate()
         if self.subMenu:
             self.subMenu.destroyForward(True)
 
