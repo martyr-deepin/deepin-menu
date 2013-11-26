@@ -145,7 +145,7 @@ class Menu(QQuickView):
             return
         if self.parent: self.parent.destroyMenu()
         if self.subMenu: self.subMenu.destroyMenu()
-        self.destroyMenu()
+        # self.destroyMenu()
         
     @pyqtProperty(bool)
     def isSubMenu(self):
@@ -214,6 +214,7 @@ class Menu(QQuickView):
     @pyqtSlot()
     def destroyMenu(self):
         menuService.unregisterMenu(self.dbusObj.objPath)
+        if self.parent: self.activateParent()
         if self.subMenu: self.subMenu.destroyMenu()
         self.destroy()
         

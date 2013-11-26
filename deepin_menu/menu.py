@@ -46,11 +46,6 @@ def parseMenu(obj, menu):
             result.addMenuItem(parseMenuItem(menuItem))
     return result
 
-def getRgbaF(r, g, b, a):
-    color = QColor()
-    color.setRgbF(r, g, b, a)
-    return color.name()
-
 class MenuManagerInterface(QDBusAbstractInterface):
 
     MenuUnregistered = pyqtSignal(str)
@@ -81,7 +76,8 @@ class MenuObjectInterface(QDBusAbstractInterface):
         self.call('ShowMenu', jsonContent)
 
 class MenuItem(QObject):
-    def __init__(self, id, text, icons=None, subMenu=None, isActive=True, isCheckable=False, checked=False):
+    def __init__(self, id, text, icons=None, subMenu=None, 
+                 isActive=True, isCheckable=False, checked=False):
         super(MenuItem, self).__init__()
         self.id = id
         self.text = text
