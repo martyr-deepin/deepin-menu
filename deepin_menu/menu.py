@@ -22,7 +22,6 @@
 
 import json
 
-from PyQt5.QtGui import QColor
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from PyQt5.QtDBus import QDBusAbstractInterface, QDBusConnection, QDBusReply
 
@@ -64,7 +63,7 @@ class MenuManagerInterface(QDBusAbstractInterface):
 
 class MenuObjectInterface(QDBusAbstractInterface):
 
-    ItemInvoked = pyqtSignal(str)
+    ItemInvoked = pyqtSignal(str, bool)
 
     def __init__(self, path):
         super(MenuObjectInterface, self).__init__("com.deepin.menu",
@@ -129,7 +128,8 @@ class MenuSeparator(MenuItem):
         super(MenuSeparator, self).__init__("", "", isActive=False)
 
 class Menu(QObject):
-    itemClicked = pyqtSignal(str)
+    itemClicked = pyqtSignal(str, bool)
+    menuDismissed = pyqtSignal()
 
     def __init__(self, items=None, is_root=True, checkableMenu=False, singleCheck=False):
         super(Menu, self).__init__()
@@ -138,6 +138,7 @@ class Menu(QObject):
             parseMenu(self, items)
         if is_root:
             self.managerIface = MenuManagerInterface()
+            self.managerIface.MenuUnregistered.connect(self.menuUnregisteredSlot)
         self.checkableMenu = checkableMenu
         self.singleCheck = singleCheck
 
@@ -188,9 +189,13 @@ class Menu(QObject):
                                             "menuJsonContent": str(self)}))
         self.menuIface.ItemInvoked.connect(self.itemInvokedSlot)
 
-    @pyqtSlot(str)
-    def itemInvokedSlot(self, itemId):
-        self.itemClicked.emit(itemId)
+    @pyqtSlot(str, bool)
+    def itemInvokedSlot(self, itemId, checked):
+        self.itemClicked.emit(itemId, checked)
+
+    @pyqtSlot()
+    def menuUnregisteredSlot(self):
+        self.menuDismissed.emit()
 
     def __str__(self):
         return json.dumps(self.serializableItemList)
@@ -217,9 +222,9 @@ if __name__ == "__main__":
 
     app = QCoreApplication([])
 
-    @pyqtSlot(str)
-    def test(s):
-        print "test", s
+    @pyqtSlot(str, bool)
+    def test(s, c):
+        print "id: ", s, ", checked: ", c
 
     # 1)
     # driver = MenuItem("id_driver", "Driver", "/usr/share/icons/Deepin/apps/16/preferences-driver.png")

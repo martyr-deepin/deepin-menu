@@ -90,10 +90,11 @@ class MenuObjectAdaptor(QDBusAbstractAdaptor):
                 '    </method>\n'
                 '    <signal name="ItemInvoked">\n'
                 '      <arg direction="out" type="s" name="itemId"/>\n'
+                '      <arg direction="out" type="b" name="checked"/>\n'
                 '    </signal>\n'
                 '  </interface>\n')
 
-    ItemInvoked = pyqtSignal(str)
+    ItemInvoked = pyqtSignal(str, bool)
 
     def __init__(self, parent):
         super(MenuObjectAdaptor, self).__init__(parent)
@@ -165,10 +166,10 @@ class Menu(QQuickView):
         if self.parent:
             self.parent.updateCheckableItem(id, value)
 
-    @pyqtSlot(str)
-    def invokeItem(self, id):
+    @pyqtSlot(str, bool)
+    def invokeItem(self, id, checked):
         msg = QDBusMessage.createSignal(self.dbusObj.objPath, 'com.deepin.menu.Menu', 'ItemInvoked')
-        msg << id
+        msg << id << checked
         QDBusConnection.sessionBus().send(msg)
         
     @pyqtSlot()

@@ -1,6 +1,6 @@
 function onPressed(index, menuItem, menu) {
 	if (JSON.parse(menuItem.componentSubMenu).items.length == 0 && menuItem.componentActive == true) {
-		_menu_view.invokeItem(menuItem.componentId)
+		_menu_view.invokeItem(menuItem.componentId, menuItem.componentChecked)
 		
 		if (menuItem.componentCheckable) {
 			
