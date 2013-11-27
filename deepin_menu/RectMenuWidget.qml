@@ -23,7 +23,7 @@ Rect {
 	function selectItem(idx) {
 		listview.currentIndex = idx
 	}
-
+	
     MenuItemListView {
         id: listview
 

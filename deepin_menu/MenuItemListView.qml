@@ -105,11 +105,11 @@ ListView {
             var component_width = component_size.width
             var component_height = component_size.height
 
-            var component_x = _menu_view.x + menu.x + menu.width - menu.blurWidth * 2
-            var component_y = _menu_view.y + menu.y + currentItem.y
+            var component_x = _menu_view.x + menu.width - menu.blurWidth * 2
+            var component_y = _menu_view.y + currentItem.y
 
             if (component_x + component_width> _injection.getScreenWidth()) {
-                component_x = menu.x - component_width
+                component_x = _menu_view.x - component_width
             }
 
             if (component_y + component_height > _injection.getScreenHeight()) {
@@ -151,9 +151,9 @@ ListView {
         var _width = 0
         var _height = 0
         for (var i in items) {
-            if (_injection.getStringWidth(items[i].itemText, textSize)
+            if (_injection.getStringWidth(items[i].itemText.replace("_", ""), textSize)
                 + textLeftMargin + textRightMargin + horizontalPadding > _width) {
-                _width = _injection.getStringWidth(items[i].itemText, textSize)
+                _width = _injection.getStringWidth(items[i].itemText.replace("_", ""), textSize)
                 + textLeftMargin + textRightMargin + horizontalPadding
             }
 
@@ -164,7 +164,7 @@ ListView {
                                     pictureSize + verticalPadding * 2)
             }
         }
-        return {"width": _width, "height": _height}
+        return {"width": Math.max(_width, minWidth), "height": _height}
     }
 
     function setHasSelection() {
@@ -195,28 +195,13 @@ ListView {
     Component.onCompleted: {
         var size = getSize(menuJsonContent)
 
-        listview.width = (Math.max(size.width, minWidth))
+        listview.width = size.width
         listview.height = size.height
-
+		
         if (!isDockMenu) {
             setHasSelection()
         }
     }
-
-    /* Keys.onEscapePressed: { */
-    /*     _menu_view.destroyForward(false) */
-    /*     _menu_view.destroyBackward(true) */
-    /* } */
-
-    /* Keys.onLeftPressed: { */
-    /*     _menu_view.activateParent() */
-    /* } */
-    /* Keys.onRightPressed: { */
-    /*     _menu_view.activateSubMenu() */
-    /* } */
-    /* Keys.onReturnPressed: { */
-    /*     MenuItemJs.onPressed(currentIndex, currentItem, parent) */
-    /* } */
 
     Keys.onPressed: {
         switch(event.key) {

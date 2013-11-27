@@ -43,17 +43,17 @@ RectWithCorner {
                 }
 
                 var distance
-                distance = 0 - menu.x
+                distance = 0 - _menu_view.x
                 if (distance > 0) {
                     distance = Math.min(distance, menu.rectWidth - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
-                    menu.x += distance
+                    _menu_view.x += distance
                     menu.cornerPos -= distance
                 }
 
-                var distance = menu.x + menu.width - _injection.getScreenWidth()
+                var distance = _menu_view.x + menu.width - _injection.getScreenWidth()
                 if (distance > 0) {
                     distance = Math.min(distance, menu.rectWidth - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
-                    menu.x -= distance
+                    _menu_view.x -= distance
                     menu.cornerPos += distance
                 }
             }
@@ -72,17 +72,17 @@ RectWithCorner {
                 }
 
                 var distance
-                distance = 0 - menu.y
+                distance = 0 - _menu_view.y
                 if (distance > 0) {
                     distance = Math.min(distance, menu.rectHeight - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
-                    menu.y += distance
+                    _menu_view.y += distance
                     menu.cornerPos -= distance
                 }
 
                 var distance = menu.y + menu.height - _injection.getScreenHeight()
                 if (distance > 0) {
                     distance = Math.min(distance, menu.rectHeight - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
-                    menu.y -= distance
+                    _menu_view.y -= distance
                     menu.cornerPos += distance
                 }
             }

@@ -148,6 +148,7 @@ class Menu(QQuickView):
     def focusOutEvent(self, e):
         if (self.parent and self.parent.isActive()) or (self.subMenu and self.subMenu.isActive()):
             return
+        self.destroyBackward(False)
         self.destroyForward(True)
 
     @pyqtProperty(bool)
@@ -192,7 +193,7 @@ class Menu(QQuickView):
             self.subMenu.showMenu()
         else:
             self.subMenu = None
-
+            
     def showMenu(self):
         qml_context = self.rootContext()
         qml_context.setContextProperty("_menu_view", self)
@@ -204,13 +205,13 @@ class Menu(QQuickView):
 
         self.setColor(QColor(0, 0, 0, 0))
         self.setFlags(QtCore.Qt.Popup)
+        self.setX(self.menuJsonObj["x"])
+        self.setY(self.menuJsonObj["y"])
+
         if self.menuJsonObj["isDockMenu"] and not self.isSubMenu:
             self.setSource(QtCore.QUrl.fromLocalFile('DockMenu.qml'))
         else:
             self.setSource(QtCore.QUrl.fromLocalFile('RectMenu.qml'))
-
-        self.setX(self.menuJsonObj["x"])
-        self.setY(self.menuJsonObj["y"])
 
         self.show()
 

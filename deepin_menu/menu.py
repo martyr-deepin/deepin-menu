@@ -241,9 +241,9 @@ if __name__ == "__main__":
     # menu.showMenu(200, 200)
 
     # 2)
-    menu = Menu([("id_driver", "Driver", ("/usr/share/icons/Deepin/apps/16/preferences-display.png",), [("id_sub1", "SubMenu1"), ("id_sub2", "SubMenu2", (), [("id_sub1", "SubMenu1"), ("id_sub2", "_SubMenu2")])]),
+    menu = Menu([("id_driver", "Driver", ("/usr/share/icons/Deepin/apps/16/preferences-display.png",), [("id_sub1", "SubMenu1"), ("id_sub2", "SubMenu2", (), [("id_sub1", "SubMenu1"), ("id_sub2", "_SubMenu2", (), [("id_sub1", "SubMenu1"), ("id_sub2", "_SubMenu2", (), [("id_sub1", "SubMenu1"), ("id_sub2", "_SubMenu2")])])])]),
                  None,
-                 ("id_display", "_Display"),
+                 ("id_display", "_Display", (), [("id_radio1", "Radio1"), ("id_radio2", "Radio2"),]),
                  ("id_checkbox", "CheckBoxMenu"),
                  MenuSeparator(),
                  MenuItem("id_nonactive", "NotActive", isActive=False),
@@ -252,7 +252,7 @@ if __name__ == "__main__":
     menu.getItemById("id_checkbox").setSubMenu(sub)
     menu.itemClicked.connect(invoked)
     menu.menuDismissed.connect(dismissed)
-    menu.showRectMenu(300, 300)
-    # menu.showDockMenu(300, 300)
+    # menu.showRectMenu(1300, 300)
+    menu.showDockMenu(1300, 500)
 
     sys.exit(app.exec_())
