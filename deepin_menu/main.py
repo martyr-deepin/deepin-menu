@@ -146,7 +146,7 @@ class Menu(QQuickView):
         self.__injection = Injection()
 
     def focusOutEvent(self, e):
-        if (self.parent and self.parent.isActive()) or (self.subMenu and self.subMenu.isActive()):
+        if self.ancestorHasFocus() or self.descendantHasFocus():
             return
         self.destroyBackward(False)
         self.destroyForward(True)
@@ -154,6 +154,24 @@ class Menu(QQuickView):
     @pyqtProperty(bool)
     def isSubMenu(self):
         return not self.parent == None
+    
+    def ancestorHasFocus(self):
+        if self.parent:
+            if self.parent.isActive():
+                return True
+            else:
+                return self.parent.ancestorHasFocus()
+        else:
+            return False
+        
+    def descendantHasFocus(self):
+        if self.subMenu:
+            if self.subMenu.isActive():
+                return True
+            else:
+                return self.subMenu.descendantHasFocus()
+        else:
+            return False
 
     @pyqtProperty(str)
     def menuJsonContent(self):

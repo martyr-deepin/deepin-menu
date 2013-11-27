@@ -97,6 +97,7 @@ ListView {
 
         // Create new subMenu
         if (hasSubMenu(currentItem.componentSubMenu)) {
+            _menu_view.destroyForward(false)			
             var component_menuJsonContent = currentItem.componentSubMenu
 
             var component_size = currentItem.ListView.view.getSize(component_menuJsonContent)
@@ -106,7 +107,7 @@ ListView {
             var component_height = component_size.height
 
             var component_x = _menu_view.x + menu.width - menu.blurWidth * 2
-            var component_y = _menu_view.y + currentItem.y
+            var component_y = _menu_view.y + y + currentItem.y - menu.blurWidth
 
             if (component_x + component_width> _injection.getScreenWidth()) {
                 component_x = _menu_view.x - component_width
