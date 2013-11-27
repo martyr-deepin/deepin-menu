@@ -47,8 +47,6 @@ def parseMenu(obj, menu):
 
 class MenuManagerInterface(QDBusAbstractInterface):
 
-    MenuUnregistered = pyqtSignal(str)
-
     def __init__(self):
         super(MenuManagerInterface, self).__init__("com.deepin.menu",
                                                    "/com/deepin/menu",
@@ -64,6 +62,7 @@ class MenuManagerInterface(QDBusAbstractInterface):
 class MenuObjectInterface(QDBusAbstractInterface):
 
     ItemInvoked = pyqtSignal(str, bool)
+    MenuUnregistered = pyqtSignal()
 
     def __init__(self, path):
         super(MenuObjectInterface, self).__init__("com.deepin.menu",
@@ -138,7 +137,6 @@ class Menu(QObject):
             parseMenu(self, items)
         if is_root:
             self.managerIface = MenuManagerInterface()
-            self.managerIface.MenuUnregistered.connect(self.menuUnregisteredSlot)
         self.checkableMenu = checkableMenu
         self.singleCheck = singleCheck
 
@@ -177,6 +175,7 @@ class Menu(QObject):
                                             "isDockMenu": False,
                                             "menuJsonContent": str(self)}))
         self.menuIface.ItemInvoked.connect(self.itemInvokedSlot)
+        self.menuIface.MenuUnregistered.connect(self.menuUnregisteredSlot)
 
     def showDockMenu(self, x, y, cornerDirection="down"):
         msg = self.managerIface.registerMenu()
@@ -188,6 +187,7 @@ class Menu(QObject):
                                             "cornerDirection": cornerDirection,
                                             "menuJsonContent": str(self)}))
         self.menuIface.ItemInvoked.connect(self.itemInvokedSlot)
+        self.menuIface.MenuUnregistered.connect(self.menuUnregisteredSlot)        
 
     @pyqtSlot(str, bool)
     def itemInvokedSlot(self, itemId, checked):
@@ -223,8 +223,12 @@ if __name__ == "__main__":
     app = QCoreApplication([])
 
     @pyqtSlot(str, bool)
-    def test(s, c):
+    def invoked(s, c):
         print "id: ", s, ", checked: ", c
+        
+    @pyqtSlot()
+    def dismissed():
+        print "dismissed"
 
     # 1)
     # driver = MenuItem("id_driver", "Driver", "/usr/share/icons/Deepin/apps/16/preferences-driver.png")
@@ -246,7 +250,8 @@ if __name__ == "__main__":
                  CheckboxMenuItem("id_check", "CheckMe", True)], is_root=True,)
     sub = RadioButtonMenu([("id_radio1", "Radio1"), ("id_radio2", "Radio2"),])
     menu.getItemById("id_checkbox").setSubMenu(sub)
-    menu.itemClicked.connect(test)
+    menu.itemClicked.connect(invoked)
+    menu.menuDismissed.connect(dismissed)
     menu.showRectMenu(300, 300)
     # menu.showDockMenu(300, 300)
 

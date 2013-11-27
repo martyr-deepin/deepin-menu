@@ -35,8 +35,7 @@ class MenuService(QObject):
 
     def unregisterMenu(self, objPath):
         self._sessionBus.unregisterObject(objPath)
-        msg = QDBusMessage.createSignal('/com/deepin/menu', 'com.deepin.menu.Manager', 'MenuUnregistered')
-        msg << objPath
+        msg = QDBusMessage.createSignal(objPath, 'com.deepin.menu.Menu', 'MenuUnregistered')
         QDBusConnection.sessionBus().send(msg)
 
 class MenuServiceAdaptor(QDBusAbstractAdaptor):
@@ -51,12 +50,7 @@ class MenuServiceAdaptor(QDBusAbstractAdaptor):
                 '    <method name="UnregisterMenu">\n'
                 '      <arg direction="in" type="s" name="menuObjectPath"/>\n'
                 '    </method>\n'
-                '    <signal name="MenuUnregistered">\n'
-                '      <arg direction="out" type="o" name="menuObjectPath"/>\n'
-                '    </signal>\n'
                 '  </interface>\n')
-
-    MenuUnregistered = pyqtSignal(str)
 
     def __init__(self, parent):
         super(MenuServiceAdaptor, self).__init__(parent)
@@ -92,9 +86,12 @@ class MenuObjectAdaptor(QDBusAbstractAdaptor):
                 '      <arg direction="out" type="s" name="itemId"/>\n'
                 '      <arg direction="out" type="b" name="checked"/>\n'
                 '    </signal>\n'
+                '    <signal name="MenuUnregistered">\n'
+                '    </signal>\n'
                 '  </interface>\n')
 
     ItemInvoked = pyqtSignal(str, bool)
+    MenuUnregistered = pyqtSignal()
 
     def __init__(self, parent):
         super(MenuObjectAdaptor, self).__init__(parent)
@@ -176,7 +173,7 @@ class Menu(QQuickView):
         msg = QDBusMessage.createSignal(self.dbusObj.objPath, 'com.deepin.menu.Menu', 'ItemInvoked')
         msg << id << checked
         QDBusConnection.sessionBus().send(msg)
-
+        
     @pyqtSlot()
     def activateParent(self):
         if self.parent != None:
