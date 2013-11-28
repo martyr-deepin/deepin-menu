@@ -7,6 +7,7 @@ from PyQt5.QtQuick import QQuickView
 from PyQt5.QtGui import QSurfaceFormat, QColor, QKeySequence, QCursor, QFont, QFontMetrics
 from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal
 from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusMessage
+import os
 import sys
 import json
 import signal
@@ -125,7 +126,7 @@ class Injection(QObject):
         font.setPixelSize(pixelSize)
         fm = QFontMetrics(font)
         return fm.height()
-    
+
     @pyqtSlot(str, result=int)
     def keyStringToCode(self, s):
         seq = QKeySequence(s)
@@ -145,7 +146,7 @@ class Menu(QQuickView):
         self.__menuJsonContent = menuJsonContent
         self.__injection = Injection()
         qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
-        
+
     def focusWindowChangedSlot(self, window):
         if not self:
             return
@@ -153,15 +154,15 @@ class Menu(QQuickView):
             self.destroyForward(True)
 
     # def focusOutEvent(self, e):
-        # if self.ancestorHasFocus() or self.descendantHasFocus():
-            # return
-        # self.destroyBackward(False)
-        # self.destroyForward(True)
-        
+    # if self.ancestorHasFocus() or self.descendantHasFocus():
+    # return
+    # self.destroyBackward(False)
+    # self.destroyForward(True)
+
     @pyqtProperty(bool)
     def isSubMenu(self):
         return not self.parent == None
-    
+
     # def ancestorHasFocus(self):
     #     if self.parent:
     #         if self.parent.isActive():
@@ -170,7 +171,7 @@ class Menu(QQuickView):
     #             return self.parent.ancestorHasFocus()
     #     else:
     #         return False
-        
+
     # def descendantHasFocus(self):
     #     if self.subMenu:
     #         if self.subMenu.isActive():
@@ -199,7 +200,7 @@ class Menu(QQuickView):
         msg = QDBusMessage.createSignal(self.dbusObj.objPath, 'com.deepin.menu.Menu', 'ItemInvoked')
         msg << id << checked
         QDBusConnection.sessionBus().send(msg)
-        
+
     @pyqtSlot()
     def activateParent(self):
         if self.parent != None:
@@ -218,7 +219,7 @@ class Menu(QQuickView):
             self.subMenu.showMenu()
         else:
             self.subMenu = None
-            
+
     def showMenu(self):
         qml_context = self.rootContext()
         qml_context.setContextProperty("_menu_view", self)
@@ -234,18 +235,20 @@ class Menu(QQuickView):
         self.setY(self.menuJsonObj["y"])
 
         if self.menuJsonObj["isDockMenu"] and not self.isSubMenu:
-            self.setSource(QtCore.QUrl.fromLocalFile('DockMenu.qml'))
+            print os.path.join(__file__, 'DockMenu.qml')
+            self.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'DockMenu.qml')))
         else:
-            self.setSource(QtCore.QUrl.fromLocalFile('RectMenu.qml'))
+            print os.path.join(__file__, 'RectMenu.qml')            
+            self.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'RectMenu.qml')))
 
         self.show()
 
     @pyqtSlot(bool)
     def destroyBackward(self, includingSelf):
-        if includingSelf: 
+        if includingSelf:
             self.destroy()
             if not self.parent:
-                menuService.unregisterMenu(self.dbusObj.objPath)  
+                menuService.unregisterMenu(self.dbusObj.objPath)
         else:
             self.requestActivate()
         if self.parent:
@@ -253,19 +256,19 @@ class Menu(QQuickView):
 
     @pyqtSlot(bool)
     def destroyForward(self, includingSelf):
-        if includingSelf: 
-            self.destroy()        
+        if includingSelf:
+            self.destroy()
             if not self.parent:
                 menuService.unregisterMenu(self.dbusObj.objPath)
         else:
             self.requestActivate()
         if self.subMenu:
             self.subMenu.destroyForward(True)
-            
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    
+
     bus = QDBusConnection.sessionBus()
     menuService = MenuService()
     bus.registerService('com.deepin.menu')
