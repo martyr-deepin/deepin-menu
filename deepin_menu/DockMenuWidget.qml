@@ -36,7 +36,7 @@ RectWithCorner {
 				
                 if (menu.cornerDirection == "down"){
 					_menu_view.x -= cornerPos
-					_menu_view.y -= menu.width
+					_menu_view.y -= menu.height
                     anchors.top = parent.top
                     anchors.topMargin = parent.blurWidth + topBottomPadding
                 } else {
