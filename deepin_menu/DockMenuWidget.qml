@@ -35,9 +35,12 @@ RectWithCorner {
                 anchors.horizontalCenter = parent.horizontalCenter
 				
                 if (menu.cornerDirection == "down"){
+					_menu_view.x -= cornerPos
+					_menu_view.y -= menu.width
                     anchors.top = parent.top
                     anchors.topMargin = parent.blurWidth + topBottomPadding
                 } else {
+					_menu_view.x -= cornerPos
                     anchors.bottom = parent.bottom
                     anchors.bottomMargin = parent.blurWidth + topBottomPadding
                 }
@@ -63,10 +66,13 @@ RectWithCorner {
                 anchors.verticalCenter = parent.verticalCenter
 
                 if (menu.cornerDirection == "right") {
+					_menu_view.x -= _menu_view.width
+					_menu_view.y -= cornerPos
                     anchors.left = parent.left
                     anchors.leftMargin = parent.blurWidth
 
                 } else {
+					_menu_view.y -= cornerPos
                     anchors.right = parent.right
                     anchors.rightMargin = parent.blurWidth
                 }

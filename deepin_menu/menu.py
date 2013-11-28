@@ -252,7 +252,7 @@ if __name__ == "__main__":
     menu.getItemById("id_checkbox").setSubMenu(sub)
     menu.itemClicked.connect(invoked)
     menu.menuDismissed.connect(dismissed)
-    menu.showRectMenu(300, 300)
-    # menu.showDockMenu(1300, 500)
+    # menu.showRectMenu(300, 300)
+    menu.showDockMenu(1366, 768)
 
     sys.exit(app.exec_())

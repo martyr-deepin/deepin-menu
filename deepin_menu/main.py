@@ -235,10 +235,8 @@ class Menu(QQuickView):
         self.setY(self.menuJsonObj["y"])
 
         if self.menuJsonObj["isDockMenu"] and not self.isSubMenu:
-            print os.path.join(__file__, 'DockMenu.qml')
             self.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'DockMenu.qml')))
         else:
-            print os.path.join(__file__, 'RectMenu.qml')            
             self.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'RectMenu.qml')))
 
         self.show()
