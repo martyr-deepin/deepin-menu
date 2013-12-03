@@ -25,12 +25,13 @@ class MenuService(QObject):
         self._sessionBus = QDBusConnection.sessionBus()
 
         self.__count = -1
+        self.__menu = None
 
     def registerMenu(self):
         self.__count += 1
         objPath = "/com/deepin/menu/%s" % self.__count
         objPathHolder= objPath.replace("/", "_")
-        setattr(self, objPathHolder, MenuObject(objPath))
+        setattr(self, objPathHolder, MenuObject(self, objPath))
         self._sessionBus.registerObject(objPath, getattr(self, objPathHolder))
         return objPath
 
@@ -39,6 +40,17 @@ class MenuService(QObject):
         setattr(self, objPath.replace("/", "_"), None)
         msg = QDBusMessage.createSignal(objPath, 'com.deepin.menu.Menu', 'MenuUnregistered')
         QDBusConnection.sessionBus().send(msg)
+        
+    def showMenu(self, dbusObj, menuJsonContent):
+        if self.__menu:
+            self.__menu.destroyForward(False)
+            self.__menu.setDBusObj(dbusObj)
+            self.__menu.setMenuJsonContent(menuJsonContent)
+        else:
+            self.__menu = Menu(dbusObj, menuJsonContent)
+            
+        self.__menu.showMenu()
+        self.__menu.requestActivate()
 
 class MenuServiceAdaptor(QDBusAbstractAdaptor):
     """DBus service for creating beautiful menus."""
@@ -66,15 +78,14 @@ class MenuServiceAdaptor(QDBusAbstractAdaptor):
         return self.parent().unregisterMenu(objPath)
 
 class MenuObject(QObject):
-    def __init__(self, objPath):
+    def __init__(self, manager, objPath):
         super(MenuObject, self).__init__()
         self.__dbusAdaptor = MenuObjectAdaptor(self)
+        self.manager = manager
         self.objPath = objPath
 
     def showMenu(self, menuJsonContent):
-        self.menu = Menu(self, menuJsonContent)
-        self.menu.showMenu()
-        self.menu.requestActivate()
+        self.manager.showMenu(self, menuJsonContent)
 
 class MenuObjectAdaptor(QDBusAbstractAdaptor):
 
@@ -147,6 +158,12 @@ class Menu(QQuickView):
         self.__menuJsonContent = menuJsonContent
         self.__injection = Injection()
         qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
+        
+    def setDBusObj(self, dbusObj):
+        self.dbusObj = dbusObj
+        
+    def setMenuJsonContent(self, menuJsonContent):
+        self.__menuJsonContent = menuJsonContent
 
     def focusWindowChangedSlot(self, window):
         if not self:
@@ -267,8 +284,11 @@ class Menu(QQuickView):
             self.requestActivate()
 
 if __name__ == "__main__":
+    from PyQt5.QtCore import QCoreApplication    
+    QCoreApplication.setAttribute(10, True)
+    
     app = QApplication(sys.argv)
-
+    
     bus = QDBusConnection.sessionBus()
     menuService = MenuService()
     bus.registerService('com.deepin.menu')
