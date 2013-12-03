@@ -1,5 +1,7 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
+from PyQt5.QtCore import QCoreApplication
+QCoreApplication.setAttribute(10, True)
 
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, qApp
@@ -40,7 +42,7 @@ class MenuService(QObject):
         setattr(self, objPath.replace("/", "_"), None)
         msg = QDBusMessage.createSignal(objPath, 'com.deepin.menu.Menu', 'MenuUnregistered')
         QDBusConnection.sessionBus().send(msg)
-        
+
     def showMenu(self, dbusObj, menuJsonContent):
         if self.__menu:
             self.__menu.destroyForward(False)
@@ -48,7 +50,7 @@ class MenuService(QObject):
             self.__menu.setMenuJsonContent(menuJsonContent)
         else:
             self.__menu = Menu(dbusObj, menuJsonContent)
-            
+
         self.__menu.showMenu()
         self.__menu.requestActivate()
 
@@ -158,10 +160,10 @@ class Menu(QQuickView):
         self.__menuJsonContent = menuJsonContent
         self.__injection = Injection()
         qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
-        
+
     def setDBusObj(self, dbusObj):
         self.dbusObj = dbusObj
-        
+
     def setMenuJsonContent(self, menuJsonContent):
         self.__menuJsonContent = menuJsonContent
 
@@ -171,33 +173,9 @@ class Menu(QQuickView):
         if window == None:
             self.destroyForward(True)
 
-    # def focusOutEvent(self, e):
-    # if self.ancestorHasFocus() or self.descendantHasFocus():
-    # return
-    # self.destroyBackward(False)
-    # self.destroyForward(True)
-
     @pyqtProperty(bool)
     def isSubMenu(self):
         return not self.parent == None
-
-    # def ancestorHasFocus(self):
-    #     if self.parent:
-    #         if self.parent.isActive():
-    #             return True
-    #         else:
-    #             return self.parent.ancestorHasFocus()
-    #     else:
-    #         return False
-
-    # def descendantHasFocus(self):
-    #     if self.subMenu:
-    #         if self.subMenu.isActive():
-    #             return True
-    #         else:
-    #             return self.subMenu.descendantHasFocus()
-    #     else:
-    #         return False
 
     @pyqtProperty(str)
     def menuJsonContent(self):
@@ -263,7 +241,6 @@ class Menu(QQuickView):
     def destroyBackward(self, includingSelf):
         if self.parent:
             self.parent.destroyBackward(True)
-            self.parent = None
         if includingSelf:
             self.destroy()
             if not self.parent:
@@ -275,7 +252,6 @@ class Menu(QQuickView):
     def destroyForward(self, includingSelf):
         if self.subMenu:
             self.subMenu.destroyForward(True)
-            self.subMenu = None
         if includingSelf:
             self.destroy()
             if not self.parent:
@@ -284,11 +260,8 @@ class Menu(QQuickView):
             self.requestActivate()
 
 if __name__ == "__main__":
-    from PyQt5.QtCore import QCoreApplication    
-    QCoreApplication.setAttribute(10, True)
-    
     app = QApplication(sys.argv)
-    
+
     bus = QDBusConnection.sessionBus()
     menuService = MenuService()
     bus.registerService('com.deepin.menu')
