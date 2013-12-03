@@ -19,5 +19,7 @@ function onPressed(index, menuItem, menu) {
 }
 
 function onEntered(index, menuItem, menu) {
-	menu.currentMenuIndex = index	
+	if (menuItem.componentActive && !menuItem.isSep) {
+		menu.currentMenuIndex = index	
+	}
 }
