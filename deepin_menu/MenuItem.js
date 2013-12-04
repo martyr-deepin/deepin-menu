@@ -14,7 +14,8 @@ function onPressed(index, menuItem, menu) {
 			menuItem.itemIconPic = menuItem.iconHover
 			return
 		}
-		_menu_view.destroyBackward(true)
+		_menu_view.unregisterMenu()
+		_application.quit()
 	}
 }
 

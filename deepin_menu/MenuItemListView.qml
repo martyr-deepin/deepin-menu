@@ -97,7 +97,7 @@ ListView {
 
         // Create new subMenu
         if (hasSubMenu(currentItem.componentSubMenu)) {
-            _menu_view.destroyForward(false)			
+            _menu_view.destroyForward(false)
             var component_menuJsonContent = currentItem.componentSubMenu
 
             var component_size = currentItem.ListView.view.getSize(component_menuJsonContent)
@@ -116,7 +116,6 @@ ListView {
             if (component_y + component_height > _injection.getScreenHeight()) {
                 component_y = _injection.getScreenHeight() - component_height
             }
-
             _menu_view.showSubMenu(JSON.stringify({"x": component_x, "y": component_y,
                                                    "isDockMenu": menu.isDockMenu,
                                                    "isCheckableMenu": component_is_checkable_menu,
@@ -208,8 +207,8 @@ ListView {
         switch(event.key) {
 			
             case Qt.Key_Escape:
-            _menu_view.destroyForward(false)
-            _menu_view.destroyBackward(true)
+			_menu_view.unregisterMenu()
+			_application.quit()
 			break;
 			
 			case Qt.Key_Left:
