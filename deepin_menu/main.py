@@ -239,28 +239,32 @@ class Menu(QQuickView):
 
     @pyqtSlot(bool)
     def destroyBackward(self, includingSelf):
+        self.engine().collectGarbage()
         if self.parent:
             self.parent.destroyBackward(True)
         if includingSelf:
-            self.destroy()
             if not self.parent:
                 menuService.unregisterMenu(self.dbusObj.objPath)
+            self.close()
         else:
             self.requestActivate()
 
     @pyqtSlot(bool)
     def destroyForward(self, includingSelf):
+        self.engine().collectGarbage()            
         if self.subMenu:
             self.subMenu.destroyForward(True)
         if includingSelf:
-            self.destroy()
             if not self.parent:
                 menuService.unregisterMenu(self.dbusObj.objPath)
+            # self.deleteLater()
+            self.close()
         else:
             self.requestActivate()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(False)
 
     bus = QDBusConnection.sessionBus()
     menuService = MenuService()
