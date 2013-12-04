@@ -219,6 +219,7 @@ class RadioButtonMenu(Menu):
 if __name__ == "__main__":
     import sys
     from PyQt5.QtCore import QCoreApplication
+    import signal
 
     app = QCoreApplication([])
 
@@ -255,4 +256,5 @@ if __name__ == "__main__":
     # menu.showRectMenu(300, 300)
     menu.showDockMenu(1366, 768)
 
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
     sys.exit(app.exec_())
