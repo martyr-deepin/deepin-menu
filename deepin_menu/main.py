@@ -13,6 +13,7 @@ import os
 import sys
 import json
 import signal
+from cycle_number import CycleNumber
 
 SCREEN_WIDTH = 0
 SCREEN_HEIGHT = 0
@@ -43,13 +44,13 @@ class MenuService(QObject):
         msg = QDBusMessage.createSignal(objPath, 'com.deepin.menu.Menu', 'MenuUnregistered')
         QDBusConnection.sessionBus().send(msg)
 
-    def showMenu(self, dbusObj, menuJsonContent):
+    def showMenu(self, objPath, menuJsonContent):
         if self.__menu:
             self.__menu.destroyForward(False)
-            self.__menu.setDBusObj(dbusObj)
+            self.__menu.setObjPath(objPath)
             self.__menu.setMenuJsonContent(menuJsonContent)
         else:
-            self.__menu = Menu(dbusObj, menuJsonContent)
+            self.__menu = Menu(objPath, menuJsonContent)
 
         self.__menu.showMenu()
         self.__menu.requestActivate()
@@ -87,7 +88,7 @@ class MenuObject(QObject):
         self.objPath = objPath
 
     def showMenu(self, menuJsonContent):
-        self.manager.showMenu(self, menuJsonContent)
+        self.manager.showMenu(self.objPath, menuJsonContent)
 
 class MenuObjectAdaptor(QDBusAbstractAdaptor):
 
@@ -150,23 +151,34 @@ class Injection(QObject):
 
 class Menu(QQuickView):
 
-    def __init__(self, dbusObj, menuJsonContent, parent=None):
+    def __init__(self, objPath, menuJsonContent, parent=None):
         QQuickView.__init__(self)
 
-        self.dbusObj = dbusObj
+        self.objPath = objPath
         self.parent = parent
         self.subMenu = None
+        
+        if not parent:
+            self.subMenuQueue = (Menu(None, None, self), Menu(None, None, self), 
+                                 Menu(None, None, self), Menu(None, None, self), Menu(None, None, self))
+            self.cycle_number = CycleNumber(5)
 
         self.__menuJsonContent = menuJsonContent
         self.__injection = Injection()
         qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
 
-    def setDBusObj(self, dbusObj):
-        self.dbusObj = dbusObj
+    def setObjPath(self, objPath):
+        self.objPath = objPath
 
     def setMenuJsonContent(self, menuJsonContent):
         self.__menuJsonContent = menuJsonContent
-
+        
+    def getRootMenu(self):
+        if self.parent:
+            return self.parent.getRootMenu()
+        else:
+            return self
+        
     def focusWindowChangedSlot(self, window):
         if not self:
             return
@@ -184,7 +196,7 @@ class Menu(QQuickView):
     @pyqtProperty("QVariant", constant=True)
     def menuJsonObj(self):
         return json.loads(self.__menuJsonContent)
-
+    
     @pyqtSlot(str, bool)
     def updateCheckableItem(self, id, value):
         self.rootObject().updateCheckableItem(id, value)
@@ -193,7 +205,7 @@ class Menu(QQuickView):
 
     @pyqtSlot(str, bool)
     def invokeItem(self, id, checked):
-        msg = QDBusMessage.createSignal(self.dbusObj.objPath, 'com.deepin.menu.Menu', 'ItemInvoked')
+        msg = QDBusMessage.createSignal(self.objPath, 'com.deepin.menu.Menu', 'ItemInvoked')
         msg << id << checked
         QDBusConnection.sessionBus().send(msg)
 
@@ -211,10 +223,10 @@ class Menu(QQuickView):
     @pyqtSlot(str)
     def showSubMenu(self, menuJsonContent):
         if menuJsonContent:
-            self.subMenu = Menu(self.dbusObj, menuJsonContent, self)
+            self.subMenu = self.getRootMenu().subMenuQueue[self.getRootMenu().cycle_number.next()]
+            self.subMenu.setObjPath(self.objPath)
+            self.subMenu.setMenuJsonContent(menuJsonContent)
             self.subMenu.showMenu()
-        else:
-            self.subMenu = None
 
     def showMenu(self):
         qml_context = self.rootContext()
@@ -236,7 +248,7 @@ class Menu(QQuickView):
             self.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'RectMenu.qml')))
 
         self.show()
-
+        
     @pyqtSlot(bool)
     def destroyBackward(self, includingSelf):
         self.engine().collectGarbage()
@@ -244,8 +256,8 @@ class Menu(QQuickView):
             self.parent.destroyBackward(True)
         if includingSelf:
             if not self.parent:
-                menuService.unregisterMenu(self.dbusObj.objPath)
-            self.close()
+                menuService.unregisterMenu(self.objPath)
+            self.hide()
         else:
             self.requestActivate()
 
@@ -254,11 +266,12 @@ class Menu(QQuickView):
         self.engine().collectGarbage()            
         if self.subMenu:
             self.subMenu.destroyForward(True)
+            self.subMenu = None
         if includingSelf:
             if not self.parent:
-                menuService.unregisterMenu(self.dbusObj.objPath)
+                menuService.unregisterMenu(self.objPath)
             # self.deleteLater()
-            self.close()
+            self.hide()
         else:
             self.requestActivate()
 
