@@ -7,7 +7,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, qApp
 from PyQt5.QtQuick import QQuickView
 from PyQt5.QtGui import QSurfaceFormat, QColor, QKeySequence, QCursor, QFont, QFontMetrics
-from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal
+from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal, QTimer
 from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusConnectionInterface, QDBusMessage
 import os
 import sys
@@ -29,8 +29,16 @@ class MenuService(QObject):
         self._sessionBus = QDBusConnection.sessionBus()
 
         self.__menu = None
+        
+    def __checkToRestart(self):
+        print "check"
+        if self.__restart_flag:
+            INJECTION.startNewService()
+        self.__restart_flag = True
 
     def registerMenu(self):
+        self.__restart_flag = False
+        
         objPath = "/com/deepin/menu/%s" % str(uuid4()).replace("-", "_")
         objPathHolder= objPath.replace("/", "_")
         setattr(self, objPathHolder, MenuObject(self, objPath))
@@ -38,12 +46,17 @@ class MenuService(QObject):
         return objPath
 
     def unregisterMenu(self, objPath):
+        self.__restart_flag = True
+        
         self._sessionBus.unregisterObject(objPath)
         setattr(self, objPath.replace("/", "_"), None)
         msg = QDBusMessage.createSignal(objPath, 'com.deepin.menu.Menu', 'MenuUnregistered')
         QDBusConnection.sessionBus().send(msg)
         
-        INJECTION.startNewService() 
+        self.__timer = QTimer()
+        self.__timer.singleShot = True
+        self.__timer.timeout.connect(self.__checkToRestart)
+        self.__timer.start(5000)
 
     def showMenu(self, dbusObj, menuJsonContent):
         print os.getpid()
@@ -151,9 +164,8 @@ class Injection(QObject):
             return seq[0]
         return -1
     
-    @pyqtSlot()
     def startNewService(self):
-        subprocess.Popen(["python", "-OO", "main.py"])
+        subprocess.Popen(["python", "-OO", os.path.join(os.path.dirname(__file__), "main.py")])
         
 INJECTION = Injection()
 
@@ -272,7 +284,7 @@ class Menu(QQuickView):
             
 @pyqtSlot(str)
 def serviceReplacedByOtherSlot(name):
-    sys.exit(0)
+    os._exit(0)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
