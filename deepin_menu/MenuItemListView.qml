@@ -179,8 +179,10 @@ ListView {
         listview.highlight = component
     }
 
-    function updateCheckableItem(menuJsonContent, id, value) {
-        var json = JSON.parse(menuJsonContent)
+    function updateCheckableItem(id, value) {
+		print("udpateCheckableItem", id, value)
+		/* update json content */
+        var json = JSON.parse(listview.menuJsonContent)
 
         for (var item in json.items) {
             if (json.items[item].itemSubMenu.items.length != 0) {
@@ -190,7 +192,10 @@ ListView {
             }
         }
 
-        return JSON.stringify(json)
+        listview.menuJsonContent = JSON.stringify(json)
+		
+		/* update model */
+		listview.model.updateMenuJsonContent(listview.menuJsonContent)
     }
 	
 	function updateItemActivity(id, value) {

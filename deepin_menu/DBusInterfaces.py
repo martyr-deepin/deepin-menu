@@ -41,6 +41,7 @@ class MenuObjectInterface(QDBusAbstractInterface):
 
     ItemInvoked = pyqtSignal(str, bool)
     ItemActivitySet = pyqtSignal(str, bool)
+    ItemCheckedSet = pyqtSignal(str, bool)
     MenuUnregistered = pyqtSignal()
 
     def __init__(self, path):
@@ -54,3 +55,6 @@ class MenuObjectInterface(QDBusAbstractInterface):
         
     def setItemActivity(self, id, value):
         self.call('SetItemActivity', id, value)
+        
+    def setItemChecked(self, id, value):
+        self.call('SetItemChecked', id, value)

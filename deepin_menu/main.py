@@ -112,6 +112,11 @@ class MenuObject(QObject):
         msg << id << value
         QDBusConnection.sessionBus().send(msg)
 
+    def setItemChecked(self, id, value):
+        msg = QDBusMessage.createSignal(self.objPath, 'com.deepin.menu.Menu', 'ItemCheckedSet')
+        msg << id << value
+        QDBusConnection.sessionBus().send(msg)
+
 class MenuObjectAdaptor(QDBusAbstractAdaptor):
 
     Q_CLASSINFO("D-Bus Interface", "com.deepin.menu.Menu")
@@ -124,6 +129,10 @@ class MenuObjectAdaptor(QDBusAbstractAdaptor):
                 '      <arg direction="in" type="s" name="itemId"/>\n'
                 '      <arg direction="in" type="b" name="isActive"/>\n'
                 '    </method>\n'
+                '    <method name="SetItemChecked">\n'
+                '      <arg direction="in" type="s" name="itemId"/>\n'
+                '      <arg direction="in" type="b" name="checked"/>\n'
+                '    </method>\n'
                 '    <signal name="ItemInvoked">\n'
                 '      <arg direction="out" type="s" name="itemId"/>\n'
                 '      <arg direction="out" type="b" name="checked"/>\n'
@@ -132,12 +141,17 @@ class MenuObjectAdaptor(QDBusAbstractAdaptor):
                 '      <arg direction="out" type="s" name="itemId"/>\n'
                 '      <arg direction="out" type="b" name="isActive"/>\n'
                 '    </signal>\n'
+                '    <signal name="ItemCheckedSet">\n'
+                '      <arg direction="out" type="s" name="itemId"/>\n'
+                '      <arg direction="out" type="b" name="checked"/>\n'
+                '    </signal>\n'
                 '    <signal name="MenuUnregistered">\n'
                 '    </signal>\n'
                 '  </interface>\n')
 
     ItemInvoked = pyqtSignal(str, bool)
     ItemActivitySet = pyqtSignal(str, bool)
+    ItemCheckedSet = pyqtSignal(str, bool)
     MenuUnregistered = pyqtSignal()
 
     def __init__(self, parent):
@@ -150,6 +164,10 @@ class MenuObjectAdaptor(QDBusAbstractAdaptor):
     @pyqtSlot(str, bool)
     def SetItemActivity(self, id, value):
         self.parent().setItemActivity(id, value)
+
+    @pyqtSlot(str, bool)
+    def SetItemChecked(self, id, value):
+        self.parent().setItemChecked(id, value)
 
 class Injection(QObject):
     def __init__(self):
@@ -203,6 +221,7 @@ class Menu(QQuickView):
         
         qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
         self.dbus_interface.ItemActivitySet.connect(self.updateItemActivity)
+        self.dbus_interface.ItemCheckedSet.connect(self.updateCheckableItem)
 
     def setDBusObj(self, dbusObj):
         self.dbusObj = dbusObj
@@ -227,16 +246,17 @@ class Menu(QQuickView):
     @pyqtProperty("QVariant", constant=True)
     def menuJsonObj(self):
         return json.loads(self.__menuJsonContent)
-
+    
     @pyqtSlot(str, bool)
+    def notifyUpdateItemChecked(self, id, value):
+        self.dbus_interface.setItemChecked(id, value)
+
     def updateCheckableItem(self, id, value):
         self.rootObject().updateCheckableItem(id, value)
-        if self.parent:
-            self.parent.updateCheckableItem(id, value)
             
     def updateItemActivity(self, id, value):
         self.rootObject().updateItemActivity(id, value)
-
+        
     @pyqtSlot(str, bool)
     def invokeItem(self, id, checked):
         msg = QDBusMessage.createSignal(self.dbusObj.objPath, 'com.deepin.menu.Menu', 'ItemInvoked')
