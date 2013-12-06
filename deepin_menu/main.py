@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication, qApp
 from PyQt5.QtQuick import QQuickView
 from PyQt5.QtGui import QSurfaceFormat, QColor, QKeySequence, QCursor, QFont, QFontMetrics
 from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal
-from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusMessage
+from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusConnectionInterface, QDBusMessage
 import os
 import sys
 import json
@@ -30,6 +30,7 @@ class MenuService(QObject):
         self.__menu = None
 
     def registerMenu(self):
+        print os.getpid()
         self.__count += 1
         objPath = "/com/deepin/menu/%s" % self.__count
         objPathHolder= objPath.replace("/", "_")
@@ -261,6 +262,10 @@ class Menu(QQuickView):
             self.close()
         else:
             self.requestActivate()
+            
+@pyqtSlot(str)
+def serviceReplacedByOtherSlot(name):
+    sys.exit(0)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -268,8 +273,11 @@ if __name__ == "__main__":
 
     bus = QDBusConnection.sessionBus()
     menuService = MenuService()
-    bus.registerService('com.deepin.menu')
+    bus.interface().registerService('com.deepin.menu', 
+                                    QDBusConnectionInterface.ReplaceExistingService, 
+                                    QDBusConnectionInterface.AllowReplacement)
     bus.registerObject('/com/deepin/menu', menuService)
+    bus.interface().serviceUnregistered.connect(serviceReplacedByOtherSlot)
 
     # retrieve the geometry of the screen
     desktopWidget = app.desktop()
