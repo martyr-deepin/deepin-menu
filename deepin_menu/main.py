@@ -13,6 +13,7 @@ import os
 import sys
 import json
 import signal
+from uuid import uuid4
 
 SCREEN_WIDTH = 0
 SCREEN_HEIGHT = 0
@@ -26,13 +27,10 @@ class MenuService(QObject):
         self.__dbusAdaptor = MenuServiceAdaptor(self)
         self._sessionBus = QDBusConnection.sessionBus()
 
-        self.__count = -1
         self.__menu = None
 
     def registerMenu(self):
-        print os.getpid()
-        self.__count += 1
-        objPath = "/com/deepin/menu/%s" % self.__count
+        objPath = "/com/deepin/menu/%s" % str(uuid4()).replace("-", "_")
         objPathHolder= objPath.replace("/", "_")
         setattr(self, objPathHolder, MenuObject(self, objPath))
         self._sessionBus.registerObject(objPath, getattr(self, objPathHolder))
