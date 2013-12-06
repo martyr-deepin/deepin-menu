@@ -192,6 +192,24 @@ ListView {
 
         return JSON.stringify(json)
     }
+	
+	function updateItemActivity(id, value) {
+		/* update json content */
+        var json = JSON.parse(listview.menuJsonContent)
+
+        for (var item in json.items) {
+            if (json.items[item].itemSubMenu.items.length != 0) {
+                updateCheckableItem(JSON.stringify(json.items[item].itemSubMenu), id, value)
+            } else if (json.items[item].itemId == id){
+                json.items[item].isActive = value
+            }
+        }
+
+        listview.menuJsonContent = JSON.stringify(json)
+		
+		/* update model */
+		listview.model.updateMenuJsonContent(listview.menuJsonContent)
+	}
 
     Component.onCompleted: {
         var size = getSize(menuJsonContent)

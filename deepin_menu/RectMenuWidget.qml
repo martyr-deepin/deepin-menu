@@ -19,6 +19,10 @@ Rect {
     function updateCheckableItem(id, value) {
         listview.currentItem.componentSubMenu = listview.updateCheckableItem(listview.currentItem.componentSubMenu, id, value)
     }
+	
+	function updateItemActivity(id, value) {
+		listview.updateItemActivity(id, value)
+	}
 
     function selectItem(idx) {
         listview.currentIndex = idx

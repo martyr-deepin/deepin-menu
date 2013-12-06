@@ -21,9 +21,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
-
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
-from PyQt5.QtDBus import QDBusAbstractInterface, QDBusConnection, QDBusReply
+from PyQt5.QtDBus import QDBusReply
+from DBusInterfaces import MenuManagerInterface, MenuObjectInterface
 
 def parseMenuItem(menuItem):
     assert len(menuItem) >= 2
@@ -45,33 +45,6 @@ def parseMenu(obj, menu):
             result.addMenuItem(parseMenuItem(menuItem))
     return result
 
-class MenuManagerInterface(QDBusAbstractInterface):
-
-    def __init__(self):
-        super(MenuManagerInterface, self).__init__("com.deepin.menu",
-                                                   "/com/deepin/menu",
-                                                   "com.deepin.menu.Manager",
-                                                   QDBusConnection.sessionBus(), None)
-
-    def registerMenu(self):
-        return self.call('RegisterMenu')
-
-    def unregisterMenu(self, objPath):
-        self.call('UnregisterMenu', objPath)
-
-class MenuObjectInterface(QDBusAbstractInterface):
-
-    ItemInvoked = pyqtSignal(str, bool)
-    MenuUnregistered = pyqtSignal()
-
-    def __init__(self, path):
-        super(MenuObjectInterface, self).__init__("com.deepin.menu",
-                                                  path,
-                                                  "com.deepin.menu.Menu",
-                                                  QDBusConnection.sessionBus(), None)
-
-    def showMenu(self, jsonContent):
-        self.call('ShowMenu', jsonContent)
 
 class MenuItem(QObject):
     def __init__(self, id, text, icons=None, subMenu=None, 
@@ -110,7 +83,7 @@ class MenuItem(QObject):
 
     def setIcons(self, icons):
         self.icons = icons
-
+        
     @property
     def hasSubMenu(self):
         return len(self.subMenu.items) != 0
@@ -165,7 +138,14 @@ class Menu(QObject):
                 if item.id == id:
                     return item
         return None
-
+    
+    def setItemActivity(self, id, value):
+        item = self.getItemById(id)
+        if item: 
+            item.isActive = value
+            if self.menuIface:
+                self.menuIface.setItemActivity(id, value)
+        
     def showRectMenu(self, x, y):
         msg = self.managerIface.registerMenu()
         reply = QDBusReply(msg)
@@ -225,6 +205,7 @@ if __name__ == "__main__":
     @pyqtSlot(str, bool)
     def invoked(s, c):
         print "id: ", s, ", checked: ", c
+        menu.setItemActivity("id_nonactive", True)
         
     @pyqtSlot()
     def dismissed():
