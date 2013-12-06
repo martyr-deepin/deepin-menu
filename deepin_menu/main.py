@@ -13,6 +13,7 @@ import os
 import sys
 import json
 import signal
+import subprocess
 from uuid import uuid4
 
 SCREEN_WIDTH = 0
@@ -41,8 +42,11 @@ class MenuService(QObject):
         setattr(self, objPath.replace("/", "_"), None)
         msg = QDBusMessage.createSignal(objPath, 'com.deepin.menu.Menu', 'MenuUnregistered')
         QDBusConnection.sessionBus().send(msg)
+        
+        INJECTION.startNewService() 
 
     def showMenu(self, dbusObj, menuJsonContent):
+        print os.getpid()
         if self.__menu:
             self.__menu.destroyForward(False)
             self.__menu.setDBusObj(dbusObj)
@@ -146,6 +150,12 @@ class Injection(QObject):
         if len(seq) > 0:
             return seq[0]
         return -1
+    
+    @pyqtSlot()
+    def startNewService(self):
+        subprocess.Popen(["python", "-OO", "main.py"])
+        
+INJECTION = Injection()
 
 class Menu(QQuickView):
 
@@ -157,7 +167,6 @@ class Menu(QQuickView):
         self.subMenu = None
 
         self.__menuJsonContent = menuJsonContent
-        self.__injection = Injection()
         qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
 
     def setDBusObj(self, dbusObj):
@@ -218,7 +227,7 @@ class Menu(QQuickView):
     def showMenu(self):
         qml_context = self.rootContext()
         qml_context.setContextProperty("_menu_view", self)
-        qml_context.setContextProperty("_injection", self.__injection)
+        qml_context.setContextProperty("_injection", INJECTION)
 
         surface_format = QSurfaceFormat()
         surface_format.setAlphaBufferSize(8)
