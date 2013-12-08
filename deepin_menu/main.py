@@ -33,10 +33,10 @@ class MenuService(QObject):
         self.__menu = None
         
     def __checkToRestart(self):
-        print "check"
         if self.__restart_flag:
             INJECTION.startNewService()
         self.__restart_flag = True
+        del self.__timer
 
     def registerMenu(self):
         self.__restart_flag = False
@@ -61,7 +61,6 @@ class MenuService(QObject):
         self.__timer.start(5000)
 
     def showMenu(self, dbusObj, menuJsonContent):
-        print os.getpid()
         if self.__menu:
             self.__menu.destroyForward(False)
             self.__menu.setDBusObj(dbusObj)
@@ -212,19 +211,19 @@ class Menu(QQuickView):
     def __init__(self, dbusObj, menuJsonContent, parent=None):
         QQuickView.__init__(self)
 
-        self.dbusObj = dbusObj
         self.parent = parent
         self.subMenu = None
-        self.dbus_interface = MenuObjectInterface(self.dbusObj.objPath)
 
-        self.__menuJsonContent = menuJsonContent
+        self.setMenuJsonContent(menuJsonContent)
+        self.setDBusObj(dbusObj)
         
         qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
-        self.dbus_interface.ItemActivitySet.connect(self.updateItemActivity)
-        self.dbus_interface.ItemCheckedSet.connect(self.updateCheckableItem)
 
     def setDBusObj(self, dbusObj):
         self.dbusObj = dbusObj
+        self.dbus_interface = MenuObjectInterface(self.dbusObj.objPath)
+        self.dbus_interface.ItemActivitySet.connect(self.updateItemActivity)
+        self.dbus_interface.ItemCheckedSet.connect(self.updateCheckableItem)
 
     def setMenuJsonContent(self, menuJsonContent):
         self.__menuJsonContent = menuJsonContent

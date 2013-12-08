@@ -180,7 +180,6 @@ ListView {
     }
 
     function updateCheckableItem(id, value) {
-		print("udpateCheckableItem", id, value)
 		/* update json content */
         var json = JSON.parse(listview.menuJsonContent)
 
@@ -209,10 +208,7 @@ ListView {
                 json.items[item].isActive = value
             }
         }
-
         listview.menuJsonContent = JSON.stringify(json)
-		
-		/* update model */
 		listview.model.updateMenuJsonContent(listview.menuJsonContent)
 	}
 

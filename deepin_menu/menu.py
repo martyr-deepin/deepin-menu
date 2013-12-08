@@ -110,6 +110,7 @@ class Menu(QObject):
             parseMenu(self, items)
         if is_root:
             self.managerIface = MenuManagerInterface()
+        self.menuIface = None
         self.checkableMenu = checkableMenu
         self.singleCheck = singleCheck
 
