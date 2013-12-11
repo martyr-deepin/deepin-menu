@@ -22,6 +22,7 @@ ListModel {
             menuItemModel.append({"itemId": items[i].itemId,
                                   "itemIcon":items[i].itemIcon,
                                   "itemIconHover":items[i].itemIconHover,
+                                  "itemIconInactive":items[i].itemIconInactive,
                                   "itemText":items[i].itemText,
                                   "itemShortcut": items[i].itemShortcut || "",
                                   "itemSubMenu":JSON.stringify(items[i].itemSubMenu),

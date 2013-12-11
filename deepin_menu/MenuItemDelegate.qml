@@ -29,6 +29,7 @@ Component {
 		property string componentShortcut: itemShortcut
         property string iconNormal: itemIcon
         property string iconHover: itemIconHover
+        property string iconInactive: itemIconInactive
 
         property alias itemTextColor: componentText.color
         property alias itemArrowPic: componentIndicator.source
@@ -56,15 +57,18 @@ Component {
             if (isDockMenu) {
                 iconNormal = "images/check_dark.png"
                 iconHover = "images/check_dark_hover.png"
+                iconInactive = "images/check_dark_inactive.png"
             } else {
                 iconNormal = "images/check_light.png"
                 iconHover = "images/check_light_hover.png"
+                iconInactive = "images/check_light_inactive.png"
             }
         }
 
         function undoCheckThis() {
             iconNormal = ""
             iconHover = ""
+            iconInactive = ""
         }
 
         onComponentCheckedChanged: {
@@ -80,7 +84,7 @@ Component {
         Image {
             id: componentImage
             /* visible: itemIcon != "" */
-            source: iconNormal
+            source: componentActive ? iconNormal : iconInactive
             anchors.left: parent.left
             anchors.leftMargin: horizontalPadding
             anchors.rightMargin: horizontalPadding

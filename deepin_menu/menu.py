@@ -62,16 +62,21 @@ class MenuItem(QObject):
     def serializableContent(self):
         iconNormal = ""
         iconHover = ""
+        iconInactive = ""
 
         if len(self.icons) > 0:
             iconNormal = self.icons[0]
             iconHover = self.icons[0]
+            iconInactive = self.icons[0]
         if len(self.icons) > 1:
             iconHover = self.icons[1]
-
+        if len(self.icons) > 2:
+            iconInactive = self.icons[2]
+            
         return {"itemId": self.id,
                 "itemIcon": iconNormal,
                 "itemIconHover": iconHover,
+                "itemIconInactive": iconInactive,
                 "itemText": self.text,
                 "itemSubMenu": self.subMenu.serializableItemList,
                 "isActive": self.isActive,
