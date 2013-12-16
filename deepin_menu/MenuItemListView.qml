@@ -194,7 +194,7 @@ ListView {
         listview.menuJsonContent = JSON.stringify(json)
 		
 		/* update model */
-		listview.model.updateMenuJsonContent(listview.menuJsonContent)
+		listview.model.updateItemChecked(id, value)
     }
 	
 	function updateItemActivity(id, value) {
@@ -209,7 +209,8 @@ ListView {
             }
         }
         listview.menuJsonContent = JSON.stringify(json)
-		listview.model.updateMenuJsonContent(listview.menuJsonContent)
+		listview.model.updateMenuJsonContent(listview.menuJsonContent)        
+        /* listview.model.updateItemActivity(id, value) */
 	}
 
 	function updateItemText(id, value) {
@@ -224,7 +225,7 @@ ListView {
             }
         }
         listview.menuJsonContent = JSON.stringify(json)
-		listview.model.updateMenuJsonContent(listview.menuJsonContent)
+        listview.model.updateItemText(id, value)        
 	}
 
     Component.onCompleted: {

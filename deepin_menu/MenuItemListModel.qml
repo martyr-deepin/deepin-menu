@@ -4,7 +4,34 @@ ListModel {
     id: menuItemModel
 
     property string menuJsonContent: ""
-
+    
+    function updateItemChecked(id, value) {
+        for (var i = 0; i < menuItemModel.count; i++) {
+            if (menuItemModel.get(i).itemId == id) {
+                menuItemModel.setProperty(i, "checked", value)
+                return
+            }
+        }
+    }
+    
+    function updateItemText(id, value) {
+        for (var i = 0; i < menuItemModel.count; i++) {
+            if (menuItemModel.get(i).itemId == id) {
+                menuItemModel.setProperty(i, "itemText", value)                
+                return
+            }
+        }
+    }
+    
+    function updateItemActivity(id, value) {
+        for (var i = 0; i < menuItemModel.count; i++) {
+            if (menuItemModel.get(i).itemId == id) {
+                menuItemModel.setProperty(i, "isActive", value)                
+                return
+            }
+        }
+    }
+    
     function updateMenuJsonContent(menuJsonContent) {
 		menuItemModel.clear()
 		
