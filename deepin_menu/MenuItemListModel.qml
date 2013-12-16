@@ -28,7 +28,8 @@ ListModel {
                                   "itemSubMenu":JSON.stringify(items[i].itemSubMenu),
                                   "isActive": items[i].isActive,
                                   "isCheckable": items[i].isCheckable,
-                                  "checked": items[i].checked})
+                                  "checked": items[i].checked,
+                                  "showCheckmark": items[i].showCheckmark})
         }
     }
 

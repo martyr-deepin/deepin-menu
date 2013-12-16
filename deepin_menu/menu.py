@@ -48,7 +48,7 @@ def parseMenu(obj, menu):
 
 class MenuItem(QObject):
     def __init__(self, id, text, icons=None, subMenu=None, 
-                 isActive=True, isCheckable=False, checked=False):
+                 isActive=True, isCheckable=False, checked=False, showCheckmark=True):
         super(MenuItem, self).__init__()
         self.id = id
         self.text = text
@@ -57,6 +57,7 @@ class MenuItem(QObject):
         self.isActive = isActive
         self.isCheckable = isCheckable
         self.checked = checked
+        self.showCheckmark = self.isCheckable and showCheckmark
 
     @property
     def serializableContent(self):
@@ -81,7 +82,8 @@ class MenuItem(QObject):
                 "itemSubMenu": self.subMenu.serializableItemList,
                 "isActive": self.isActive,
                 "isCheckable": self.isCheckable,
-                "checked": self.checked}
+                "checked": self.checked,
+                "showCheckmark": self.showCheckmark}
 
     def setSubMenu(self, menu):
         self.subMenu = menu
@@ -218,7 +220,7 @@ if __name__ == "__main__":
     @pyqtSlot(str, bool)
     def invoked(s, c):
         print "id: ", s, ", checked: ", c
-        menu.setItemText("id_nonactive", "hello")
+        # menu.setItemText("id_nonactive", "hello")
         # menu.setItemActivity("id_nonactive", True)
         
     @pyqtSlot()
@@ -245,6 +247,7 @@ if __name__ == "__main__":
                  CheckboxMenuItem("id_check", "CheckMe", True)], is_root=True,)
     sub = RadioButtonMenu([("id_radio1", "Radio1"), ("id_radio2", "Radio2"),])
     menu.getItemById("id_checkbox").setSubMenu(sub)
+    menu.getItemById("id_radio2").showCheckmark = False
     menu.itemClicked.connect(invoked)
     menu.menuDismissed.connect(dismissed)
     # menu.showRectMenu(300, 300)
