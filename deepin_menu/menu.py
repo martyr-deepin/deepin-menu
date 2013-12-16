@@ -152,6 +152,13 @@ class Menu(QObject):
             if self.menuIface:
                 self.menuIface.setItemActivity(id, value)
         
+    def setItemText(self, id, value):
+        item = self.getItemById(id)
+        if item: 
+            item.text = value
+            if self.menuIface:
+                self.menuIface.setItemText(id, value)
+        
     def showRectMenu(self, x, y):
         msg = self.managerIface.registerMenu()
         reply = QDBusReply(msg)
@@ -211,7 +218,8 @@ if __name__ == "__main__":
     @pyqtSlot(str, bool)
     def invoked(s, c):
         print "id: ", s, ", checked: ", c
-        menu.setItemActivity("id_nonactive", True)
+        menu.setItemText(s, "hello")
+        # menu.setItemActivity("id_nonactive", True)
         
     @pyqtSlot()
     def dismissed():
