@@ -26,7 +26,7 @@ Component {
         property bool componentActive: isActive
         property bool componentCheckable: isCheckable
         property bool componentChecked: checked
-		property string componentShortcut: itemShortcut
+        property string componentShortcut: itemShortcut
         property string iconNormal: itemIcon
         property string iconHover: itemIconHover
         property string iconInactive: itemIconInactive
@@ -37,38 +37,42 @@ Component {
 
         Connections {
             target: itemArea.ListView.view
-			
+
             onItemChecked: {
                 if (itemArea.ListView.view.isSingleCheck && idx != index) {
                     componentChecked = false
                     itemIconPic = iconNormal
-					itemArea.ListView.view.itemUnchecked(idx, itemArea)
+                    itemArea.ListView.view.itemUnchecked(idx, itemArea)
                 }
             }
-			
-			onKeyDownSignal: {
-				if (keyCode == _injection.keyStringToCode(componentShortcut)) {
-					MenuItemJs.onPressed(index, itemArea, menu)					
-				}
-			}
+
+            onKeyDownSignal: {
+                if (keyCode == _injection.keyStringToCode(componentShortcut)) {
+                    MenuItemJs.onPressed(index, itemArea, menu)
+                }
+            }
         }
 
         function checkThis() {
-            if (isDockMenu) {
-                iconNormal = "images/check_dark.png"
-                iconHover = "images/check_dark_hover.png"
-                iconInactive = "images/check_dark_inactive.png"
-            } else {
-                iconNormal = "images/check_light.png"
-                iconHover = "images/check_light_hover.png"
-                iconInactive = "images/check_light_inactive.png"
+            if (showCheckmark) {
+                if (isDockMenu) {
+                    iconNormal = "images/check_dark.png"
+                    iconHover = "images/check_dark_hover.png"
+                    iconInactive = "images/check_dark_inactive.png"
+                } else {
+                    iconNormal = "images/check_light.png"
+                    iconHover = "images/check_light_hover.png"
+                    iconInactive = "images/check_light_inactive.png"
+                }
             }
         }
 
         function undoCheckThis() {
-            iconNormal = ""
-            iconHover = ""
-            iconInactive = ""
+            if (showCheckmark) {
+                iconNormal = ""
+                iconHover = ""
+                iconInactive = ""
+            }
         }
 
         onComponentCheckedChanged: {
@@ -115,16 +119,16 @@ Component {
             anchors.rightMargin: parent.horizontalPadding
         }
 
-		Rectangle{
+        Rectangle{
             visible: parent.isSep
             anchors.centerIn: parent
             width: parent.width
             height: 2
-			color: Qt.rgba(0, 0, 0, 0)
+            color: Qt.rgba(0, 0, 0, 0)
             Rectangle {
-				width: parent.width
-				height: 1
-				color: Qt.rgba(0, 0, 0, 0)
+                width: parent.width
+                height: 1
+                color: Qt.rgba(0, 0, 0, 0)
                 Rectangle {
                     id: itemSeparator1
                     width: 1
@@ -140,14 +144,14 @@ Component {
 
                     anchors.centerIn: parent
                 }
-				anchors.top: parent.top
-				anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
             }
-			
+
             Rectangle {
-				width: parent.width
-				height: 1
-				color: Qt.rgba(0, 0, 0, 0)				
+                width: parent.width
+                height: 1
+                color: Qt.rgba(0, 0, 0, 0)
                 Rectangle {
                     id: itemSeparator
                     width: 1
@@ -163,8 +167,8 @@ Component {
 
                     anchors.centerIn: parent
                 }
-				anchors.bottom: parent.bottom
-				anchors.horizontalCenter: parent.horizontalCenter				
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
             }
         }
 
