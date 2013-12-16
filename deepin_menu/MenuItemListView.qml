@@ -220,7 +220,7 @@ ListView {
             if (json.items[item].itemSubMenu.items.length != 0) {
                 updateCheckableItem(JSON.stringify(json.items[item].itemSubMenu), id, value)
             } else if (json.items[item].itemId == id){
-                json.items[item].text = value
+                json.items[item].itemText = value
             }
         }
         listview.menuJsonContent = JSON.stringify(json)

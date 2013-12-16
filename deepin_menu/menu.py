@@ -218,7 +218,7 @@ if __name__ == "__main__":
     @pyqtSlot(str, bool)
     def invoked(s, c):
         print "id: ", s, ", checked: ", c
-        menu.setItemText(s, "hello")
+        menu.setItemText("id_nonactive", "hello")
         # menu.setItemActivity("id_nonactive", True)
         
     @pyqtSlot()
