@@ -1,9 +1,10 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
+from PyQt5 import QtCore
 from PyQt5.QtCore import QCoreApplication
 QCoreApplication.setAttribute(10, True)
+QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads, True)
 
-from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, qApp
 from PyQt5.QtQuick import QQuickView
 from PyQt5.QtGui import QSurfaceFormat, QColor, QKeySequence, QCursor, QFont, QFontMetrics
@@ -24,6 +25,9 @@ SCREEN_HEIGHT = 0
 def getCursorPosition():
     return QCursor().pos()
 
+def isInRect(x, y, xx, xy, xw, xh):
+    return (xx <= x <= xx + xw) and (xy <= y <= xy + xh)
+
 class MenuService(QObject):
     def __init__(self):
         super(MenuService, self).__init__()
@@ -31,7 +35,7 @@ class MenuService(QObject):
         self._sessionBus = QDBusConnection.sessionBus()
 
         self.__menu = None
-        
+
     def __checkToRestart(self):
         if self.__restart_flag:
             INJECTION.startNewService()
@@ -40,7 +44,7 @@ class MenuService(QObject):
 
     def registerMenu(self):
         self.__restart_flag = False
-        
+
         objPath = "/com/deepin/menu/%s" % str(uuid4()).replace("-", "_")
         objPathHolder= objPath.replace("/", "_")
         setattr(self, objPathHolder, MenuObject(self, objPath))
@@ -49,12 +53,12 @@ class MenuService(QObject):
 
     def unregisterMenu(self, objPath):
         self.__restart_flag = True
-        
+
         self._sessionBus.unregisterObject(objPath)
         setattr(self, objPath.replace("/", "_"), None)
         msg = QDBusMessage.createSignal(objPath, 'com.deepin.menu.Menu', 'MenuUnregistered')
         QDBusConnection.sessionBus().send(msg)
-        
+
         self.__timer = QTimer()
         self.__timer.singleShot = True
         self.__timer.timeout.connect(self.__checkToRestart)
@@ -105,7 +109,7 @@ class MenuObject(QObject):
 
     def showMenu(self, menuJsonContent):
         self.manager.showMenu(self, menuJsonContent)
-        
+
     def setItemText(self, id, value):
         msg = QDBusMessage.createSignal(self.objPath, 'com.deepin.menu.Menu', 'ItemTextSet')
         msg << id << value
@@ -173,7 +177,7 @@ class MenuObjectAdaptor(QDBusAbstractAdaptor):
     @pyqtSlot(str)
     def ShowMenu(self, menuJsonContent):
         self.parent().showMenu(menuJsonContent)
-    
+
     @pyqtSlot(str, str)
     def SetItemText(self, id, value):
         self.parent().setItemText(id, value)
@@ -218,10 +222,10 @@ class Injection(QObject):
         if len(seq) > 0:
             return seq[0]
         return -1
-    
+
     def startNewService(self):
         subprocess.Popen(["python", "-OO", os.path.join(os.path.dirname(__file__), "main.py")])
-        
+
 INJECTION = Injection()
 
 class Menu(QQuickView):
@@ -234,8 +238,12 @@ class Menu(QQuickView):
 
         self.setMenuJsonContent(menuJsonContent)
         self.setDBusObj(dbusObj)
-        
+
         qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
+
+        if not self.parent:
+            event_handler.left_button_press.connect(self.leftButtonPressedSlot)
+            event_handler.right_button_press.connect(self.rightButtonPressedSlot)
 
     def setDBusObj(self, dbusObj):
         self.dbusObj = dbusObj
@@ -253,6 +261,14 @@ class Menu(QQuickView):
         if window == None:
             self.destroyForward(True)
 
+    def leftButtonPressedSlot(self, rootX, rootY, timestamp):
+        if not self.isInSelf(rootX, rootY):
+            self.destroyForward(True)
+
+    def rightButtonPressedSlot(self, rootX, rootY, timestamp):
+        if not self.isInSelf(rootX, rootY):
+            self.destroyForward(True)
+
     @pyqtProperty(bool)
     def isSubMenu(self):
         return not self.parent == None
@@ -264,20 +280,28 @@ class Menu(QQuickView):
     @pyqtProperty("QVariant", constant=True)
     def menuJsonObj(self):
         return json.loads(self.__menuJsonContent)
-    
+
+    def isInSelf(self, x, y):
+        if isInRect(x, y, self.x(), self.y(), self.width(), self.height()):
+            return True
+        elif self.subMenu:
+            return self.subMenu.isInSelf(x, y)
+        else:
+            return False
+
     @pyqtSlot(str, bool)
     def notifyUpdateItemChecked(self, id, value):
         self.dbus_interface.setItemChecked(id, value)
 
     def updateCheckableItem(self, id, value):
         self.rootObject().updateCheckableItem(id, value)
-            
+
     def updateItemActivity(self, id, value):
         self.rootObject().updateItemActivity(id, value)
-        
+
     def updateItemText(self, id, value):
         self.rootObject().updateItemText(id, value)
-        
+
     @pyqtSlot(str, bool)
     def invokeItem(self, id, checked):
         msg = QDBusMessage.createSignal(self.dbusObj.objPath, 'com.deepin.menu.Menu', 'ItemInvoked')
@@ -338,7 +362,7 @@ class Menu(QQuickView):
 
     @pyqtSlot(bool)
     def destroyForward(self, includingSelf):
-        self.engine().collectGarbage()            
+        self.engine().collectGarbage()
         if self.subMenu:
             self.subMenu.destroyForward(True)
         if includingSelf:
@@ -348,7 +372,7 @@ class Menu(QQuickView):
             self.close()
         else:
             self.requestActivate()
-            
+
 @pyqtSlot(str)
 def serviceReplacedByOtherSlot(name):
     os._exit(0)
@@ -359,8 +383,8 @@ if __name__ == "__main__":
 
     bus = QDBusConnection.sessionBus()
     menuService = MenuService()
-    bus.interface().registerService('com.deepin.menu', 
-                                    QDBusConnectionInterface.ReplaceExistingService, 
+    bus.interface().registerService('com.deepin.menu',
+                                    QDBusConnectionInterface.ReplaceExistingService,
                                     QDBusConnectionInterface.AllowReplacement)
     bus.registerObject('/com/deepin/menu', menuService)
     bus.interface().serviceUnregistered.connect(serviceReplacedByOtherSlot)
@@ -370,6 +394,14 @@ if __name__ == "__main__":
     screenGeometry = desktopWidget.screenGeometry()
     SCREEN_WIDTH = screenGeometry.width()
     SCREEN_HEIGHT = screenGeometry.height()
+
+    from record_event import RecordEvent
+    from event_handler import EventHandler
+
+    event_handler = EventHandler()
+    record_event = RecordEvent()
+    record_event.capture_event.connect(event_handler.handle_event)
+    record_event.start()
 
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     sys.exit(app.exec_())
