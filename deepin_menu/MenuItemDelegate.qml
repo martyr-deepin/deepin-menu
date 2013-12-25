@@ -46,9 +46,9 @@ Component {
                 }
             }
 
-            onKeyDownSignal: {
-                if (keyCode == _injection.keyStringToCode(componentShortcut)) {
-                    MenuItemJs.onPressed(index, itemArea, menu)
+            onSelectItemPrivate: {
+                if (id == itemId) {
+                    MenuItemJs.onEntered(index, itemArea, menu)
                 }
             }
         }

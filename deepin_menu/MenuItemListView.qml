@@ -35,7 +35,7 @@ ListView {
 
     signal itemChecked(int idx, var item)
     signal itemUnchecked(int idx, var item)
-    signal keyDownSignal(int keyCode)
+    signal selectItemPrivate(string id)
 
     onItemChecked: {
         _menu_view.updateCheckableItem(item.componentId, true)
@@ -97,7 +97,7 @@ ListView {
 
         // Create new subMenu
         if (hasSubMenu(currentItem.componentSubMenu)) {
-            _menu_view.destroyForward(false)			
+            _menu_view.destroyForward(false)
             var component_menuJsonContent = currentItem.componentSubMenu
 
             var component_size = currentItem.ListView.view.getSize(component_menuJsonContent)
@@ -146,6 +146,23 @@ ListView {
         return menu.singleCheck
     }
 
+    function getNextItemsHasShortcut(keycode) {
+        for (var i = Math.max(currentIndex + 1, 0); i < listview.count; i++) {
+            // a trick here, using currentIndex as the cursor.
+            if (keycode == _injection.keyStringToCode(listview.model.get(i).itemShortcut)) {
+                return listview.model.get(i).itemId
+            }
+        }
+
+        for (var i = 0; i < listview.count; i++) {
+            // we do the check another time to support wrapping.
+            if (keycode == _injection.keyStringToCode(listview.model.get(i).itemShortcut)) {
+                return listview.model.get(i).itemId
+            }
+        }
+        return null
+    }
+
     function getSize(menuJsonContent) {
         var menu = JSON.parse(menuJsonContent)
         var items = menu.items
@@ -180,7 +197,7 @@ ListView {
     }
 
     function updateCheckableItem(id, value) {
-		/* update json content */
+        /* update json content */
         var json = JSON.parse(listview.menuJsonContent)
 
         for (var item in json.items) {
@@ -192,13 +209,13 @@ ListView {
         }
 
         listview.menuJsonContent = JSON.stringify(json)
-		
-		/* update model */
-		listview.model.updateItemChecked(id, value)
+
+        /* update model */
+        listview.model.updateItemChecked(id, value)
     }
-	
-	function updateItemActivity(id, value) {
-		/* update json content */
+
+    function updateItemActivity(id, value) {
+        /* update json content */
         var json = JSON.parse(listview.menuJsonContent)
 
         for (var item in json.items) {
@@ -209,12 +226,12 @@ ListView {
             }
         }
         listview.menuJsonContent = JSON.stringify(json)
-		listview.model.updateMenuJsonContent(listview.menuJsonContent)        
-        /* listview.model.updateItemActivity(id, value) */
-	}
+        listview.model.updateMenuJsonContent(listview.menuJsonContent)
+    /* listview.model.updateItemActivity(id, value) */
+    }
 
-	function updateItemText(id, value) {
-		/* update json content */
+    function updateItemText(id, value) {
+        /* update json content */
         var json = JSON.parse(listview.menuJsonContent)
 
         for (var item in json.items) {
@@ -225,15 +242,15 @@ ListView {
             }
         }
         listview.menuJsonContent = JSON.stringify(json)
-        listview.model.updateItemText(id, value)        
-	}
+        listview.model.updateItemText(id, value)
+    }
 
     Component.onCompleted: {
         var size = getSize(menuJsonContent)
 
         listview.width = size.width
         listview.height = size.height
-		
+
         if (!isDockMenu) {
             setHasSelection()
         }
@@ -241,26 +258,26 @@ ListView {
 
     Keys.onPressed: {
         switch(event.key) {
-			
+
             case Qt.Key_Escape:
             _menu_view.destroyForward(false)
             _menu_view.destroyBackward(true)
-			break;
-			
-			case Qt.Key_Left:
-			_menu_view.activateParent()			
-			break;
-			
-			case Qt.Key_Right:
-			_menu_view.activateSubMenu()
-			break;
-			
-			case Qt.Key_Return:
-			MenuItemJs.onPressed(currentIndex, currentItem, parent)			
-			break;
-			
-			default:
-			keyDownSignal(event.key)
+            break;
+
+            case Qt.Key_Left:
+            _menu_view.activateParent()
+            break;
+
+            case Qt.Key_Right:
+            _menu_view.activateSubMenu()
+            break;
+
+            case Qt.Key_Return:
+            MenuItemJs.onPressed(currentIndex, currentItem, parent)
+            break;
+
+            default:
+            if (getNextItemsHasShortcut(event.key)) { selectItemPrivate(getNextItemsHasShortcut(event.key)) }
         }
     }
 }

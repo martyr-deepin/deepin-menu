@@ -241,7 +241,9 @@ if __name__ == "__main__":
     menu = Menu([("id_driver", "Driver", ("/usr/share/icons/Deepin/apps/16/preferences-display.png",), [("id_sub1", "SubMenu1"), ("id_sub2", "SubMenu2", (), [("id_sub1", "SubMenu1"), ("id_sub2", "_SubMenu2", (), [("id_sub1", "SubMenu1"), ("id_sub2", "_SubMenu2", (), [("id_sub1", "SubMenu1"), ("id_sub2", "_SubMenu2")])])])]),
                  None,
                  ("id_display", "_Display", (), [("id_radio1", "Radio1"), ("id_radio2", "Radio2"),]),
-                 ("id_checkbox", "CheckBoxMenu"),
+                 ("id_checkbox", "CheckBox"),
+                 ("id_checkbox1", "_CheckOne"),
+                 ("id_checkbox2", "_CheckTwo"),
                  MenuSeparator(),
                  MenuItem("id_nonactive", "NotActive", isActive=False),
                  CheckboxMenuItem("id_check", "CheckMe", True)], is_root=True,)
