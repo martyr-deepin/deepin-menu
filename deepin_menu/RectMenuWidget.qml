@@ -46,10 +46,20 @@ Rect {
             if (distance > 0) {
                 _menu_view.x += distance
             }
+            
+            distance = 0 - _menu_view.y
+            if (distance > 0) {
+                _menu_view.y += distance
+            }
 
-            var distance = _menu_view.x + menu.width - _injection.getScreenWidth()
+            distance = _menu_view.x + menu.width - _injection.getScreenWidth()
             if (distance > 0) {
                 _menu_view.x -= distance
+            }
+            
+            distance = _menu_view.y + menu.height - _injection.getScreenHeight()
+            if (distance > 0) {
+                _menu_view.y -= distance
             }
         }
     }
