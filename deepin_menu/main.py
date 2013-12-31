@@ -6,9 +6,9 @@ QCoreApplication.setAttribute(10, True)
 QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads, True)
 
 from PyQt5.QtQuick import QQuickView
-from PyQt5.QtWidgets import QApplication, qApp
+from PyQt5.QtWidgets import QApplication, qApp, QWidget
 from PyQt5.QtGui import QSurfaceFormat, QColor, QKeySequence, QCursor, QFont, QFontMetrics
-from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal, QTimer, QThread
+from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal, QTimer, QThread, QEvent
 from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusConnectionInterface, QDBusMessage
 import os
 import sys
@@ -233,45 +233,52 @@ class Injection(QObject):
 INJECTION = Injection()
 
 class XGraber(QThread):
-    def __init__(self, wid=None):
+    def __init__(self, owner=None):
         super(QThread, self).__init__()
-        self.owner_wid = wid
+        self.owner = owner
         self._conn = xcb.connect()
         self.__pointer_grab_flag = False
         self.__keyboard_grab_flag = False
+        
+    @property
+    def owner_wid(self):
+        return self.owner.winId().__int__() if self.owner else None
 
     def grab_pointer(self):
-        if self.__pointer_grab_flag: return
+        print self.owner_wid
+        if not self.owner_wid or self.__pointer_grab_flag: return
         mask = EventMask.PointerMotion | EventMask.ButtonRelease | EventMask.ButtonPress
-        print "grab_pointer", self.owner_wid
-        self._conn.core.GrabPointer(True, self.owner_wid, mask, GrabMode.Sync, GrabMode.Sync,
+        self._conn.core.GrabPointer(False, self.owner_wid, mask, GrabMode.Async, GrabMode.Async,
                                     0, 0,
                                     xproto.Time.CurrentTime).reply()
         self.__pointer_grab_flag = True
         
     def ungrab_pointer(self):
-        if not self.__pointer_grab_flag: return
+        if not self.owner_wid or not self.__pointer_grab_flag: return
         self._conn.core.UngrabPointerChecked(xproto.Time.CurrentTime).check()
         self.__pointer_grab_flag = False
         
     def grab_keyboard(self):
-        if self.__keyboard_grab_flag: return        
-        print "grab_keyboard"
-        self._conn.core.GrabKeyboard(True, self.owner_wid, xproto.Time.CurrentTime,
-                                     GrabMode.Sync, GrabMode.Sync).reply()
+        if not self.owner_wid or self.__keyboard_grab_flag: return        
+        self._conn.core.GrabKeyboard(False, self.owner_wid, xproto.Time.CurrentTime,
+                                     GrabMode.Async, GrabMode.Async).reply()
         self.__keyboard_grab_flag = True
         
     def ungrab_keyboard(self):
-        if not self.__keyboard_grab_flag: return
+        if not self.owner_wid or not self.__keyboard_grab_flag: return
         self._conn.core.UngrabKeyboardChecked(xproto.Time.CurrentTime).check()
         self.__keyboard_grab_flag = False
         
     def run(self):
         while True:
             e = self._conn.poll_for_event()
+            # if e: print e.__dict__
             if e and isinstance(e, xproto.MotionNotifyEvent):
-                print e.x, e.y
+                if self.owner and self.owner.isInSelf(e.root_x, e.root_y):
+                    self.ungrab_pointer()
+                    self.ungrab_keyboard()
             
+  
 class Menu(QQuickView):
 
     def __init__(self, dbusObj, menuJsonContent, parent=None):
@@ -283,6 +290,7 @@ class Menu(QQuickView):
         self.setMenuJsonContent(menuJsonContent)
         self.setDBusObj(dbusObj)
 
+        self.installEventFilter(self)
         qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
 
     def setDBusObj(self, dbusObj):
@@ -308,13 +316,19 @@ class Menu(QQuickView):
             return self.subMenu.isInSelf(x, y)
         else:
             return False        
+            
+    def eventFilter(self, obj, event):
+        if isinstance(obj, Menu) and event.type() == QEvent.Leave:
+            self.grab_pointer()
+            self.grab_keyboard()
+        return QWidget.eventFilter(self, obj, event)
         
     def grab_pointer (self):
-        xgraber.owner_wid = self.winId().__int__()
+        xgraber.owner = self
         xgraber.grab_pointer()
 
     def grab_keyboard(self):
-        xgraber.owner_wid = self.winId().__int__()        
+        xgraber.owner = self
         xgraber.grab_keyboard()    
 
     @pyqtProperty(bool)
@@ -439,6 +453,7 @@ if __name__ == "__main__":
     
     xgraber = XGraber()
     xgraber.start()
+    xgraber.setPriority(QThread.LowestPriority)
 
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     sys.exit(app.exec_())
