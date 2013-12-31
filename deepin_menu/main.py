@@ -268,10 +268,10 @@ class XGraber(QThread):
         
     def run(self):
         while True:
-            print "run"
-            self._conn.poll_for_event()
-            self.sleep(5)
-        
+            e = self._conn.poll_for_event()
+            if e and isinstance(e, xproto.MotionNotifyEvent):
+                print e.x, e.y
+            
 class Menu(QQuickView):
 
     def __init__(self, dbusObj, menuJsonContent, parent=None):
