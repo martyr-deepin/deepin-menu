@@ -248,9 +248,10 @@ class XGraber(QThread):
         print self.owner_wid
         if not self.owner_wid or self.__pointer_grab_flag: return
         mask = EventMask.PointerMotion | EventMask.ButtonRelease | EventMask.ButtonPress
-        self._conn.core.GrabPointer(False, self.owner_wid, mask, GrabMode.Async, GrabMode.Async,
+        while self._conn.core.GrabPointer(False, self.owner_wid, mask, GrabMode.Async, GrabMode.Async,
                                     0, 0,
-                                    xproto.Time.CurrentTime).reply()
+                                    xproto.Time.CurrentTime).reply().status != 0:
+            pass
         self.__pointer_grab_flag = True
         
     def ungrab_pointer(self):
@@ -272,6 +273,8 @@ class XGraber(QThread):
     def run(self):
         while True:
             e = self._conn.poll_for_event()
+            if e == None :
+                self.yieldCurrentThread()
             # if e: print e.__dict__
             if e and isinstance(e, xproto.MotionNotifyEvent):
                 if self.owner and self.owner.isInSelf(e.root_x, e.root_y):
@@ -453,7 +456,7 @@ if __name__ == "__main__":
     
     xgraber = XGraber()
     xgraber.start()
-    xgraber.setPriority(QThread.LowestPriority)
+    #xgraber.setPriority(QThread.LowestPriority)
 
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     sys.exit(app.exec_())
