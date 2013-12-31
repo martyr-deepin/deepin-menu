@@ -5,10 +5,10 @@ from PyQt5.QtCore import QCoreApplication
 QCoreApplication.setAttribute(10, True)
 QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads, True)
 
-from PyQt5.QtWidgets import QApplication, qApp
 from PyQt5.QtQuick import QQuickView
+from PyQt5.QtWidgets import QApplication, qApp
 from PyQt5.QtGui import QSurfaceFormat, QColor, QKeySequence, QCursor, QFont, QFontMetrics
-from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal, QTimer
+from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal, QTimer, QThread
 from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusConnectionInterface, QDBusMessage
 import os
 import sys
@@ -16,6 +16,10 @@ import json
 import signal
 import subprocess
 from uuid import uuid4
+
+import xcb
+from xcb import xproto
+from xcb.xproto import EventMask, GrabMode
 
 from DBusInterfaces import MenuObjectInterface
 
@@ -228,6 +232,46 @@ class Injection(QObject):
 
 INJECTION = Injection()
 
+class XGraber(QThread):
+    def __init__(self, wid=None):
+        super(QThread, self).__init__()
+        self.owner_wid = wid
+        self._conn = xcb.connect()
+        self.__pointer_grab_flag = False
+        self.__keyboard_grab_flag = False
+
+    def grab_pointer(self):
+        if self.__pointer_grab_flag: return
+        mask = EventMask.PointerMotion | EventMask.ButtonRelease | EventMask.ButtonPress
+        print "grab_pointer", self.owner_wid
+        self._conn.core.GrabPointer(True, self.owner_wid, mask, GrabMode.Sync, GrabMode.Sync,
+                                    0, 0,
+                                    xproto.Time.CurrentTime).reply()
+        self.__pointer_grab_flag = True
+        
+    def ungrab_pointer(self):
+        if not self.__pointer_grab_flag: return
+        self._conn.core.UngrabPointerChecked(xproto.Time.CurrentTime).check()
+        self.__pointer_grab_flag = False
+        
+    def grab_keyboard(self):
+        if self.__keyboard_grab_flag: return        
+        print "grab_keyboard"
+        self._conn.core.GrabKeyboard(True, self.owner_wid, xproto.Time.CurrentTime,
+                                     GrabMode.Sync, GrabMode.Sync).reply()
+        self.__keyboard_grab_flag = True
+        
+    def ungrab_keyboard(self):
+        if not self.__keyboard_grab_flag: return
+        self._conn.core.UngrabKeyboardChecked(xproto.Time.CurrentTime).check()
+        self.__keyboard_grab_flag = False
+        
+    def run(self):
+        while True:
+            print "run"
+            self._conn.poll_for_event()
+            self.sleep(5)
+        
 class Menu(QQuickView):
 
     def __init__(self, dbusObj, menuJsonContent, parent=None):
@@ -240,10 +284,6 @@ class Menu(QQuickView):
         self.setDBusObj(dbusObj)
 
         qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
-
-        if not self.parent:
-            event_handler.left_button_press.connect(self.leftButtonPressedSlot)
-            event_handler.right_button_press.connect(self.rightButtonPressedSlot)
 
     def setDBusObj(self, dbusObj):
         self.dbusObj = dbusObj
@@ -260,14 +300,22 @@ class Menu(QQuickView):
             return
         if window == None:
             self.destroyForward(True)
+            
+    def isInSelf(self, x, y):
+        if isInRect(x, y, self.x(), self.y(), self.width(), self.height()):
+            return True
+        elif self.subMenu:
+            return self.subMenu.isInSelf(x, y)
+        else:
+            return False        
+        
+    def grab_pointer (self):
+        xgraber.owner_wid = self.winId().__int__()
+        xgraber.grab_pointer()
 
-    def leftButtonPressedSlot(self, rootX, rootY, timestamp):
-        if not self.isInSelf(rootX, rootY):
-            self.destroyForward(True)
-
-    def rightButtonPressedSlot(self, rootX, rootY, timestamp):
-        if not self.isInSelf(rootX, rootY):
-            self.destroyForward(True)
+    def grab_keyboard(self):
+        xgraber.owner_wid = self.winId().__int__()        
+        xgraber.grab_keyboard()    
 
     @pyqtProperty(bool)
     def isSubMenu(self):
@@ -280,14 +328,6 @@ class Menu(QQuickView):
     @pyqtProperty("QVariant", constant=True)
     def menuJsonObj(self):
         return json.loads(self.__menuJsonContent)
-
-    def isInSelf(self, x, y):
-        if isInRect(x, y, self.x(), self.y(), self.width(), self.height()):
-            return True
-        elif self.subMenu:
-            return self.subMenu.isInSelf(x, y)
-        else:
-            return False
 
     @pyqtSlot(str, bool)
     def notifyUpdateItemChecked(self, id, value):
@@ -347,6 +387,8 @@ class Menu(QQuickView):
             self.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'RectMenu.qml')))
 
         self.show()
+        self.grab_pointer()
+        self.grab_keyboard()
 
     @pyqtSlot(bool)
     def destroyBackward(self, includingSelf):
@@ -394,14 +436,9 @@ if __name__ == "__main__":
     screenGeometry = desktopWidget.screenGeometry()
     SCREEN_WIDTH = screenGeometry.width()
     SCREEN_HEIGHT = screenGeometry.height()
-
-    from record_event import RecordEvent
-    from event_handler import EventHandler
-
-    event_handler = EventHandler()
-    record_event = RecordEvent()
-    record_event.capture_event.connect(event_handler.handle_event)
-    record_event.start()
+    
+    xgraber = XGraber()
+    xgraber.start()
 
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     sys.exit(app.exec_())
