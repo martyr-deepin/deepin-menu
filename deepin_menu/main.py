@@ -280,6 +280,8 @@ class XGraber(QThread):
                     self.ungrab_pointer()
                     self.ungrab_keyboard()
             elif isinstance(e, xproto.ButtonPressEvent):
+                self.ungrab_pointer()
+                self.ungrab_keyboard()
                 self.owner.destroyForward(True)
 
 
