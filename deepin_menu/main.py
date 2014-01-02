@@ -410,8 +410,8 @@ class Menu(QQuickView):
             self.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'RectMenu.qml')))
 
         self.show()
-        # self.grab_pointer()
-        # self.grab_keyboard()
+        self.grab_pointer()
+        self.grab_keyboard()
 
     @pyqtSlot(bool)
     def destroyBackward(self, includingSelf):
