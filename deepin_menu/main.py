@@ -239,54 +239,53 @@ class XGraber(QThread):
         self._conn = xcb.connect()
         self.__pointer_grab_flag = False
         self.__keyboard_grab_flag = False
-        
+
     @property
     def owner_wid(self):
         return self.owner.winId().__int__() if self.owner else None
 
     def grab_pointer(self):
-        print self.owner_wid
         if not self.owner_wid or self.__pointer_grab_flag: return
         mask = EventMask.PointerMotion | EventMask.ButtonRelease | EventMask.ButtonPress
         while self._conn.core.GrabPointer(False, self.owner_wid, mask, GrabMode.Async, GrabMode.Async,
-                                    0, 0,
-                                    xproto.Time.CurrentTime).reply().status != 0:
+                                          0, 0,
+                                          xproto.Time.CurrentTime).reply().status != 0:
             pass
         self.__pointer_grab_flag = True
-        
+
     def ungrab_pointer(self):
         if not self.owner_wid or not self.__pointer_grab_flag: return
         self._conn.core.UngrabPointerChecked(xproto.Time.CurrentTime).check()
         self.__pointer_grab_flag = False
-        
+
     def grab_keyboard(self):
-        if not self.owner_wid or self.__keyboard_grab_flag: return        
-        self._conn.core.GrabKeyboard(False, self.owner_wid, xproto.Time.CurrentTime,
-                                     GrabMode.Async, GrabMode.Async).reply()
+        if not self.owner_wid or self.__keyboard_grab_flag: return
+        while self._conn.core.GrabKeyboard(False, self.owner_wid, xproto.Time.CurrentTime,
+                                           GrabMode.Async, GrabMode.Async).reply().status != 0:
+            pass
         self.__keyboard_grab_flag = True
-        
+
     def ungrab_keyboard(self):
         if not self.owner_wid or not self.__keyboard_grab_flag: return
         self._conn.core.UngrabKeyboardChecked(xproto.Time.CurrentTime).check()
         self.__keyboard_grab_flag = False
-        
+
     def run(self):
         while True:
             e = self._conn.poll_for_event()
             if e == None :
                 self.yieldCurrentThread()
-            # if e: print e.__dict__
-            if e and isinstance(e, xproto.MotionNotifyEvent):
-                if self.owner and self.owner.isInSelf(e.root_x, e.root_y):
+            if isinstance(e, xproto.MotionNotifyEvent):
+                if self.owner and self.owner.inMenuArea(e.root_x, e.root_y):
                     self.ungrab_pointer()
                     self.ungrab_keyboard()
-            
-  
-class Menu(QQuickView):
+            elif isinstance(e, xproto.ButtonPressEvent):
+                self.owner.destroyForward(True)
 
+
+class Menu(QQuickView):
     def __init__(self, dbusObj, menuJsonContent, parent=None):
         QQuickView.__init__(self)
-
         self.parent = parent
         self.subMenu = None
 
@@ -311,28 +310,35 @@ class Menu(QQuickView):
             return
         if window == None:
             self.destroyForward(True)
-            
-    def isInSelf(self, x, y):
+
+    def inMenuArea(self, x, y):
         if isInRect(x, y, self.x(), self.y(), self.width(), self.height()):
             return True
-        elif self.subMenu:
-            return self.subMenu.isInSelf(x, y)
-        else:
-            return False        
-            
+        elif self.subMenu and self.subMenu.inMenuArea(x, y):
+            return True
+        return False
+
     def eventFilter(self, obj, event):
-        if isinstance(obj, Menu) and event.type() == QEvent.Leave:
+        cursor_pos = getCursorPosition()
+        if isinstance(obj, Menu) and event.type() == QEvent.Leave \
+           and not self.ancestor.inMenuArea(cursor_pos.x(), cursor_pos.y()):
             self.grab_pointer()
             self.grab_keyboard()
         return QWidget.eventFilter(self, obj, event)
-        
-    def grab_pointer (self):
-        xgraber.owner = self
+
+    def grab_pointer(self):
+        xgraber.owner = self.ancestor
         xgraber.grab_pointer()
 
     def grab_keyboard(self):
-        xgraber.owner = self
-        xgraber.grab_keyboard()    
+        xgraber.owner = self.ancestor
+        xgraber.grab_keyboard()
+
+    @property
+    def ancestor(self):
+        if not self.parent:
+            return self
+        else: return self.parent.ancestor
 
     @pyqtProperty(bool)
     def isSubMenu(self):
@@ -404,8 +410,8 @@ class Menu(QQuickView):
             self.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'RectMenu.qml')))
 
         self.show()
-        self.grab_pointer()
-        self.grab_keyboard()
+        # self.grab_pointer()
+        # self.grab_keyboard()
 
     @pyqtSlot(bool)
     def destroyBackward(self, includingSelf):
@@ -453,7 +459,7 @@ if __name__ == "__main__":
     screenGeometry = desktopWidget.screenGeometry()
     SCREEN_WIDTH = screenGeometry.width()
     SCREEN_HEIGHT = screenGeometry.height()
-    
+
     xgraber = XGraber()
     xgraber.start()
     #xgraber.setPriority(QThread.LowestPriority)
