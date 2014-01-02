@@ -70,7 +70,7 @@ class MenuService(QObject):
 
     def showMenu(self, dbusObj, menuJsonContent):
         if self.__menu:
-            self.__menu.destroyForward(False)
+            self.__menu.destroySubs()
             self.__menu.setDBusObj(dbusObj)
             self.__menu.setMenuJsonContent(menuJsonContent)
         else:
@@ -282,7 +282,7 @@ class XGraber(QThread):
             elif isinstance(e, xproto.ButtonPressEvent):
                 self.ungrab_pointer()
                 self.ungrab_keyboard()
-                self.owner.destroyForward(True)
+                self.owner.destroyWholeMenu()
 
 
 class Menu(QQuickView):
@@ -311,7 +311,7 @@ class Menu(QQuickView):
         if not self:
             return
         if window == None:
-            self.destroyForward(True)
+            self.destroyWholeMenu()
 
     def inMenuArea(self, x, y):
         if isInRect(x, y, self.x(), self.y(), self.width(), self.height()):
@@ -414,31 +414,21 @@ class Menu(QQuickView):
         self.show()
         self.grab_pointer()
         self.grab_keyboard()
-
-    @pyqtSlot(bool)
-    def destroyBackward(self, includingSelf):
-        self.engine().collectGarbage()
-        if self.parent:
-            self.parent.destroyBackward(True)
-        if includingSelf:
-            if not self.parent:
-                menuService.unregisterMenu(self.dbusObj.objPath)
-            self.close()
-        else:
-            self.requestActivate()
-
-    @pyqtSlot(bool)
-    def destroyForward(self, includingSelf):
-        self.engine().collectGarbage()
+        
+    def destroyForward(self):
         if self.subMenu:
-            self.subMenu.destroyForward(True)
-        if includingSelf:
-            if not self.parent:
-                menuService.unregisterMenu(self.dbusObj.objPath)
-            # self.deleteLater()
-            self.close()
-        else:
-            self.requestActivate()
+            self.subMenu.destroyForward()
+        self.destroy()
+        
+    @pyqtSlot()
+    def destroyWholeMenu(self):
+        menuService.unregisterMenu(self.dbusObj.objPath)
+        self.ancestor.destroyForward()
+        
+    @pyqtSlot()
+    def destroySubs(self):
+        if self.subMenu: self.subMenu.destroyForward()
+        self.requestActivate()
 
 @pyqtSlot(str)
 def serviceReplacedByOtherSlot(name):

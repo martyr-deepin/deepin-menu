@@ -97,7 +97,7 @@ ListView {
 
         // Create new subMenu
         if (hasSubMenu(currentItem.componentSubMenu)) {
-            _menu_view.destroyForward(false)
+            _menu_view.destroySubs()
             var component_menuJsonContent = currentItem.componentSubMenu
 
             var component_size = currentItem.ListView.view.getSize(component_menuJsonContent)
@@ -123,7 +123,7 @@ ListView {
                                                    "isSingleCheck": component_is_single_check,
                                                    "menuJsonContent": component_menuJsonContent}))
         } else {
-            _menu_view.destroyForward(false)
+            _menu_view.destroySubs()
         }
     }
 
@@ -260,8 +260,7 @@ ListView {
         switch(event.key) {
 
             case Qt.Key_Escape:
-            _menu_view.destroyForward(false)
-            _menu_view.destroyBackward(true)
+            _menu_view.destroyWholeMenu()
             break;
 
             case Qt.Key_Left:
