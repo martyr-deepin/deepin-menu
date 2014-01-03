@@ -274,7 +274,8 @@ class XGraber(QThread):
         while True:
             e = self._conn.poll_for_event()
             if e == None :
-                self.yieldCurrentThread()
+                # self.yieldCurrentThread()
+                self.usleep(400)
             if isinstance(e, xproto.MotionNotifyEvent):
                 if self.owner and self.owner.inMenuArea(e.root_x, e.root_y):
                     self.ungrab_pointer()
