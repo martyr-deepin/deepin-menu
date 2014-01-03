@@ -27,9 +27,9 @@ Component {
         property bool componentCheckable: isCheckable
         property bool componentChecked: checked
         property string componentShortcut: itemShortcut
-        property string iconNormal: componentCheckable && componentChecked ? _get_check_icon("normal") : itemIcon
-        property string iconHover: componentCheckable && componentChecked ? _get_check_icon("hover") : itemIconHover
-        property string iconInactive: componentCheckable && componentChecked ? _get_check_icon("inactive") : itemIconInactive
+        property string iconNormal: itemIcon 
+        property string iconHover: itemIconHover
+        property string iconInactive: itemIconInactive
 
         property alias itemTextColor: componentText.color
         property alias itemArrowPic: componentIndicator.source
