@@ -235,7 +235,7 @@ ListView {
             break;
 
             case Qt.Key_Return:
-            MenuItemJs.onPressed(currentIndex, currentItem, parent)
+            MenuItemJs.onClicked(currentIndex, currentItem, parent)
             break;
 
             default:

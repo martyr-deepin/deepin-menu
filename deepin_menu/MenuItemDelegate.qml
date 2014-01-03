@@ -180,7 +180,7 @@ Component {
             anchors.fill: parent
             hoverEnabled: true
 
-            onPressed: MenuItemJs.onPressed(index, parent, menu)
+            onClicked: MenuItemJs.onClicked(index, parent, menu)
             onEntered: MenuItemJs.onEntered(index, parent, menu)
         }
     }
