@@ -27,14 +27,14 @@ Component {
         property bool componentCheckable: isCheckable
         property bool componentChecked: checked
         property string componentShortcut: itemShortcut
-        property string iconNormal: itemIcon
-        property string iconHover: itemIconHover
-        property string iconInactive: itemIconInactive
+        property string iconNormal: componentCheckable && componentChecked ? _get_check_icon("normal") : itemIcon
+        property string iconHover: componentCheckable && componentChecked ? _get_check_icon("hover") : itemIconHover
+        property string iconInactive: componentCheckable && componentChecked ? _get_check_icon("inactive") : itemIconInactive
 
         property alias itemTextColor: componentText.color
         property alias itemArrowPic: componentIndicator.source
         property alias itemIconPic: componentImage.source
-
+        
         Connections {
             target: itemArea.ListView.view
 
@@ -52,18 +52,20 @@ Component {
                 }
             }
         }
-
+        
+        function _get_check_icon(state) {
+            if (isDockMenu) {
+                return "images/check_dark_" + state + ".png"
+            } else {
+                return "images/check_light_" + state + ".png"
+            }
+        }
+        
         function checkThis() {
             if (showCheckmark) {
-                if (isDockMenu) {
-                    iconNormal = "images/check_dark.png"
-                    iconHover = "images/check_dark_hover.png"
-                    iconInactive = "images/check_dark_inactive.png"
-                } else {
-                    iconNormal = "images/check_light.png"
-                    iconHover = "images/check_light_hover.png"
-                    iconInactive = "images/check_light_inactive.png"
-                }
+                iconNormal = _get_check_icon("normal")
+                iconHover = _get_check_icon("hover")
+                iconInactive = _get_check_icon("inactive")
             }
         }
 

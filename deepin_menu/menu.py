@@ -201,6 +201,7 @@ class CheckboxMenu(Menu):
 
     def addMenuItem(self, item):
         item.isCheckable = True
+        item.showCheckmark = True
         self.items.append(item)
 
 class RadioButtonMenu(Menu):
@@ -209,6 +210,7 @@ class RadioButtonMenu(Menu):
 
     def addMenuItem(self, item):
         item.isCheckable = True
+        item.showCheckmark = True
         self.items.append(item)
 
 if __name__ == "__main__":
@@ -249,7 +251,7 @@ if __name__ == "__main__":
                  CheckboxMenuItem("id_check", "CheckMe", True)], is_root=True,)
     sub = RadioButtonMenu([("id_radio1", "Radio1"), ("id_radio2", "Radio2"),])
     menu.getItemById("id_checkbox").setSubMenu(sub)
-    menu.getItemById("id_radio2").showCheckmark = False
+    # menu.getItemById("id_radio2").showCheckmark = False
     menu.itemClicked.connect(invoked)
     menu.menuDismissed.connect(dismissed)
     # menu.showRectMenu(300, 300)

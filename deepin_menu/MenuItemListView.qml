@@ -197,51 +197,14 @@ ListView {
     }
 
     function updateCheckableItem(id, value) {
-        /* update json content */
-        var json = JSON.parse(listview.menuJsonContent)
-
-        for (var item in json.items) {
-            if (json.items[item].itemSubMenu.items.length != 0) {
-                updateCheckableItem(JSON.stringify(json.items[item].itemSubMenu), id, value)
-            } else if (json.items[item].itemId == id){
-                json.items[item].checked = value
-            }
-        }
-
-        listview.menuJsonContent = JSON.stringify(json)
-
-        /* update model */
         listview.model.updateItemChecked(id, value)
     }
 
     function updateItemActivity(id, value) {
-        /* update json content */
-        var json = JSON.parse(listview.menuJsonContent)
-
-        for (var item in json.items) {
-            if (json.items[item].itemSubMenu.items.length != 0) {
-                updateCheckableItem(JSON.stringify(json.items[item].itemSubMenu), id, value)
-            } else if (json.items[item].itemId == id){
-                json.items[item].isActive = value
-            }
-        }
-        listview.menuJsonContent = JSON.stringify(json)
-        listview.model.updateMenuJsonContent(listview.menuJsonContent)
-    /* listview.model.updateItemActivity(id, value) */
+        listview.model.updateItemActivity(id, value)
     }
 
     function updateItemText(id, value) {
-        /* update json content */
-        var json = JSON.parse(listview.menuJsonContent)
-
-        for (var item in json.items) {
-            if (json.items[item].itemSubMenu.items.length != 0) {
-                updateCheckableItem(JSON.stringify(json.items[item].itemSubMenu), id, value)
-            } else if (json.items[item].itemId == id){
-                json.items[item].itemText = value
-            }
-        }
-        listview.menuJsonContent = JSON.stringify(json)
         listview.model.updateItemText(id, value)
     }
 
