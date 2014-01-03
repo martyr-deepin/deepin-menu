@@ -35,7 +35,7 @@ ListView {
 
     signal itemChecked(int idx, var item)
     signal itemUnchecked(int idx, var item)
-    signal selectItemPrivate(string id)
+    signal selectItemPrivate(int idx)
 
     onItemChecked: {
         _menu_view.updateCheckableItem(item.componentId, true)
@@ -145,19 +145,21 @@ ListView {
         var menu = JSON.parse(menuJsonContent)
         return menu.singleCheck
     }
-
-    function getNextItemsHasShortcut(keycode) {
-        for (var i = Math.max(currentIndex + 1, 0); i < listview.count; i++) {
+    
+    function getNextItemsHasShortcut(startPos, keycode) {
+        for (var i = Math.max(startPos, 0); i < listview.count; i++) {
             // a trick here, using currentIndex as the cursor.
             if (keycode == _injection.keyStringToCode(listview.model.get(i).itemShortcut)) {
-                return listview.model.get(i).itemId
+                print(listview.model.get(i).itemText)
+                return i
             }
         }
 
         for (var i = 0; i < listview.count; i++) {
             // we do the check another time to support wrapping.
             if (keycode == _injection.keyStringToCode(listview.model.get(i).itemShortcut)) {
-                return listview.model.get(i).itemId
+                print(listview.model.get(i).itemText)
+                return i
             }
         }
         return null
@@ -226,6 +228,14 @@ ListView {
             _menu_view.destroyWholeMenu()
             break;
 
+            case Qt.Key_Up:
+            currentIndex = Math.max(currentIndex - 1, 0)
+            break;
+
+            case Qt.Key_Down:
+            currentIndex = Math.min(currentIndex + 1, listview.count - 1)
+            break;
+
             case Qt.Key_Left:
             _menu_view.activateParent()
             break;
@@ -238,8 +248,15 @@ ListView {
             MenuItemJs.onClicked(currentIndex, currentItem, parent)
             break;
 
-            default:
-            if (getNextItemsHasShortcut(event.key)) { selectItemPrivate(getNextItemsHasShortcut(event.key)) }
+            default: {
+                var _next_index_has_shortcut = getNextItemsHasShortcut(currentIndex + 1, event.key)
+                if (_next_index_has_shortcut) { 
+                    selectItemPrivate(getNextItemsHasShortcut(currentIndex + 1, event.key)) 
+                    if (_next_index_has_shortcut == getNextItemsHasShortcut(_next_index_has_shortcut + 1, event.key)) {
+                        MenuItemJs.onClicked(currentIndex, currentItem, parent)
+                    }
+                }
+            }
         }
     }
 }

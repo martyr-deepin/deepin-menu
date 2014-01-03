@@ -47,7 +47,7 @@ Component {
             }
 
             onSelectItemPrivate: {
-                if (id == itemId) {
+                if (index == idx) {
                     MenuItemJs.onEntered(index, itemArea, menu)
                 }
             }
