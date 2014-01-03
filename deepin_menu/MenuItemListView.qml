@@ -8,7 +8,7 @@ ListView {
     model: MenuItemListModel { menuJsonContent: listview.menuJsonContent}
     delegate: MenuItemDelegate {}
     /* keyNavigationWraps: true */
-    /* interactive: false */
+    interactive: false
 
     property int textSize: 12
     property int textLeftMargin: 22
