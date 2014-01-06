@@ -21,8 +21,7 @@ import xcb
 from xcb import xproto
 from xcb.xproto import EventMask, GrabMode
 
-import logger
-from logger import func_logger
+from logger import func_logger, logger
 from DBusInterfaces import MenuObjectInterface
 
 SCREEN_WIDTH = 0
