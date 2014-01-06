@@ -5,9 +5,9 @@ from PyQt5.QtCore import QCoreApplication
 QCoreApplication.setAttribute(10, True)
 QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads, True)
 
-from PyQt5.QtQuick import QQuickView
+from PyQt5.QtQuick import QQuickView, QQuickItem
 from PyQt5.QtWidgets import QApplication, qApp, QWidget
-from PyQt5.QtGui import QSurfaceFormat, QColor, QKeySequence, QCursor, QFont, QFontMetrics
+from PyQt5.QtGui import QSurfaceFormat, QColor, QKeySequence, QKeyEvent, QCursor, QFont, QFontMetrics
 from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal, QTimer, QThread, QEvent
 from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusConnectionInterface, QDBusMessage
 import os
@@ -21,6 +21,7 @@ import xcb
 from xcb import xproto
 from xcb.xproto import EventMask, GrabMode
 
+import functools
 from logger import func_logger, logger
 from DBusInterfaces import MenuObjectInterface
 
@@ -230,8 +231,42 @@ class Injection(QObject):
 
     def startNewService(self):
         subprocess.Popen(["python", "-OO", os.path.join(os.path.dirname(__file__), "main.py")])
+        
+class postGui(QtCore.QObject):
+    
+    throughThread = QtCore.pyqtSignal(object, object)    
+    
+    def __init__(self, inclass=True):
+        super(postGui, self).__init__()
+        self.throughThread.connect(self.onSignalReceived)
+        self.inclass = inclass
+        
+    def __call__(self, func):
+        self._func = func
+        
+        @functools.wraps(func)
+        def objCall(*args, **kwargs):
+            self.emitSignal(args, kwargs)
+        return objCall
+        
+    def emitSignal(self, args, kwargs):
+        self.throughThread.emit(args, kwargs)
+                
+    def onSignalReceived(self, args, kwargs):
+        if self.inclass:
+            obj, args = args[0], args[1:]
+            self._func(obj, *args, **kwargs)
+        else:    
+            self._func(*args, **kwargs)
 
 INJECTION = Injection()
+ALLOWED_KEYS = [38, 56, 54, 40, 26, 41, 
+                42, 43, 31, 44, 45, 46, 
+                58, 57, 32, 33, 24, 27, 
+                39, 28, 30, 55, 25, 53,
+                29, 52,         # a-z
+                111, 116, 113, 114, # arrows
+                36, 9]          # enter escape
 
 class XGraber(QThread):
     def __init__(self, owner=None):
@@ -249,10 +284,12 @@ class XGraber(QThread):
     def grab_pointer(self):
         if not self.owner_wid or self.__pointer_grab_flag: return
         mask = EventMask.PointerMotion | EventMask.ButtonRelease | EventMask.ButtonPress
-        while not self._conn.core.GrabPointer(False, self.owner_wid, mask, GrabMode.Async, GrabMode.Async,
-                                              0, 0,
-                                              xproto.Time.CurrentTime).reply().status in [0, 1]:
+        try_times = 10
+        while try_times and not self._conn.core.GrabPointer(False, self.owner_wid, mask, GrabMode.Async, GrabMode.Async,
+                                                            0, 0,
+                                                            xproto.Time.CurrentTime).reply().status in [0, 1]:
             logger.info("grabbing pointer")
+            try_times -= 1
             self.usleep(500)
         self.__pointer_grab_flag = True
 
@@ -265,9 +302,11 @@ class XGraber(QThread):
     @func_logger()
     def grab_keyboard(self):
         if not self.owner_wid or self.__keyboard_grab_flag: return
-        while not self._conn.core.GrabKeyboard(False, self.owner_wid, xproto.Time.CurrentTime,
-                                               GrabMode.Async, GrabMode.Async).reply().status in [0, 1]:
+        try_times = 10
+        while try_times and not self._conn.core.GrabKeyboard(False, self.owner_wid, xproto.Time.CurrentTime,
+                                                             GrabMode.Async, GrabMode.Async).reply().status in [0, 1]:
             logger.info("grabbing keyboard")            
+            try_times -= 1
             self.usleep(500)            
         self.__keyboard_grab_flag = True
 
@@ -276,6 +315,25 @@ class XGraber(QThread):
         if not self.owner_wid or not self.__keyboard_grab_flag: return
         self._conn.core.UngrabKeyboardChecked(xproto.Time.CurrentTime).check()
         self.__keyboard_grab_flag = False
+        
+    @postGui()
+    def simulate_key_press(self, keycode):
+        x_arrow_keys = (111, 116, 113, 114)
+        qt_arrow_keys = (16777235, 16777237, 16777234, 16777236)
+        x_special_keys = (36, 9)
+        qt_special_keys = (16777220, 16777216)
+        qt_ascii_keys = range(65, 91)
+        if keycode in x_arrow_keys:
+            keycode = qt_arrow_keys[x_arrow_keys.index(keycode)]
+        elif keycode in x_special_keys:
+            keycode = qt_special_keys[x_special_keys.index(keycode)]
+        else:
+            keycode = qt_ascii_keys[ALLOWED_KEYS.index(keycode)]
+        key_press_event = QKeyEvent(
+            QtCore.QEvent.KeyPress,
+            keycode,
+            QtCore.Qt.NoModifier)
+        self.owner.focusOwner.sendEvent(self.owner.focusOwner.rootObject().findChild(QQuickItem, "listview"), key_press_event)
 
     def run(self):
         while True:
@@ -283,7 +341,10 @@ class XGraber(QThread):
             if e == None :
                 # self.yieldCurrentThread()
                 self.usleep(400)
-            if isinstance(e, xproto.MotionNotifyEvent):
+            if isinstance(e, xproto.KeyPressEvent):
+                if e.detail in ALLOWED_KEYS:
+                    self.simulate_key_press(e.detail)
+            elif isinstance(e, xproto.MotionNotifyEvent):
                 if self.owner and self.owner.inMenuArea(e.root_x, e.root_y):
                     self.ungrab_pointer()
                     self.ungrab_keyboard()
@@ -319,7 +380,7 @@ class Menu(QQuickView):
         if not self:
             return
         if window == None:
-            print "window lost focus"
+            logger.info("window lost focus")
             self.ungrab_pointer()
             self.ungrab_keyboard()
             self.destroyWholeMenu()
@@ -358,6 +419,15 @@ class Menu(QQuickView):
         if not self.parent:
             return self
         else: return self.parent.ancestor
+        
+    @property
+    def focusOwner(self):
+        this = self
+        while this:
+            if this.isActive():
+                return this
+            this = this.subMenu
+        return self
 
     @pyqtProperty(bool)
     def isSubMenu(self):
@@ -471,7 +541,7 @@ if __name__ == "__main__":
 
     xgraber = XGraber()
     xgraber.start()
-    #xgraber.setPriority(QThread.LowestPriority)
+    xgraber.setPriority(QThread.LowestPriority)
 
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     sys.exit(app.exec_())
