@@ -83,10 +83,10 @@ def func_logger(level=SIMPLE):
         functools.update_wrapper(wrapper_1, fn)
     return wrapper_1
 
-if __name__ == "__main__":
-    @func_logger(level=DETAIL)
+if __name__ == "_p_main__":
+    @func_logger()
     def test_function(a, b="b"):
-        pass
+        print "test_function inner"
 
     test_function("a")
 

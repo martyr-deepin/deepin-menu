@@ -21,6 +21,7 @@ import xcb
 from xcb import xproto
 from xcb.xproto import EventMask, GrabMode
 
+import logger
 from logger import func_logger
 from DBusInterfaces import MenuObjectInterface
 
@@ -245,31 +246,33 @@ class XGraber(QThread):
     def owner_wid(self):
         return self.owner.winId().__int__() if self.owner else None
 
-    @func_logger
+    @func_logger()
     def grab_pointer(self):
         if not self.owner_wid or self.__pointer_grab_flag: return
         mask = EventMask.PointerMotion | EventMask.ButtonRelease | EventMask.ButtonPress
-        while self._conn.core.GrabPointer(False, self.owner_wid, mask, GrabMode.Async, GrabMode.Async,
-                                          0, 0,
-                                          xproto.Time.CurrentTime).reply().status != 0:
-            pass
+        while not self._conn.core.GrabPointer(False, self.owner_wid, mask, GrabMode.Async, GrabMode.Async,
+                                              0, 0,
+                                              xproto.Time.CurrentTime).reply().status in [0, 1]:
+            logger.info("grabbing pointer")
+            self.usleep(500)
         self.__pointer_grab_flag = True
 
-    @func_logger
+    @func_logger()
     def ungrab_pointer(self):
         if not self.owner_wid or not self.__pointer_grab_flag: return
         self._conn.core.UngrabPointerChecked(xproto.Time.CurrentTime).check()
         self.__pointer_grab_flag = False
 
-    @func_logger
+    @func_logger()
     def grab_keyboard(self):
         if not self.owner_wid or self.__keyboard_grab_flag: return
-        while self._conn.core.GrabKeyboard(False, self.owner_wid, xproto.Time.CurrentTime,
-                                           GrabMode.Async, GrabMode.Async).reply().status != 0:
-            pass
+        while not self._conn.core.GrabKeyboard(False, self.owner_wid, xproto.Time.CurrentTime,
+                                               GrabMode.Async, GrabMode.Async).reply().status in [0, 1]:
+            logger.info("grabbing keyboard")            
+            self.usleep(500)            
         self.__keyboard_grab_flag = True
 
-    @func_logger
+    @func_logger()
     def ungrab_keyboard(self):
         if not self.owner_wid or not self.__keyboard_grab_flag: return
         self._conn.core.UngrabKeyboardChecked(xproto.Time.CurrentTime).check()
@@ -333,7 +336,6 @@ class Menu(QQuickView):
         cursor_pos = getCursorPosition()
         if isinstance(obj, Menu) and event.type() == QEvent.Leave \
            and not self.ancestor.inMenuArea(cursor_pos.x(), cursor_pos.y()):
-            print "leave"
             self.grab_pointer()
             self.grab_keyboard()
         return QWidget.eventFilter(self, obj, event)
