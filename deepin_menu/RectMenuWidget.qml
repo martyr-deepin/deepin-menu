@@ -3,7 +3,7 @@ import QtQuick 2.0
 Rect {
     id: menu
     rectWidth: listview.width + blurWidth * 2
-    rectHeight: listview.height + blurWidth * 2
+    rectHeight: listview.height + blurWidth * 2 + topBottomPadding * 2
 
     property alias fontColor: listview.textColor
     property alias fontColorHover: listview.textColorHover

@@ -6,10 +6,7 @@ Component {
     Rectangle {
         id: itemArea
         width: ListView.view.width
-        height: componentText.text == "" ? verticalPadding * 2 + 2 : Math.max(componentImage.implicitHeight
-                                                                              + verticalPadding * 2,
-                                                                              componentText.implicitHeight
-                                                                              + verticalPadding * 2)
+        height: componentText.text == "" ? verticalPadding * 2 + 2 : componentText.implicitHeight + verticalPadding * 2
         color: Qt.rgba(0, 0, 0, 0)
 
         property bool isSep: itemText == ""

@@ -3,7 +3,7 @@ import QtQuick 2.0
 RectWithCorner {
     id: menu
     rectWidth: listview.width + blurWidth * 2
-    rectHeight: listview.height + blurWidth * 2
+    rectHeight: listview.height + blurWidth * 2 + topBottomPadding * 2
     cornerDirection: "down"
 
     property alias fontColor: listview.textColor

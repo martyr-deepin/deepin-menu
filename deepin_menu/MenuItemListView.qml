@@ -181,8 +181,7 @@ ListView {
             if (items[i].itemText == undefined || items[i].itemText == "") {
                 _height += verticalPadding * 2 + 2
             } else {
-                _height += Math.max(_injection.getStringHeight(items[i].itemText, textSize) + verticalPadding * 2,
-                                    pictureSize + verticalPadding * 2)
+                _height += _injection.getStringHeight(items[i].itemText, textSize) + verticalPadding * 2
             }
         }
         return {"width": Math.max(_width, minWidth), "height": _height}
