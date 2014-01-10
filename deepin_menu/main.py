@@ -19,7 +19,7 @@ from uuid import uuid4
 
 import xcb
 from xcb import xproto
-from xcb.xproto import EventMask, GrabMode
+from xcb.xproto import EventMask, GrabMode, unpack_from
 
 import functools
 from logger import func_logger, logger
@@ -27,6 +27,22 @@ from DBusInterfaces import MenuObjectInterface
 
 SCREEN_WIDTH = 0
 SCREEN_HEIGHT = 0
+
+def getWorkArea():
+    global SCREEN_WIDTH, SCREEN_HEIGHT
+    conn = xcb.connect()
+    setup = conn.get_setup()
+    root = setup.roots[0].root
+
+    cookie1 = conn.core.InternAtom(False, 13, "_NET_WORKAREA");
+    cookie2 = conn.core.InternAtom(True, 8, "CARDINAL");
+    name = cookie1.reply().atom
+    type = cookie2.reply().atom
+
+    cookie = conn.core.GetProperty(False, root, name, type, 0, 4)
+    reply = cookie.reply()
+
+    _, _, SCREEN_WIDTH, SCREEN_HEIGHT = unpack_from('IIII', reply.value.buf())
 
 def getCursorPosition():
     return QCursor().pos()
@@ -347,12 +363,13 @@ class XGraber(QThread):
             elif isinstance(e, xproto.MotionNotifyEvent):
                 if self.owner and self.owner.inMenuArea(e.root_x, e.root_y):
                     self.ungrab_pointer()
-                    self.ungrab_keyboard()
+                    # self.ungrab_keyboard() # shouldn't ungrab keyboard here
             elif isinstance(e, xproto.ButtonPressEvent):
                 self.ungrab_pointer()
                 self.ungrab_keyboard()
                 self.owner.destroyWholeMenu()
-
+                
+        self._conn.disconnect()
 
 class Menu(QQuickView):
     def __init__(self, dbusObj, menuJsonContent, parent=None):
@@ -399,7 +416,24 @@ class Menu(QQuickView):
             self.grab_pointer()
             self.grab_keyboard()
         return QWidget.eventFilter(self, obj, event)
-
+        
+    def set_menu_hint(self):
+        conn = xcb.connect()
+        conn.core.ChangeProperty(
+            xproto.PropMode.Replace,
+            self.winId().__int__(),
+            conn.core.InternAtom(False, 
+                                 len("_NET_WM_WINDOW_TYPE"), 
+                                 "_NET_WM_WINDOW_TYPE").reply().atom,
+            xproto.Atom.ATOM,
+            32,
+            2,
+            conn.core.InternAtom(False, 
+                                 len("_NET_WM_WINDOW_TYPE_POP_MENU"), 
+                                 "_NET_WM_WINDOW_TYPE_POP_MENU").reply().atom
+        )
+        conn.disconnect()
+        
     def grab_pointer(self):
         xgraber.owner = self.ancestor
         xgraber.grab_pointer()
@@ -489,14 +523,20 @@ class Menu(QQuickView):
         self.setFormat(surface_format)
 
         self.setColor(QColor(0, 0, 0, 0))
-        self.setFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool)
+        self.setFlags(QtCore.Qt.FramelessWindowHint 
+                      # | QtCore.Qt.WA_X11NetWmWindowTypePopupMenu
+                      | QtCore.Qt.Tool)
         self.setX(self.menuJsonObj["x"])
         self.setY(self.menuJsonObj["y"])
 
         if self.menuJsonObj["isDockMenu"] and not self.isSubMenu:
-            self.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'DockMenu.qml')))
+            self.setSource(QtCore.QUrl.fromLocalFile(
+                os.path.join(os.path.dirname(__file__), 
+                'DockMenu.qml')))
         else:
-            self.setSource(QtCore.QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'RectMenu.qml')))
+            self.setSource(QtCore.QUrl.fromLocalFile(
+                os.path.join(os.path.dirname(__file__), 
+                'RectMenu.qml')))
 
         self.show()
         self.grab_pointer()
@@ -524,6 +564,7 @@ def serviceReplacedByOtherSlot(name):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
+    getWorkArea()
 
     bus = QDBusConnection.sessionBus()
     menuService = MenuService()
@@ -532,12 +573,6 @@ if __name__ == "__main__":
                                     QDBusConnectionInterface.AllowReplacement)
     bus.registerObject('/com/deepin/menu', menuService)
     bus.interface().serviceUnregistered.connect(serviceReplacedByOtherSlot)
-
-    # retrieve the geometry of the screen
-    desktopWidget = app.desktop()
-    screenGeometry = desktopWidget.screenGeometry()
-    SCREEN_WIDTH = screenGeometry.width()
-    SCREEN_HEIGHT = screenGeometry.height()
 
     xgraber = XGraber()
     xgraber.start()
