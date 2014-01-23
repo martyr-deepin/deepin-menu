@@ -46,6 +46,16 @@ ListView {
         _menu_view.updateCheckableItem(item.componentId, false)
     }
 
+    Timer {
+        id: timer
+        interval: 250
+        running: false
+        repeat: false
+
+        property string jsonContent
+        onTriggered: _menu_view.showSubMenu(jsonContent)
+    }
+
     /* below two property is created for onCurrentItemChanged method. */
     property int lastCurrentIndex: 0
     property var lastCurrentItem: null
@@ -118,11 +128,12 @@ ListView {
                 component_y = _injection.getScreenHeight() - component_height
             }
 
-            _menu_view.showSubMenu(JSON.stringify({"x": component_x, "y": component_y,
-                                                   "isDockMenu": menu.isDockMenu,
-                                                   "isCheckableMenu": component_is_checkable_menu,
-                                                   "isSingleCheck": component_is_single_check,
-                                                   "menuJsonContent": component_menuJsonContent}))
+            timer.jsonContent = JSON.stringify({"x": component_x, "y": component_y,
+                                                "isDockMenu": menu.isDockMenu,
+                                                "isCheckableMenu": component_is_checkable_menu,
+                                                "isSingleCheck": component_is_single_check,
+                                                "menuJsonContent": component_menuJsonContent})
+            timer.restart()
         } else {
             _menu_view.destroySubs()
         }
@@ -146,7 +157,7 @@ ListView {
         var menu = JSON.parse(menuJsonContent)
         return menu.singleCheck
     }
-    
+
     function getNextItemsHasShortcut(startPos, keycode) {
         for (var i = Math.max(startPos, 0); i < listview.count; i++) {
             // a trick here, using currentIndex as the cursor.
@@ -250,8 +261,8 @@ ListView {
 
             default: {
                 var _next_index_has_shortcut = getNextItemsHasShortcut(currentIndex + 1, event.key)
-                if (_next_index_has_shortcut) { 
-                    selectItemPrivate(getNextItemsHasShortcut(currentIndex + 1, event.key)) 
+                if (_next_index_has_shortcut) {
+                    selectItemPrivate(getNextItemsHasShortcut(currentIndex + 1, event.key))
                     if (_next_index_has_shortcut == getNextItemsHasShortcut(_next_index_has_shortcut + 1, event.key)) {
                         MenuItemJs.onClicked(currentIndex, currentItem, parent)
                     }
