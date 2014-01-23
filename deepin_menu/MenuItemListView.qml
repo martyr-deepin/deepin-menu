@@ -261,8 +261,8 @@ ListView {
 
             default: {
                 var _next_index_has_shortcut = getNextItemsHasShortcut(currentIndex + 1, event.key)
-                if (_next_index_has_shortcut) {
-                    selectItemPrivate(getNextItemsHasShortcut(currentIndex + 1, event.key))
+                if (_next_index_has_shortcut != null) {
+                    listview.selectItemPrivate(_next_index_has_shortcut)
                     if (_next_index_has_shortcut == getNextItemsHasShortcut(_next_index_has_shortcut + 1, event.key)) {
                         MenuItemJs.onClicked(currentIndex, currentItem, parent)
                     }
