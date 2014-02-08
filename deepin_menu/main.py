@@ -87,13 +87,16 @@ class MenuService(QObject):
         self.__timer.start(5000)
 
     def showMenu(self, dbusObj, menuJsonContent):
-        if self.__menu:
-            self.__menu.destroySubs()
-            self.__menu.setDBusObj(dbusObj)
-            self.__menu.setMenuJsonContent(menuJsonContent)
-        else:
-            self.__menu = Menu(dbusObj, menuJsonContent)
-
+        # if self.__menu:
+        #     self.__menu.destroySubs()
+        #     self.__menu.setDBusObj(dbusObj)
+        #     self.__menu.setMenuJsonContent(menuJsonContent)
+        #     self.__menu.ungrab_pointer()
+        #     self.__menu.ungrab_keyboard()
+        # else:
+        #     self.__menu = Menu(dbusObj, menuJsonContent)
+        
+        self.__menu = Menu(dbusObj, menuJsonContent)
         self.__menu.showMenu()
         self.__menu.requestActivate()
 
@@ -289,48 +292,46 @@ class XGraber(QThread):
         super(QThread, self).__init__()
         self.owner = owner
         self._conn = xcb.connect()
-        self.__pointer_grab_flag = False
-        self.__keyboard_grab_flag = False
 
     @property
     def owner_wid(self):
         return self.owner.winId().__int__() if self.owner else None
 
     @func_logger()
-    def grab_pointer(self):
-        if not self.owner_wid or self.__pointer_grab_flag: return
+    def grab_pointer(self, try_times=20):
+        if not self.owner_wid: return
         mask = EventMask.PointerMotion | EventMask.ButtonRelease | EventMask.ButtonPress
-        try_times = 10
-        while try_times and not self._conn.core.GrabPointer(False, self.owner_wid, mask, GrabMode.Async, GrabMode.Async,
-                                                            0, 0,
-                                                            xproto.Time.CurrentTime).reply().status in [0, 1]:
+        while try_times:
+            grab_status = self._conn.core.GrabPointer(False, self.owner_wid, mask, GrabMode.Async, GrabMode.Async,
+                                                      0, 0,
+                                                      xproto.Time.CurrentTime).reply().status
+            logger.debug("grab result: %s" % grab_status)
+            if grab_status in [0, 1]: break
             logger.info("grabbing pointer")
             try_times -= 1
-            self.usleep(500)
-        self.__pointer_grab_flag = True
+            self.usleep(300)
 
     @func_logger()
     def ungrab_pointer(self):
-        if not self.owner_wid or not self.__pointer_grab_flag: return
+        if not self.owner_wid: return
         self._conn.core.UngrabPointerChecked(xproto.Time.CurrentTime).check()
-        self.__pointer_grab_flag = False
 
     @func_logger()
-    def grab_keyboard(self):
-        if not self.owner_wid or self.__keyboard_grab_flag: return
-        try_times = 10
-        while try_times and not self._conn.core.GrabKeyboard(False, self.owner_wid, xproto.Time.CurrentTime,
-                                                             GrabMode.Async, GrabMode.Async).reply().status in [0, 1]:
+    def grab_keyboard(self, try_times=20):
+        if not self.owner_wid: return
+        while try_times:
+            grab_status = self._conn.core.GrabKeyboard(False, self.owner_wid, xproto.Time.CurrentTime,
+                                                       GrabMode.Async, GrabMode.Async).reply().status
+            logger.debug("grab result: %s" % grab_status)            
+            if grab_status in [0, 1]: break
             logger.info("grabbing keyboard")            
             try_times -= 1
-            self.usleep(500)            
-        self.__keyboard_grab_flag = True
+            self.usleep(300)            
 
     @func_logger()
     def ungrab_keyboard(self):
-        if not self.owner_wid or not self.__keyboard_grab_flag: return
+        if not self.owner_wid: return
         self._conn.core.UngrabKeyboardChecked(xproto.Time.CurrentTime).check()
-        self.__keyboard_grab_flag = False
         
     @postGui()
     def simulate_key_press(self, keycode):
@@ -413,8 +414,8 @@ class Menu(QQuickView):
         cursor_pos = getCursorPosition()
         if isinstance(obj, Menu) and event.type() == QEvent.Leave \
            and not self.ancestor.inMenuArea(cursor_pos.x(), cursor_pos.y()):
-            self.grab_pointer()
-            self.grab_keyboard()
+            self.grab_pointer(try_times=5)
+            self.grab_keyboard(try_times=5)
         return QWidget.eventFilter(self, obj, event)
         
     def set_menu_hint(self):
@@ -434,16 +435,16 @@ class Menu(QQuickView):
         )
         conn.disconnect()
         
-    def grab_pointer(self):
+    def grab_pointer(self, try_times=20):
         xgraber.owner = self.ancestor
-        xgraber.grab_pointer()
+        xgraber.grab_pointer(try_times)
         
     def ungrab_pointer(self):
         xgraber.ungrab_pointer()
 
-    def grab_keyboard(self):
+    def grab_keyboard(self, try_times=20):
         xgraber.owner = self.ancestor
-        xgraber.grab_keyboard()
+        xgraber.grab_keyboard(try_times)
         
     def ungrab_keyboard(self):
         xgraber.ungrab_keyboard()
