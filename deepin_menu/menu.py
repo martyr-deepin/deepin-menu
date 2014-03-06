@@ -254,7 +254,7 @@ if __name__ == "__main__":
     # menu.getItemById("id_radio2").showCheckmark = False
     menu.itemClicked.connect(invoked)
     menu.menuDismissed.connect(dismissed)
-    # menu.showRectMenu(300, 300)
-    menu.showDockMenu(1366, 768)
+    menu.showRectMenu(300, 300)
+    #menu.showDockMenu(1366, 768)
 
     sys.exit(app.exec_())
