@@ -364,7 +364,7 @@ class XGraber(QThread):
                 if self.owner and self.owner.inMenuArea(e.root_x, e.root_y):
                     self.ungrab_pointer()
                     # self.ungrab_keyboard() # shouldn't ungrab keyboard here
-            elif isinstance(e, xproto.ButtonPressEvent):
+            elif isinstance(e, xproto.ButtonPressEvent) and e.detail == 1:
                 self.ungrab_pointer()
                 self.ungrab_keyboard()
                 self.owner.destroyWholeMenu()
