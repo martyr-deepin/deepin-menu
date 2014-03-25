@@ -412,9 +412,12 @@ class Menu(QQuickView):
     def eventFilter(self, obj, event):
         cursor_pos = getCursorPosition()
         if isinstance(obj, Menu) and event.type() == QEvent.Leave:
-            if self.ancestor.inMenuArea(cursor_pos.x(), cursor_pos.y()):
+            if not self.ancestor.inMenuArea(cursor_pos.x(), cursor_pos.y()):
                 self.grab_pointer()
                 self.grab_keyboard()
+            else:
+                self.ungrab_pointer()
+                self.ungrab_keyboard()
         return QWidget.eventFilter(self, obj, event)
         
     def set_menu_hint(self):
