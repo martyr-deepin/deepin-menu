@@ -39,11 +39,11 @@ ListView {
     signal selectItemPrivate(int idx)
 
     onItemChecked: {
-        _menu_view.updateCheckableItem(item.componentId, true)
+        updateCheckableItem(item.componentId, true)
     }
 
     onItemUnchecked: {
-        _menu_view.updateCheckableItem(item.componentId, false)
+        updateCheckableItem(item.componentId, false)
     }
 
     Timer {
