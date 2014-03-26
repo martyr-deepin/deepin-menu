@@ -4,10 +4,11 @@ function onClicked(index, menuItem, menu) {
 
         if (menuItem.componentCheckable) {
 
-            menuItem.componentChecked = !menuItem.componentChecked;
-            if (menuItem.componentChecked) {
+            if (!menuItem.componentChecked) {
+				menuItem.componentChecked = true
                 menuItem.ListView.view.itemChecked(index, menuItem)
-            } else {
+            } else if (!menu.isSingleCheck) {
+				menuItem.componentChecked = false				
                 menuItem.ListView.view.itemUnchecked(index, menuItem)
             }
 			// _menu_view.notifyUpdateItemChecked(menuItem.componentId, menuItem.componentChecked);
