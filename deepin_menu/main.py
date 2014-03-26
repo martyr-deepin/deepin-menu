@@ -364,7 +364,7 @@ class XGraber(QThread):
                 if self.owner and self.owner.inMenuArea(e.root_x, e.root_y):
                     self.ungrab_pointer()
                     # self.ungrab_keyboard() # shouldn't ungrab keyboard here
-            elif isinstance(e, xproto.ButtonPressEvent) and e.detail == 1:
+            elif isinstance(e, xproto.ButtonPressEvent) and not self.owner.inMenuArea(e.root_x, e.root_y):
                 self.ungrab_pointer()
                 self.ungrab_keyboard()
                 self.owner.destroyWholeMenu()
@@ -380,7 +380,7 @@ class Menu(QQuickView):
         self.setMenuJsonContent(menuJsonContent)
         self.setDBusObj(dbusObj)
 
-        self.installEventFilter(self)
+        # self.installEventFilter(self)
         qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
 
     def setDBusObj(self, dbusObj):
@@ -397,7 +397,6 @@ class Menu(QQuickView):
         if not self:
             return
         if window == None:
-            logger.info("window lost focus")
             self.ungrab_pointer()
             self.ungrab_keyboard()
             self.destroyWholeMenu()
@@ -409,16 +408,17 @@ class Menu(QQuickView):
             return True
         return False
 
-    def eventFilter(self, obj, event):
-        cursor_pos = getCursorPosition()
-        if isinstance(obj, Menu) and event.type() == QEvent.Leave:
-            if not self.ancestor.inMenuArea(cursor_pos.x(), cursor_pos.y()):
-                self.grab_pointer()
-                self.grab_keyboard()
-            else:
-                self.ungrab_pointer()
-                self.ungrab_keyboard()
-        return QWidget.eventFilter(self, obj, event)
+    # def eventFilter(self, obj, event):
+        # cursor_pos = getCursorPosition()
+        # if isinstance(obj, Menu) and event.type() == QEvent.Leave:
+        #     if not self.ancestor.inMenuArea(cursor_pos.x(), cursor_pos.y()):
+        #         print "grab here"
+        #         self.grab_pointer()
+        #         self.grab_keyboard()
+        #     else:
+        #         self.ungrab_pointer()
+        #         self.ungrab_keyboard()
+        # return QWidget.eventFilter(self, obj, event)
         
     def set_menu_hint(self):
         conn = xcb.connect()
@@ -510,7 +510,7 @@ class Menu(QQuickView):
 
     @pyqtSlot(str)
     def showSubMenu(self, menuJsonContent):
-        if menuJsonContent:
+        if menuJsonContent and self.isVisible():
             self.subMenu = Menu(self.dbusObj, menuJsonContent, self)
             self.subMenu.showMenu()
         else:
@@ -548,10 +548,11 @@ class Menu(QQuickView):
     def destroyForward(self):
         if self.subMenu:
             self.subMenu.destroyForward()
-        self.destroy()
+        self.close()
         
     @pyqtSlot()
     def destroyWholeMenu(self):
+        print "destroyWholeMenu"
         menuService.unregisterMenu(self.dbusObj.objPath)
         self.ancestor.destroyForward()
         
