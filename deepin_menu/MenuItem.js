@@ -5,11 +5,11 @@ function onClicked(index, menuItem, menu) {
         if (menuItem.componentCheckable) {
 
             menuItem.componentChecked = !menuItem.componentChecked;
-            // if (menuItem.componentChecked) {
-            //     menuItem.ListView.view.itemChecked(index, menuItem)
-            // } else {
-            //     menuItem.ListView.view.itemUnchecked(index, menuItem)
-            // }
+            if (menuItem.componentChecked) {
+                menuItem.ListView.view.itemChecked(index, menuItem)
+            } else {
+                menuItem.ListView.view.itemUnchecked(index, menuItem)
+            }
 			_menu_view.notifyUpdateItemChecked(menuItem.componentId, menuItem.componentChecked);
 
             menuItem.itemIconPic = menuItem.iconHover;
