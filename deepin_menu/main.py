@@ -545,10 +545,15 @@ class Menu(QQuickView):
         self.grab_pointer()
         self.grab_keyboard()
         
+    @postGui()
     def destroyForward(self):
         if self.subMenu:
             self.subMenu.destroyForward()
+        
+        # signal.signal(signal.SIGALRM, lambda signum, frame: os._exit(0))
+        # signal.alarm(1)
         self.close()
+        # signal.alarm(0)
         
     @pyqtSlot()
     def destroyWholeMenu(self):
