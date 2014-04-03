@@ -42,6 +42,8 @@ Rect {
         }
 
         Component.onCompleted: {
+            _menu_view.x -= menu.blurWidth / 2
+            _menu_view.y -= menu.blurWidth / 2
             var distance = 0 - _menu_view.x
             if (distance > 0) {
                 _menu_view.x += distance
