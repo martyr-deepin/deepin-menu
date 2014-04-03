@@ -6,9 +6,9 @@ QCoreApplication.setAttribute(10, True)
 QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads, True)
 
 from PyQt5.QtQuick import QQuickView, QQuickItem
-from PyQt5.QtWidgets import QApplication, qApp, QWidget
+from PyQt5.QtWidgets import QApplication, qApp
 from PyQt5.QtGui import QSurfaceFormat, QColor, QKeySequence, QKeyEvent, QCursor, QFont, QFontMetrics
-from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal, QTimer, QThread, QEvent
+from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal, QTimer, QThread
 from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusConnectionInterface, QDBusMessage
 import os
 import sys

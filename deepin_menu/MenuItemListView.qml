@@ -135,6 +135,7 @@ ListView {
                                                 "menuJsonContent": component_menuJsonContent})
             timer.restart()
         } else {
+            timer.stop()
             _menu_view.destroySubs()
         }
     }
