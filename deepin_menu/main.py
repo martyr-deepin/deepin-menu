@@ -9,7 +9,7 @@ from PyQt5.QtQuick import QQuickView, QQuickItem
 from PyQt5.QtWidgets import QApplication, qApp
 from PyQt5.QtGui import QSurfaceFormat, QColor, QKeySequence, QKeyEvent, QCursor, QFont, QFontMetrics
 from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal, QTimer, QThread
-from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusConnectionInterface, QDBusMessage
+from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusConnectionInterface, QDBusMessage, QDBusObjectPath
 import os
 import sys
 import json
@@ -71,7 +71,9 @@ class MenuService(QObject):
         objPathHolder= objPath.replace("/", "_")
         setattr(self, objPathHolder, MenuObject(self, objPath))
         self._sessionBus.registerObject(objPath, getattr(self, objPathHolder))
-        return objPath
+        result = QDBusObjectPath()
+        result.setPath(objPath)
+        return result
 
     def unregisterMenu(self, objPath):
         self.__restart_flag = True
@@ -114,7 +116,7 @@ class MenuServiceAdaptor(QDBusAbstractAdaptor):
     def __init__(self, parent):
         super(MenuServiceAdaptor, self).__init__(parent)
 
-    @pyqtSlot(result=str)
+    @pyqtSlot(result="QDBusObjectPath")
     def RegisterMenu(self):
         return self.parent().registerMenu()
 
