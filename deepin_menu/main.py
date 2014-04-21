@@ -87,7 +87,9 @@ class MenuService(QObject):
         self.__restart_flag = True
 
         self._sessionBus.unregisterObject(objPath)
-        setattr(self, objPath.replace("/", "_"), None)
+        objPathHolder= objPath.replace("/", "_")
+        if self.__menu: self.__menu.ancestor.destroyForward()
+        setattr(self, objPathHolder, None)
         msg = QDBusMessage.createSignal(objPath, 'com.deepin.menu.Menu', 'MenuUnregistered')
         QDBusConnection.sessionBus().send(msg)
 
@@ -592,9 +594,7 @@ class Menu(QQuickView):
         
     @pyqtSlot()
     def destroyWholeMenu(self):
-        print "destroyWholeMenu"
         menuService.unregisterMenu(self.dbusObj.objPath)
-        self.ancestor.destroyForward()
         
     @pyqtSlot()
     def destroySubs(self):
