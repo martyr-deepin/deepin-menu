@@ -86,3 +86,17 @@ class XMouseAreaInterface(QDBusAbstractInterface):
 
     def unregisterArea(self, id):
         self.call("UnregisterArea", id)
+
+class DisplayPropertyInterface(QDBusAbstractInterface):
+    def __init__(self):
+        super(DisplayPropertyInterface, self).__init__(
+            "com.deepin.daemon.Display",
+            "/com/deepin/daemon/Display",
+            "org.freedesktop.DBus.Properties",
+            QDBusConnection.sessionBus(), 
+            None)
+
+    def getPrimaryRect(self):
+        msg = self.call("Get", "com.deepin.daemon.Display", "PrimaryRect")
+        reply = QDBusReply(msg)
+        return reply.value()

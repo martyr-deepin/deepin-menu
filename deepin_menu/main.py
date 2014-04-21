@@ -1,5 +1,18 @@
 # ! /usr/bin/python
 # -*- coding: utf-8 -*-
+import os
+import sys
+import json
+import time
+import signal
+import functools
+import subprocess
+from uuid import uuid4
+
+import xcb
+from xcb import xproto
+from xcb.xproto import EventMask, GrabMode, unpack_from
+
 from PyQt5 import QtCore
 from PyQt5.QtCore import QCoreApplication
 QCoreApplication.setAttribute(10, True)
@@ -13,21 +26,10 @@ from PyQt5.QtCore import (QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty,
     pyqtSignal, QTimer, QThread)
 from PyQt5.QtDBus import (QDBusAbstractAdaptor, QDBusConnection, 
     QDBusConnectionInterface, QDBusMessage, QDBusObjectPath)
-import os
-import sys
-import json
-import time
-import signal
-import subprocess
-from uuid import uuid4
 
-import xcb
-from xcb import xproto
-from xcb.xproto import EventMask, GrabMode, unpack_from
-
-import functools
 from logger import func_logger, logger
-from DBusInterfaces import MenuObjectInterface, XMouseAreaInterface
+from DBusInterfaces import (MenuObjectInterface, XMouseAreaInterface, 
+    DisplayPropertyInterface)
 
 SCREEN_WIDTH = 0
 SCREEN_HEIGHT = 0
@@ -302,6 +304,7 @@ class XGraber(QObject):
         super(QObject, self).__init__()
         self.owner = owner
         self._mousearea = XMouseAreaInterface()
+        self._display = DisplayPropertyInterface()
         self._cookie = None
         self._conn = xcb.connect()
 
@@ -315,7 +318,9 @@ class XGraber(QObject):
 
     def registerXMouseArea(self):
         if not self._cookie: 
-            self._cookie = self._mousearea.registerArea(0, 1366, 0, 768,
+            rect =  self._display.getPrimaryRect()
+            self._cookie = self._mousearea.registerArea(rect[0],
+                rect[2], rect[1], rect[3],
                 XGraber.RegisterAreaAllFlag)
 
     def unregisterXMouseArea(self):
@@ -329,10 +334,14 @@ class XGraber(QObject):
 
         try_times = 200
         while try_times:
-            mask = EventMask.PointerMotion | EventMask.ButtonRelease | EventMask.ButtonPress            
-            grab_status = self._conn.core.GrabPointer(False, self.owner_wid, mask, GrabMode.Async, GrabMode.Async,
-                                                      0, 0,
-                                                      xproto.Time.CurrentTime).reply().status
+            mask = (EventMask.PointerMotion 
+                | EventMask.ButtonRelease 
+                | EventMask.ButtonPress)            
+            grab_status = self._conn.core.GrabPointer(False, 
+                self.owner_wid, 
+                mask, GrabMode.Async, GrabMode.Async,
+                0, 0,
+                xproto.Time.CurrentTime).reply().status
             logger.debug("grab result: %s" % grab_status)
             if grab_status in [0, 1]: break
             try_times -= 1
@@ -349,8 +358,9 @@ class XGraber(QObject):
         
         try_times = 200        
         while try_times:
-            grab_status = self._conn.core.GrabKeyboard(False, self.owner_wid, xproto.Time.CurrentTime,
-                                                       GrabMode.Async, GrabMode.Async).reply().status
+            grab_status = self._conn.core.GrabKeyboard(False, 
+                self.owner_wid, xproto.Time.CurrentTime,
+                GrabMode.Async, GrabMode.Async).reply().status
             logger.debug("grab result: %s" % grab_status)            
             if grab_status in [0, 1]: break
             try_times -= 1
@@ -380,7 +390,7 @@ class XGraber(QObject):
 
     def onButtonPress(self, button, x, y, cookie):
         if cookie == self._cookie: 
-            if self.owner and self.owner.inMenuArea(x, y):
+            if self.owner and not self.owner.inMenuArea(x, y):
                 self.ungrab_pointer()
                 self.ungrab_keyboard()
                 self.owner.destroyWholeMenu()                
@@ -517,7 +527,8 @@ class Menu(QQuickView):
 
     @pyqtSlot(str, bool)
     def invokeItem(self, id, checked):
-        msg = QDBusMessage.createSignal(self.dbusObj.objPath, 'com.deepin.menu.Menu', 'ItemInvoked')
+        msg = QDBusMessage.createSignal(self.dbusObj.objPath, 
+            'com.deepin.menu.Menu', 'ItemInvoked')
         msg << id << checked
         QDBusConnection.sessionBus().send(msg)
 
@@ -603,8 +614,8 @@ if __name__ == "__main__":
     menuService = MenuService()
     bus = QDBusConnection.sessionBus()
     bus.interface().registerService('com.deepin.menu',
-                                    QDBusConnectionInterface.ReplaceExistingService,
-                                    QDBusConnectionInterface.AllowReplacement)
+        QDBusConnectionInterface.ReplaceExistingService,
+        QDBusConnectionInterface.AllowReplacement)
     bus.registerObject('/com/deepin/menu', menuService)
     bus.interface().serviceUnregistered.connect(serviceReplacedByOtherSlot)
 
