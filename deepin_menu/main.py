@@ -1,4 +1,4 @@
-#! /usr/bin/python
+# ! /usr/bin/python
 # -*- coding: utf-8 -*-
 from PyQt5 import QtCore
 from PyQt5.QtCore import QCoreApplication
@@ -7,12 +7,16 @@ QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads, True)
 
 from PyQt5.QtQuick import QQuickView, QQuickItem
 from PyQt5.QtWidgets import QApplication, qApp
-from PyQt5.QtGui import QSurfaceFormat, QColor, QKeySequence, QKeyEvent, QCursor, QFont, QFontMetrics
-from PyQt5.QtCore import QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, pyqtSignal, QTimer, QThread
-from PyQt5.QtDBus import QDBusAbstractAdaptor, QDBusConnection, QDBusConnectionInterface, QDBusMessage, QDBusObjectPath
+from PyQt5.QtGui import (QSurfaceFormat, QColor, QKeySequence, QKeyEvent, 
+    QCursor, QFont, QFontMetrics)
+from PyQt5.QtCore import (QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, 
+    pyqtSignal, QTimer, QThread)
+from PyQt5.QtDBus import (QDBusAbstractAdaptor, QDBusConnection, 
+    QDBusConnectionInterface, QDBusMessage, QDBusObjectPath)
 import os
 import sys
 import json
+import time
 import signal
 import subprocess
 from uuid import uuid4
@@ -23,7 +27,7 @@ from xcb.xproto import EventMask, GrabMode, unpack_from
 
 import functools
 from logger import func_logger, logger
-from DBusInterfaces import MenuObjectInterface
+from DBusInterfaces import MenuObjectInterface, XMouseAreaInterface
 
 SCREEN_WIDTH = 0
 SCREEN_HEIGHT = 0
@@ -65,6 +69,7 @@ class MenuService(QObject):
         del self.__timer
 
     def registerMenu(self):
+        xgraber.registerXMouseArea()
         self.__restart_flag = False
 
         objPath = "/com/deepin/menu/%s" % str(uuid4()).replace("-", "_")
@@ -76,6 +81,7 @@ class MenuService(QObject):
         return result
 
     def unregisterMenu(self, objPath):
+        xgraber.unregisterXMouseArea()
         self.__restart_flag = True
 
         self._sessionBus.unregisterObject(objPath)
@@ -278,23 +284,44 @@ class postGui(QtCore.QObject):
             self._func(*args, **kwargs)
 
 INJECTION = Injection()
-ALLOWED_KEYS = [38, 56, 54, 40, 26, 41, 
-                42, 43, 31, 44, 45, 46, 
-                58, 57, 32, 33, 24, 27, 
-                39, 28, 30, 55, 25, 53,
-                29, 52,         # a-z
-                111, 116, 113, 114, # arrows
-                36, 9]          # enter escape
+LITERAL_KEYS = tuple("abcdefghijklmnopqrstuvwxyz")
+CONTROL_KEYS = ("up", "down", "left", "right", "enter", "escape")
+ALLOWED_KEYS = LITERAL_KEYS + CONTROL_KEYS
 
-class XGraber(QThread):
+class XGraber(QObject):
+
+    RegisterAreaMotionFlag = 1 << 0
+    RegisterAreaButtonFlag = 1 << 1
+    RegisterAreaKeyFlag = 1 << 2
+    RegisterAreaAllFlag = (
+        RegisterAreaMotionFlag | 
+        RegisterAreaButtonFlag | 
+        RegisterAreaKeyFlag )  
+
     def __init__(self, owner=None):
-        super(QThread, self).__init__()
+        super(QObject, self).__init__()
         self.owner = owner
+        self._mousearea = XMouseAreaInterface()
+        self._cookie = None
         self._conn = xcb.connect()
+
+        self._mousearea.ButtonPress.connect(self.onButtonPress)
+        self._mousearea.KeyPress.connect(self.onKeyPress)
+        self._mousearea.MotionMove.connect(self.onMotionMove)
 
     @property
     def owner_wid(self):
         return self.owner.winId().__int__() if self.owner else None
+
+    def registerXMouseArea(self):
+        if not self._cookie: 
+            self._cookie = self._mousearea.registerArea(0, 1366, 0, 768,
+                XGraber.RegisterAreaAllFlag)
+
+    def unregisterXMouseArea(self):
+        if self._cookie: 
+            self._mousearea.unregisterArea(self._cookie) 
+            self._cookie = None
 
     @func_logger()
     def grab_pointer(self):
@@ -309,7 +336,7 @@ class XGraber(QThread):
             logger.debug("grab result: %s" % grab_status)
             if grab_status in [0, 1]: break
             try_times -= 1
-            self.usleep(300)
+            time.sleep(0.3)
 
     @func_logger()
     def ungrab_pointer(self):
@@ -327,7 +354,7 @@ class XGraber(QThread):
             logger.debug("grab result: %s" % grab_status)            
             if grab_status in [0, 1]: break
             try_times -= 1
-            self.usleep(300)            
+            time.sleep(0.3)            
 
     @func_logger()
     def ungrab_keyboard(self):
@@ -336,42 +363,37 @@ class XGraber(QThread):
         
     @postGui()
     def simulate_key_press(self, keycode):
-        x_arrow_keys = (111, 116, 113, 114)
-        qt_arrow_keys = (16777235, 16777237, 16777234, 16777236)
-        x_special_keys = (36, 9)
-        qt_special_keys = (16777220, 16777216)
+        qt_control_keys = (16777235, 16777237, 16777234, 
+            16777236, 16777220, 16777216)
         qt_ascii_keys = range(65, 91)
-        if keycode in x_arrow_keys:
-            keycode = qt_arrow_keys[x_arrow_keys.index(keycode)]
-        elif keycode in x_special_keys:
-            keycode = qt_special_keys[x_special_keys.index(keycode)]
-        else:
-            keycode = qt_ascii_keys[ALLOWED_KEYS.index(keycode)]
+        if keycode in LITERAL_KEYS:
+            keycode = qt_ascii_keys[LITERAL_KEYS.index(keycode)]
+        elif keycode in CONTROL_KEYS:
+            keycode = qt_control_keys[CONTROL_KEYS.index(keycode)]
         key_press_event = QKeyEvent(
             QtCore.QEvent.KeyPress,
             keycode,
             QtCore.Qt.NoModifier)
-        self.owner.focusOwner.sendEvent(self.owner.focusOwner.rootObject().findChild(QQuickItem, "listview"), key_press_event)
+        self.owner.focusOwner.sendEvent(
+            self.owner.focusOwner.rootObject().findChild(QQuickItem, "listview")
+            , key_press_event)
 
-    def run(self):
-        while True:
-            e = self._conn.poll_for_event()
-            if e == None :
-                # self.yieldCurrentThread()
-                self.usleep(400)
-            if isinstance(e, xproto.KeyPressEvent):
-                if e.detail in ALLOWED_KEYS:
-                    self.simulate_key_press(e.detail)
-            elif isinstance(e, xproto.MotionNotifyEvent):
-                if self.owner and self.owner.inMenuArea(e.root_x, e.root_y):
-                    self.ungrab_pointer()
-                    # self.ungrab_keyboard() # shouldn't ungrab keyboard here
-            elif isinstance(e, xproto.ButtonPressEvent) and not self.owner.inMenuArea(e.root_x, e.root_y):
+    def onButtonPress(self, button, x, y, cookie):
+        if cookie == self._cookie: 
+            if self.owner and self.owner.inMenuArea(x, y):
                 self.ungrab_pointer()
                 self.ungrab_keyboard()
-                self.owner.destroyWholeMenu()
-                
-        self._conn.disconnect()
+                self.owner.destroyWholeMenu()                
+
+    def onKeyPress(self, key, x, y, cookie):
+        if cookie == self._cookie:
+            if self.owner and key in ALLOWED_KEYS:
+                self.simulate_key_press(key)
+
+    def onMotionMove(self, x, y, cookie):
+        if cookie == self._cookie:
+            if self.owner and self.owner.inMenuArea(x, y):
+                self.ungrab_pointer()
 
 class Menu(QQuickView):
     def __init__(self, dbusObj, menuJsonContent, parent=None):
@@ -570,24 +592,21 @@ class Menu(QQuickView):
 
 @pyqtSlot(str)
 def serviceReplacedByOtherSlot(name):
-    os._exit(0)
+    os._exit(0 and xgraber.unregisterXMouseArea())
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
     getWorkArea()
+    xgraber = XGraber()
 
-    bus = QDBusConnection.sessionBus()
     menuService = MenuService()
+    bus = QDBusConnection.sessionBus()
     bus.interface().registerService('com.deepin.menu',
                                     QDBusConnectionInterface.ReplaceExistingService,
                                     QDBusConnectionInterface.AllowReplacement)
     bus.registerObject('/com/deepin/menu', menuService)
     bus.interface().serviceUnregistered.connect(serviceReplacedByOtherSlot)
 
-    xgraber = XGraber()
-    xgraber.start()
-    xgraber.setPriority(QThread.LowestPriority)
-
     signal.signal(signal.SIGINT, signal.SIG_DFL)
-    sys.exit(app.exec_())
+    sys.exit(app.exec_() and xgraber.unregisterXMouseArea())

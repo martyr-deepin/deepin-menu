@@ -20,8 +20,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtDBus import QDBusAbstractInterface, QDBusConnection
+from PyQt5.QtCore import pyqtSignal, QVariant
+from PyQt5.QtDBus import QDBusAbstractInterface, QDBusConnection, QDBusReply
 
 class MenuManagerInterface(QDBusAbstractInterface):
 
@@ -29,7 +29,8 @@ class MenuManagerInterface(QDBusAbstractInterface):
         super(MenuManagerInterface, self).__init__("com.deepin.menu",
                                                    "/com/deepin/menu",
                                                    "com.deepin.menu.Manager",
-                                                   QDBusConnection.sessionBus(), None)
+                                                   QDBusConnection.sessionBus(), 
+                                                   None)
 
     def registerMenu(self):
         return self.call('RegisterMenu')
@@ -49,7 +50,8 @@ class MenuObjectInterface(QDBusAbstractInterface):
         super(MenuObjectInterface, self).__init__("com.deepin.menu",
                                                   path,
                                                   "com.deepin.menu.Menu",
-                                                  QDBusConnection.sessionBus(), None)
+                                                  QDBusConnection.sessionBus(), 
+                                                  None)
 
     def showMenu(self, jsonContent):
         self.call('ShowMenu', jsonContent)
@@ -62,3 +64,25 @@ class MenuObjectInterface(QDBusAbstractInterface):
         
     def setItemChecked(self, id, value):
         self.call('SetItemChecked', id, value)
+
+class XMouseAreaInterface(QDBusAbstractInterface):
+
+    ButtonPress = pyqtSignal(str, int, int, int)
+    KeyPress = pyqtSignal(str, int, int, int)
+    MotionMove = pyqtSignal(int, int, int)
+
+    def __init__(self):
+        super(XMouseAreaInterface, self).__init__("com.deepin.api.XMouseArea",
+                                                  "/com/deepin/api/XMouseArea",
+                                                  "com.deepin.api.XMouseArea",
+                                                  QDBusConnection.sessionBus(), 
+                                                  None)
+
+    def registerArea(self, x1, x2, y1, y2, flag):
+        msg = self.call("RegisterArea", x1, x2, y1, y2, flag)
+        print msg.errorName(), msg.errorMessage()
+        reply = QDBusReply(msg)
+        return reply.value()
+
+    def unregisterArea(self, id):
+        self.call("UnregisterArea", id)
