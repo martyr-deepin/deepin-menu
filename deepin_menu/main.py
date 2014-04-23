@@ -3,7 +3,6 @@
 import os
 import sys
 import json
-import time
 import signal
 import functools
 import subprocess
@@ -23,7 +22,7 @@ from PyQt5.QtWidgets import QApplication, qApp
 from PyQt5.QtGui import (QSurfaceFormat, QColor, QKeySequence, QKeyEvent, 
     QCursor, QFont, QFontMetrics)
 from PyQt5.QtCore import (QObject, Q_CLASSINFO, pyqtSlot, pyqtProperty, 
-    pyqtSignal, QTimer, QThread)
+    pyqtSignal, QTimer)
 from PyQt5.QtDBus import (QDBusAbstractAdaptor, QDBusConnection, 
     QDBusConnectionInterface, QDBusMessage, QDBusObjectPath)
 
@@ -349,7 +348,6 @@ class XGraber(QObject):
             logger.debug("grab result: %s" % grab_status)
             if grab_status in [0, 1]: break
             try_times -= 1
-            time.sleep(0.3)
 
     @func_logger()
     def ungrab_pointer(self):
@@ -368,7 +366,6 @@ class XGraber(QObject):
             logger.debug("grab result: %s" % grab_status)            
             if grab_status in [0, 1]: break
             try_times -= 1
-            time.sleep(0.3)            
 
     @func_logger()
     def ungrab_keyboard(self):
