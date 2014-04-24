@@ -54,14 +54,14 @@ RectWithCorner {
                 }
 
                 var distance
-                distance = 0 - _menu_view.x
+                distance = currentMonitorRect.x - _menu_view.x
                 if (distance > 0) {
                     distance = Math.min(distance, menu.rectWidth - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
                     _menu_view.x += distance
                     menu.cornerPos -= distance
                 }
 
-                var distance = _menu_view.x + menu.width - _injection.getScreenWidth()
+                var distance = _menu_view.x + menu.width - (currentMonitorRect.x + currentMonitorRect.width)
                 if (distance > 0) {
                     distance = Math.min(distance, menu.rectWidth - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
                     _menu_view.x -= distance

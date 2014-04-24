@@ -89,7 +89,8 @@ class MenuService(QObject):
         objPathHolder= objPath.replace("/", "_")
         if self.__menu: self.__menu.ancestor.destroyForward()
         setattr(self, objPathHolder, None)
-        msg = QDBusMessage.createSignal(objPath, 'com.deepin.menu.Menu', 'MenuUnregistered')
+        msg = QDBusMessage.createSignal(objPath, 'com.deepin.menu.Menu', 
+            'MenuUnregistered')
         QDBusConnection.sessionBus().send(msg)
 
         self.__timer = QTimer()
@@ -144,17 +145,20 @@ class MenuObject(QObject):
         self.manager.showMenu(self, menuJsonContent)
 
     def setItemText(self, id, value):
-        msg = QDBusMessage.createSignal(self.objPath, 'com.deepin.menu.Menu', 'ItemTextSet')
+        msg = QDBusMessage.createSignal(self.objPath, 'com.deepin.menu.Menu', 
+            'ItemTextSet')
         msg << id << value
         QDBusConnection.sessionBus().send(msg)
 
     def setItemActivity(self, id, value):
-        msg = QDBusMessage.createSignal(self.objPath, 'com.deepin.menu.Menu', 'ItemActivitySet')
+        msg = QDBusMessage.createSignal(self.objPath, 'com.deepin.menu.Menu', 
+            'ItemActivitySet')
         msg << id << value
         QDBusConnection.sessionBus().send(msg)
 
     def setItemChecked(self, id, value):
-        msg = QDBusMessage.createSignal(self.objPath, 'com.deepin.menu.Menu', 'ItemCheckedSet')
+        msg = QDBusMessage.createSignal(self.objPath, 'com.deepin.menu.Menu', 
+            'ItemCheckedSet')
         msg << id << value
         QDBusConnection.sessionBus().send(msg)
 
@@ -257,7 +261,8 @@ class Injection(QObject):
         return -1
 
     def startNewService(self):
-        subprocess.Popen(["python", "-OO", os.path.join(os.path.dirname(__file__), "main.py")])
+        subprocess.Popen(["python", "-OO", 
+            os.path.join(os.path.dirname(__file__), "main.py")])
         
 class postGui(QtCore.QObject):
     
@@ -319,11 +324,10 @@ class XGraber(QObject):
 
     def registerXMouseArea(self):
         if not self._cookie: 
-            rect =  self._display.getPrimaryRect()
-            self._cookie = self._mousearea.registerArea(rect[0],
-                                                        rect[1], 
-                                                        rect[2],
-                                                        rect[3],
+            self._cookie = self._mousearea.registerArea(0,
+                                                        0, 
+                                                        SCREEN_WIDTH,
+                                                        SCREEN_HEIGHT,
                                                         XGraber.RegisterAreaAllFlag)
 
     def unregisterXMouseArea(self):

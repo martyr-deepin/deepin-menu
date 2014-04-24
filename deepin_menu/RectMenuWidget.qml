@@ -49,17 +49,16 @@ Rect {
                 _menu_view.x += distance
             }
             
-            distance = 0 - _menu_view.y
+            distance = currentMenuIndex.x - _menu_view.y
             if (distance > 0) {
                 _menu_view.y += distance
             }
 
-            distance = _menu_view.x + menu.width - _injection.getScreenWidth()
+            distance = _menu_view.x + menu.width - (currentMonitorRect.x + currentMonitorRect.width)
             if (distance > 0) {
                 _menu_view.x -= distance
             }
-            
-            distance = _menu_view.y + menu.height - _injection.getScreenHeight()
+            distance = _menu_view.y + menu.height - (currentMonitorRect.y + currentMonitorRect.height)
             if (distance > 0) {
                 _menu_view.y -= distance
             }

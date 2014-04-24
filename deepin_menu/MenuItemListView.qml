@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import DBus.Com.Deepin.Daemon.Display 1.0
 import "MenuItem.js" as MenuItemJs
 
 ListView {
@@ -33,6 +34,25 @@ ListView {
     property bool isDockMenu: false
     property bool isCheckableMenu: false
     property bool isSingleCheck: false
+
+    Display { id: dbus_display }
+    Monitor { id: dbus_monitor }
+
+    property rect currentMonitorRect: {
+        var monitors = dbus_display.monitors
+        for (var i = 0; i < monitors.length; i++) {
+            dbus_monitor.path = monitors[i]
+            if (dbus_monitor.x <= _menu_view.x &&
+                _menu_view.x <= dbus_monitor.x + dbus_monitor.width &&
+                dbus_monitor.y <= _menu_view.y &&
+                _menu_view.y <= dbus_monitor.y + dbus_monitor.height) {
+
+                return Qt.rect(dbus_monitor.x, dbus_monitor.y,
+                               dbus_monitor.width,
+                               dbus_monitor.height)
+            }
+        }
+    }
 
     signal itemChecked(int idx, var item)
     signal itemUnchecked(int idx, var item)
