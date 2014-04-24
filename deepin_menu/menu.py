@@ -45,6 +45,9 @@ def parseMenu(obj, menu):
             result.addMenuItem(parseMenuItem(menuItem))
     return result
 
+def validateItemGroupInfo(item, groupId, groupType):
+    info = item.id.split(":")
+    item.id = "%s:%s:%s" % (groupId, groupType, info[-1])
 
 class MenuItem(QObject):
     def __init__(self, id, text, icons=None, subMenu=None, 
@@ -98,9 +101,10 @@ class MenuItem(QObject):
     def __str__(self):
         return json.dumps(self.serializableContent)
 
-class CheckboxMenuItem(MenuItem):
+class CheckableMenuItem(MenuItem):
     def __init__(self, id, text, checked=False, showCheckmark=True):
-        super(CheckboxMenuItem, self).__init__(id, text, isCheckable=True, checked=checked, showCheckmark=showCheckmark)
+        super(CheckableMenuItem, self).__init__(id, text, isCheckable=True, 
+            checked=checked, showCheckmark=showCheckmark)
 
 class MenuSeparator(MenuItem):
     def __init__(self):
@@ -110,7 +114,8 @@ class Menu(QObject):
     itemClicked = pyqtSignal(str, bool)
     menuDismissed = pyqtSignal()
 
-    def __init__(self, items=None, is_root=True, checkableMenu=False, singleCheck=False):
+    def __init__(self, items=None, is_root=True, checkableMenu=False, 
+        singleCheck=False):
         super(Menu, self).__init__()
         self.items = []
         if items:
@@ -196,19 +201,25 @@ class Menu(QObject):
         return json.dumps(self.serializableItemList)
 
 class CheckboxMenu(Menu):
-    def __init__(self, items):
-        super(CheckboxMenu, self).__init__(items, checkableMenu=True, singleCheck=False)
+    def __init__(self, groupId, items):
+        self.groupId = groupId
+        super(CheckboxMenu, self).__init__(items, checkableMenu=True, 
+            singleCheck=False)
 
     def addMenuItem(self, item):
+        validateItemGroupInfo(item, self.groupId, "checkbox")
         item.isCheckable = True
         item.showCheckmark = True
         self.items.append(item)
 
 class RadioButtonMenu(Menu):
-    def __init__(self, items):
-        super(RadioButtonMenu, self).__init__(items, checkableMenu=True, singleCheck=True)
+    def __init__(self, groupId, items):
+        self.groupId = groupId
+        super(RadioButtonMenu, self).__init__(items, checkableMenu=True, 
+            singleCheck=True)
 
     def addMenuItem(self, item):
+        validateItemGroupInfo(item, self.groupId, "radio")
         item.isCheckable = True
         item.showCheckmark = True
         self.items.append(item)
@@ -240,17 +251,24 @@ if __name__ == "__main__":
     # menu.showMenu(200, 200)
 
     # 2)
-    menu = Menu([("id_driver", "Driver", ("/usr/share/icons/Deepin/apps/16/preferences-display.png",), [("id_sub1", "SubMenu1"), ("id_sub2", "SubMenu2", (), [("id_sub1", "SubMenu1"), ("id_sub2", "_SubMenu2", (), [("id_sub1", "SubMenu1"), ("id_sub2", "_SubMenu2", (), [("id_sub1", "SubMenu1"), ("id_sub2", "_SubMenu2")])])])]),
+    menu = Menu([("id_driver", "Driver", ("/usr/share/icons/Deepin/apps/16/preferences-display.png",)),
                  None,
-                 ("id_display", "_Display", (), [("id_radio1", "Radio1"), ("id_radio2", "Radio2"),]),
-                 ("id_checkbox", "CheckBox"),
-                 ("id_checkbox1", "_CheckOne"),
-                 ("id_checkbox2", "_CheckTwo"),
+                 ("id_display", "_Display", (), [("display_sub1", "Display One"), ("display_sub2", "Display Two"),]),
+                 ("id_radio", "RadioButtonMenu"),
+                 ("id_checkbox", "_CheckBoxMenu"),
                  MenuSeparator(),
+                 CheckableMenuItem("radio_group_2:radio:radio2_sub1", "One"),
+                 CheckableMenuItem("radio_group_2:radio:radio2_sub2", "Two"),
+                 None,
+                 CheckableMenuItem("checkbox_group_2:checkbox:checkbox2_sub1", "One"),
+                 CheckableMenuItem("checkbox_group_2:checkbox:checkbox2_sub2", "Two"),
+                 None,
                  MenuItem("id_nonactive", "NotActive", isActive=False),
-                 CheckboxMenuItem("id_check", "CheckMe", True)], is_root=True,)
-    sub = RadioButtonMenu([("id_radio1", "Radio1"), ("id_radio2", "Radio2"),])
-    menu.getItemById("id_checkbox").setSubMenu(sub)
+                 CheckableMenuItem("id_check", "CheckMe", True)], is_root=True,)
+    radio_sub = RadioButtonMenu("radio_group_1", [("id_radio1", "Radio One"), ("id_radio2", "Radio Two"),])
+    checkbox_sub = CheckboxMenu("checkbox_group_1", [("id_checkbox1", "Checkbox One"), ("id_checkbox2", "Checkbox Two")])
+    menu.getItemById("id_radio").setSubMenu(radio_sub)
+    menu.getItemById("id_checkbox").setSubMenu(checkbox_sub)
     # menu.getItemById("id_radio2").showCheckmark = False
     menu.itemClicked.connect(invoked)
     menu.menuDismissed.connect(dismissed)

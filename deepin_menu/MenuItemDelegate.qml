@@ -36,10 +36,19 @@ Component {
             target: itemArea.ListView.view
 
             onItemChecked: {
-                if (itemArea.ListView.view.isSingleCheck && idx != index) {
-                    componentChecked = false
-                    itemIconPic = iconNormal
-                    itemArea.ListView.view.itemUnchecked(idx, itemArea)
+                var thisInfo = itemArea.componentId.split(":")
+                // implys that this item is part of a radio group
+                if (thisInfo.length == 3) { 
+                    var itemInfo = item.componentId.split(":")
+                    var itemGroupId = itemInfo[0]
+                    var itemGroupType = itemInfo[1]
+                    var itemItemId = itemInfo[2]
+
+                    if (itemGroupType=="radio" && itemGroupId==thisInfo[0] && idx != index) {
+                        componentChecked = false
+                        itemIconPic = iconNormal
+                        itemArea.ListView.view.itemUnchecked(idx, itemArea)  
+                    }
                 }
             }
 
