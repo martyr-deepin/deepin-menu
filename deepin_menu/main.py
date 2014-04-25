@@ -566,8 +566,8 @@ class Menu(QQuickView):
         self.setFormat(surface_format)
 
         self.setColor(QColor(0, 0, 0, 0))
-        self.setFlags(QtCore.Qt.FramelessWindowHint 
-                      | QtCore.Qt.Tool
+        self.setFlags(QtCore.Qt.Tool
+                      | QtCore.Qt.X11BypassWindowManagerHint
                       | QtCore.Qt.WindowStaysOnTopHint)
         self.setX(self.menuJsonObj["x"])
         self.setY(self.menuJsonObj["y"])
