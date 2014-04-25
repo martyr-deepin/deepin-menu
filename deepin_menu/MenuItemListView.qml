@@ -140,12 +140,12 @@ ListView {
             var component_x = _menu_view.x + menu.width - menu.blurWidth * 2
             var component_y = _menu_view.y + y + currentItem.y - menu.blurWidth
 
-            if (component_x + component_width> _injection.getScreenWidth()) {
+            if (component_x + component_width> currentMonitorRect.x + currentMonitorRect.width) {
                 component_x = _menu_view.x - component_width
             }
 
-            if (component_y + component_height > _injection.getScreenHeight()) {
-                component_y = _injection.getScreenHeight() - component_height
+            if (component_y + component_height > currentMonitorRect.y + currentMonitorRect.height) {
+                component_y = (currentMonitorRect.y + currentMonitorRect.height) - component_height
             }
 
             timer.jsonContent = JSON.stringify({"x": component_x, "y": component_y,

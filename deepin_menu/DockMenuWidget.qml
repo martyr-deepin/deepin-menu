@@ -86,21 +86,20 @@ RectWithCorner {
                 }
 
                 var distance
-                distance = 0 - _menu_view.y
+                distance = currentMonitorRect.y - _menu_view.y
                 if (distance > 0) {
                     distance = Math.min(distance, menu.rectHeight - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
                     _menu_view.y += distance
                     menu.cornerPos -= distance
                 }
 
-                var distance = menu.y + menu.height - _injection.getScreenHeight()
+                var distance = menu.y + menu.height - (currentMonitorRect.y + currentMonitorRect.height)
                 if (distance > 0) {
                     distance = Math.min(distance, menu.rectHeight - 2 * menu.blurWidth - menu.rectRadius - menu.cornerWidth / 2)
                     _menu_view.y -= distance
                     menu.cornerPos += distance
                 }
             }
-
         }
     }
 }
