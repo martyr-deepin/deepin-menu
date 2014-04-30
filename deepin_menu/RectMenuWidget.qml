@@ -31,7 +31,11 @@ Rect {
     function selectItem(idx) {
         listview.currentIndex = idx
     }
-
+    
+    function getCurrentMonitorRect() {
+        return listview.currentMonitorRect
+    }
+    
     MenuItemListView {
         id: listview
 

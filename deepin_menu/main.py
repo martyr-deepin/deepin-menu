@@ -30,11 +30,7 @@ from logger import func_logger, logger
 from DBusInterfaces import (MenuObjectInterface, XMouseAreaInterface, 
     DisplayPropertyInterface)
 
-SCREEN_WIDTH = 0
-SCREEN_HEIGHT = 0
-
 def getWorkArea():
-    global SCREEN_WIDTH, SCREEN_HEIGHT
     conn = xcb.connect()
     setup = conn.get_setup()
     root = setup.roots[0].root
@@ -47,8 +43,8 @@ def getWorkArea():
     cookie = conn.core.GetProperty(False, root, name, type, 0, 4)
     reply = cookie.reply()
 
-    _, _, SCREEN_WIDTH, SCREEN_HEIGHT = unpack_from('IIII', reply.value.buf())
-
+    return unpack_from('IIII', reply.value.buf())
+    
 def getCursorPosition():
     return QCursor().pos()
 
@@ -70,7 +66,6 @@ class MenuService(QObject):
         del self.__timer
 
     def registerMenu(self):
-        xgraber.registerXMouseArea()
         self.__restart_flag = False
 
         objPath = "/com/deepin/menu/%s" % str(uuid4()).replace("-", "_")
@@ -105,6 +100,8 @@ class MenuService(QObject):
             self.__menu.setMenuJsonContent(menuJsonContent)
         else:
             self.__menu = Menu(dbusObj, menuJsonContent)
+        xgraber.owner = self.__menu
+        xgraber.registerXMouseArea()
         
         self.__menu.showMenu()
         self.__menu.requestActivate()
@@ -231,14 +228,6 @@ class Injection(QObject):
     def __init__(self):
         super(QObject, self).__init__()
 
-    @pyqtSlot(result=int)
-    def getScreenWidth(self):
-        return SCREEN_WIDTH
-
-    @pyqtSlot(result=int)
-    def getScreenHeight(self):
-        return SCREEN_HEIGHT
-
     @pyqtSlot(str,int,result=int)
     def getStringWidth(self, string, pixelSize):
         font = QFont()
@@ -324,10 +313,11 @@ class XGraber(QObject):
 
     def registerXMouseArea(self):
         if not self._cookie: 
+            rect = self.owner.rootObject().getCurrentMonitorRect()
             self._cookie = self._mousearea.registerArea(0,
                                                         0, 
-                                                        SCREEN_WIDTH,
-                                                        SCREEN_HEIGHT,
+                                                        int(rect.width()),
+                                                        int(rect.height()),
                                                         XGraber.RegisterAreaAllFlag)
 
     def unregisterXMouseArea(self):
@@ -407,18 +397,33 @@ class XGraber(QObject):
 
     def onMotionMove(self, x, y, cookie):
         if cookie == self._cookie:
-            if self.owner and self.owner.inMenuArea(x, y):
-                self.ungrab_pointer()
+            if self.owner:
+                if self.owner.inMenuArea(x, y):
+                    self.ungrab_pointer()
+                else:
+                    self.grab_pointer()
 
 class Menu(QQuickView):
     def __init__(self, dbusObj, menuJsonContent, parent=None):
         QQuickView.__init__(self)
         self.parent = parent
         self.subMenu = None
+        
+        qml_context = self.rootContext()
+        qml_context.setContextProperty("_menu_view", self)
+        qml_context.setContextProperty("_injection", INJECTION)
 
+        surface_format = QSurfaceFormat()
+        surface_format.setAlphaBufferSize(8)
+        self.setFormat(surface_format)
+        self.setColor(QColor(0, 0, 0, 0))
+        self.setFlags(QtCore.Qt.Tool
+                      | QtCore.Qt.X11BypassWindowManagerHint
+                      | QtCore.Qt.WindowStaysOnTopHint)
+        
         self.setMenuJsonContent(menuJsonContent)
         self.setDBusObj(dbusObj)
-
+        
         # self.installEventFilter(self)
         qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
 
@@ -431,6 +436,18 @@ class Menu(QQuickView):
 
     def setMenuJsonContent(self, menuJsonContent):
         self.__menuJsonContent = menuJsonContent
+        
+        self.setX(self.menuJsonObj["x"])
+        self.setY(self.menuJsonObj["y"])
+
+        if self.menuJsonObj["isDockMenu"] and not self.isSubMenu:
+            self.setSource(QtCore.QUrl.fromLocalFile(
+                os.path.join(os.path.dirname(__file__), 
+                'DockMenu.qml')))
+        else:
+            self.setSource(QtCore.QUrl.fromLocalFile(
+                os.path.join(os.path.dirname(__file__), 
+                'RectMenu.qml')))
 
     def focusWindowChangedSlot(self, window):
         if not self:
@@ -477,14 +494,12 @@ class Menu(QQuickView):
         conn.disconnect()
         
     def grab_pointer(self):
-        xgraber.owner = self.ancestor
         xgraber.grab_pointer()
         
     def ungrab_pointer(self):
         xgraber.ungrab_pointer()
 
     def grab_keyboard(self):
-        xgraber.owner = self.ancestor
         xgraber.grab_keyboard()
         
     def ungrab_keyboard(self):
@@ -557,30 +572,6 @@ class Menu(QQuickView):
             self.subMenu = None
 
     def showMenu(self):
-        qml_context = self.rootContext()
-        qml_context.setContextProperty("_menu_view", self)
-        qml_context.setContextProperty("_injection", INJECTION)
-
-        surface_format = QSurfaceFormat()
-        surface_format.setAlphaBufferSize(8)
-        self.setFormat(surface_format)
-
-        self.setColor(QColor(0, 0, 0, 0))
-        self.setFlags(QtCore.Qt.Tool
-                      | QtCore.Qt.X11BypassWindowManagerHint
-                      | QtCore.Qt.WindowStaysOnTopHint)
-        self.setX(self.menuJsonObj["x"])
-        self.setY(self.menuJsonObj["y"])
-
-        if self.menuJsonObj["isDockMenu"] and not self.isSubMenu:
-            self.setSource(QtCore.QUrl.fromLocalFile(
-                os.path.join(os.path.dirname(__file__), 
-                'DockMenu.qml')))
-        else:
-            self.setSource(QtCore.QUrl.fromLocalFile(
-                os.path.join(os.path.dirname(__file__), 
-                'RectMenu.qml')))
-
         self.show()
         self.grab_pointer()
         self.grab_keyboard()
@@ -611,7 +602,6 @@ def serviceReplacedByOtherSlot(name):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
-    getWorkArea()
     xgraber = XGraber()
 
     menuService = MenuService()
