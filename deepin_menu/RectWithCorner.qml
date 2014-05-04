@@ -21,8 +21,8 @@ Rectangle {
 
     property string cornerDirection: "down"
     property int cornerPos: rectWidth / 2
-    property int cornerWidth: 24
-    property int cornerHeight: 12
+    property int cornerWidth: 18
+    property int cornerHeight: 10
 	
 	onCornerPosChanged: canvas.requestPaint()
 	onCornerDirectionChanged: canvas.requestPaint()
