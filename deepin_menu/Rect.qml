@@ -1,15 +1,14 @@
 import QtQuick 2.1
 import QtGraphicalEffects 1.0
 
-Rectangle {
+Item {
     id: rect
     width: rectWidth
     height: rectHeight
-	color: Qt.rgba(0, 0, 0, 0)
 
     property bool withBlur: true
     property color fillColor: Qt.rgba(0, 0, 0, 0.8)
-    property color blurColor: Qt.rgba(0, 0, 0, 1)
+    property color blurColor: Qt.rgba(0, 0, 0, 0.4)
     property color borderColor: Qt.rgba(1, 1, 1, 0.15)
 
     property int blurRadius: 16
@@ -49,9 +48,11 @@ Rectangle {
         }
     }
 	
-    Glow {
+    DropShadow {
         anchors.fill: canvas
 		visible: rect.withBlur
+        horizontalOffset: 0
+        verticalOffset: 3
         radius: blurWidth
         samples: 16
         color: rect.blurColor

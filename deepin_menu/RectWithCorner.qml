@@ -13,7 +13,7 @@ Rectangle {
     property color borderColor: Qt.rgba(1, 1, 1, 0.15)
 
     property int blurRadius: 16
-    property int blurWidth: 10
+    property int blurWidth: 8
     property int borderWidth: 2
     property int rectRadius: 4
     property int rectWidth: 200
@@ -188,12 +188,14 @@ Rectangle {
         }
     }
 
-    Glow {
+    DropShadow {
         anchors.fill: canvas
-        visible: rect.withBlur
-        radius: blurRadius
+		visible: rect.withBlur
+        horizontalOffset: 0
+        verticalOffset: 3
+        radius: blurWidth
         samples: 16
         color: rect.blurColor
         source: canvas
-    }
+    }    
 }
