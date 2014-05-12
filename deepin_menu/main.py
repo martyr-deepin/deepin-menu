@@ -314,10 +314,10 @@ class XGraber(QObject):
     def registerXMouseArea(self):
         if not self._cookie: 
             rect = self.owner.rootObject().getCurrentMonitorRect()
-            self._cookie = self._mousearea.registerArea(0,
-                                                        0, 
-                                                        int(rect.width()),
-                                                        int(rect.height()),
+            self._cookie = self._mousearea.registerArea(int(rect.x()),
+                                                        int(rect.y()), 
+                                                        int(rect.x() + rect.width()),
+                                                        int(rect.y() + rect.height()),
                                                         XGraber.RegisterAreaAllFlag)
 
     def unregisterXMouseArea(self):
