@@ -147,9 +147,8 @@ class Menu(QObject):
             if item.hasSubMenu:
                 if item.subMenu.getItemById(id):
                     return item.subMenu.getItemById(id)
-            else:
-                if item.id == id:
-                    return item
+            if item.id == id:
+                return item
         return None
     
     def setItemActivity(self, id, value):
