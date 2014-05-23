@@ -384,6 +384,7 @@ class XGraber(QObject):
             , key_press_event)
 
     def onButtonPress(self, button, x, y, cookie):
+        print("onButtonPress")
         if cookie == self._cookie: 
             if self.owner and not self.owner.inMenuArea(x, y):
                 self.ungrab_pointer()
@@ -391,11 +392,13 @@ class XGraber(QObject):
                 self.owner.destroyWholeMenu()                
 
     def onKeyPress(self, key, x, y, cookie):
+        print("onKeyPress")
         if cookie == self._cookie:
             if self.owner and key in ALLOWED_KEYS:
                 self.simulate_key_press(key)
 
     def onMotionMove(self, x, y, cookie):
+        print("onMotoinMove")
         if cookie == self._cookie:
             if self.owner:
                 if self.owner.inMenuArea(x, y):

@@ -67,7 +67,7 @@ class MenuObjectInterface(QDBusAbstractInterface):
 
 class XMouseAreaInterface(QDBusAbstractInterface):
 
-    ButtonPress = pyqtSignal(str, int, int, int)
+    ButtonPress = pyqtSignal(int, int, int, int)
     KeyPress = pyqtSignal(str, int, int, int)
     MotionMove = pyqtSignal(int, int, int)
 
