@@ -325,7 +325,7 @@ class XGraber(QObject):
             self._mousearea.unregisterArea(self._cookie) 
             self._cookie = None
 
-    @func_logger()
+    # @func_logger()
     def grab_pointer(self):
         if not self.owner_wid: return
 
@@ -343,12 +343,12 @@ class XGraber(QObject):
             if grab_status in [0, 1]: break
             try_times -= 1
 
-    @func_logger()
+    # @func_logger()
     def ungrab_pointer(self):
         if not self.owner_wid: return
         self._conn.core.UngrabPointerChecked(xproto.Time.CurrentTime).check()
 
-    @func_logger()
+    # @func_logger()
     def grab_keyboard(self):
         if not self.owner_wid: return
         
@@ -361,7 +361,7 @@ class XGraber(QObject):
             if grab_status in [0, 1]: break
             try_times -= 1
 
-    @func_logger()
+    # @func_logger()
     def ungrab_keyboard(self):
         if not self.owner_wid: return
         self._conn.core.UngrabKeyboardChecked(xproto.Time.CurrentTime).check()
@@ -384,7 +384,6 @@ class XGraber(QObject):
             , key_press_event)
 
     def onButtonPress(self, button, x, y, cookie):
-        print("onButtonPress")
         if cookie == self._cookie: 
             if self.owner and not self.owner.inMenuArea(x, y):
                 self.ungrab_pointer()
@@ -392,13 +391,11 @@ class XGraber(QObject):
                 self.owner.destroyWholeMenu()                
 
     def onKeyPress(self, key, x, y, cookie):
-        print("onKeyPress")
         if cookie == self._cookie:
             if self.owner and key in ALLOWED_KEYS:
                 self.simulate_key_press(key)
 
     def onMotionMove(self, x, y, cookie):
-        print("onMotoinMove")
         if cookie == self._cookie:
             if self.owner:
                 if self.owner.inMenuArea(x, y):
@@ -584,10 +581,9 @@ class Menu(QQuickView):
         if self.subMenu:
             self.subMenu.destroyForward()
         
-        # signal.signal(signal.SIGALRM, lambda signum, frame: os._exit(0))
-        # signal.alarm(1)
-        self.close()
-        # signal.alarm(0)
+        # hide, destroy, close will sometimes hangs there
+        self.setWidth(0)
+        self.setHeight(0)
         
     @pyqtSlot()
     def destroyWholeMenu(self):
