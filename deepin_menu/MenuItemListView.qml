@@ -4,7 +4,6 @@ import "MenuItem.js" as MenuItemJs
 
 ListView {
     id: listview
-    focus: true                 /* to enable key navigation */
     objectName: "listview"
     currentIndex: -1
     model: MenuItemListModel { menuJsonContent: listview.menuJsonContent}
