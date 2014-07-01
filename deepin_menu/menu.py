@@ -52,8 +52,8 @@ def validateItemGroupInfo(item, groupId, groupType):
     item.id = "%s:%s:%s" % (groupId, groupType, info[-1])
 
 class MenuItem(QObject):
-    def __init__(self, id, text, icons=None, extra="", subMenu=None, 
-                 isActive=True, isCheckable=False, checked=False, showCheckmark=True):
+    def __init__(self, id, text, icons=None, subMenu=None, 
+                 isActive=True, isCheckable=False, checked=False, showCheckmark=True, extra=""):
         super(MenuItem, self).__init__()
         self.id = id
         self.text = text
@@ -106,9 +106,9 @@ class MenuItem(QObject):
         return json.dumps(self.serializableContent)
 
 class CheckableMenuItem(MenuItem):
-    def __init__(self, id, text, extra="", checked=False, showCheckmark=True):
-        super(CheckableMenuItem, self).__init__(id, text, extra=extra, isCheckable=True, 
-            checked=checked, showCheckmark=showCheckmark)
+    def __init__(self, id, text, checked=False, showCheckmark=True, extra=""):
+        super(CheckableMenuItem, self).__init__(id, text, isCheckable=True, 
+                                                checked=checked, showCheckmark=showCheckmark, extra=extra)
 
 class MenuSeparator(MenuItem):
     def __init__(self):

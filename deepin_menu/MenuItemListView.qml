@@ -17,7 +17,7 @@ ListView {
     property int horizontalPadding: 3
     property int verticalPadding: 3
     property int pictureSize: 16
-    property int minWidth: 150
+    property int minWidth: 100
 
     property string arrowDark: "images/arrow-dark.png"
     property string arrowDarkHover: "images/arrow-dark-hover.png"
