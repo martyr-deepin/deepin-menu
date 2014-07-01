@@ -588,6 +588,7 @@ class Menu(QQuickView):
     @pyqtSlot()
     def destroyWholeMenu(self):
         menuService.unregisterMenu(self.dbusObj.objPath)
+        self.close()
         
     @pyqtSlot()
     def destroySubs(self):
