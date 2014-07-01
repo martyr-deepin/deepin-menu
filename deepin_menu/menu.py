@@ -32,6 +32,8 @@ def parseMenuItem(menuItem):
         result.setIcons(menuItem[2])
     if len(menuItem) > 3:
         result.setSubMenu(parseMenu(Menu(is_root=False), menuItem[3]))
+    if len(menuItem) > 4:        
+        result.extra = menuItem[4]
     return result
 
 def parseMenu(obj, menu):
@@ -50,11 +52,12 @@ def validateItemGroupInfo(item, groupId, groupType):
     item.id = "%s:%s:%s" % (groupId, groupType, info[-1])
 
 class MenuItem(QObject):
-    def __init__(self, id, text, icons=None, subMenu=None, 
+    def __init__(self, id, text, icons=None, extra="", subMenu=None, 
                  isActive=True, isCheckable=False, checked=False, showCheckmark=True):
         super(MenuItem, self).__init__()
         self.id = id
         self.text = text
+        self.extra = extra
         self.icons = icons or ()
         self.subMenu = subMenu or Menu(is_root=False)
         self.isActive = isActive
@@ -82,6 +85,7 @@ class MenuItem(QObject):
                 "itemIconHover": iconHover,
                 "itemIconInactive": iconInactive,
                 "itemText": self.text,
+                "itemExtra": self.extra,
                 "itemSubMenu": self.subMenu.serializableItemList,
                 "isActive": self.isActive,
                 "isCheckable": self.isCheckable,
@@ -255,6 +259,7 @@ if __name__ == "__main__":
                  ("id_display", "_Display", (), [("display_sub1", "Display One"), ("display_sub2", "Display Two"),]),
                  ("id_radio", "RadioButtonMenu"),
                  ("id_checkbox", "_CheckBoxMenu"),
+                 ("id_extra", "_ExtraTest", (), [], "Ctrl-X"),
                  MenuSeparator(),
                  CheckableMenuItem("radio_group_2:radio:radio2_sub1", "One"),
                  CheckableMenuItem("radio_group_2:radio:radio2_sub2", "Two"),

@@ -24,21 +24,22 @@ Component {
         property bool componentCheckable: isCheckable
         property bool componentChecked: checked
         property string componentShortcut: itemShortcut
-        property string iconNormal: itemIcon 
+        property string iconNormal: itemIcon
         property string iconHover: itemIconHover
         property string iconInactive: itemIconInactive
 
         property alias itemTextColor: componentText.color
+        property alias itemExtraColor: componentExtraInfo.color
         property alias itemArrowPic: componentIndicator.source
         property alias itemIconPic: componentImage.source
-        
+
         Connections {
             target: itemArea.ListView.view
 
             onItemChecked: {
                 var thisInfo = itemArea.componentId.split(":")
                 // implys that this item is part of a radio group
-                if (thisInfo.length == 3) { 
+                if (thisInfo.length == 3) {
                     var itemInfo = item.componentId.split(":")
                     var itemGroupId = itemInfo[0]
                     var itemGroupType = itemInfo[1]
@@ -47,7 +48,7 @@ Component {
                     if (itemGroupType=="radio" && itemGroupId==thisInfo[0] && idx != index) {
                         componentChecked = false
                         itemIconPic = iconNormal
-                        itemArea.ListView.view.itemUnchecked(idx, itemArea)  
+                        itemArea.ListView.view.itemUnchecked(idx, itemArea)
                     }
                 }
             }
@@ -58,7 +59,7 @@ Component {
                 }
             }
         }
-        
+
         function _get_check_icon(state) {
             if (isDockMenu) {
                 return "images/check_dark_" + state + ".png"
@@ -66,7 +67,7 @@ Component {
                 return "images/check_light_" + state + ".png"
             }
         }
-        
+
         function checkThis() {
             if (showCheckmark) {
                 iconNormal = _get_check_icon("normal")
@@ -88,7 +89,18 @@ Component {
                 if (componentChecked ) {
                     checkThis()
                 } else {
-                    undoCheckThis()
+                    var thisInfo = componentId.split(":")
+                    // implys that this item is part of a radio group
+                    if (thisInfo.length == 3) {
+                        var itemInfo = componentId.split(":")
+                        var itemGroupType = itemInfo[1]
+
+                        if (itemGroupType=="checkbox") {
+                            undoCheckThis()
+                        }
+                    } else {
+                        undoCheckThis()
+                    }
                 }
             }
         }
@@ -111,10 +123,19 @@ Component {
             font.pixelSize: 12
 
             anchors.left: parent.left
-            anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             anchors.leftMargin: parent.textLeftMargin
-            anchors.rightMargin: parent.textRightMargin
+        }
+
+        Text {
+            id: componentExtraInfo
+            text: itemExtra
+            color: extraColor
+            font.pixelSize: 12
+
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.rightMargin: componentIndicator.implicitWidth + parent.horizontalPadding
         }
 
         Image {

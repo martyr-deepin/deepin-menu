@@ -100,6 +100,7 @@ ListModel {
                                   "itemIconInactive":items[i].itemIconInactive,
                                   "itemText":items[i].itemText,
                                   "itemShortcut": items[i].itemShortcut || "",
+                                  "itemExtra": items[i].itemExtra,
                                   "itemSubMenu":JSON.stringify(items[i].itemSubMenu),
                                   "isActive": items[i].isActive,
                                   "isCheckable": items[i].isCheckable,

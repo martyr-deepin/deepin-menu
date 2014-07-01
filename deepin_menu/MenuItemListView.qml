@@ -17,7 +17,7 @@ ListView {
     property int horizontalPadding: 3
     property int verticalPadding: 3
     property int pictureSize: 16
-    property int minWidth: 100
+    property int minWidth: 150
 
     property string arrowDark: "images/arrow-dark.png"
     property string arrowDarkHover: "images/arrow-dark-hover.png"
@@ -27,6 +27,7 @@ ListView {
     property color textColor: Qt.rgba(1, 1, 1, 1)
     property color textColorHover: Qt.rgba(0, 0, 0, 1)
     property color textColorNotActive: Qt.rgba(0.5, 0.5, 0.5, 1)
+    property color extraColor: "#636363"
 
     property string menuJsonContent: ""
 
@@ -93,6 +94,8 @@ ListView {
             /* clear selection effect */
             if (lastCurrentItem != null) {
                 lastCurrentItem.itemTextColor = lastCurrentItem.componentActive ? textColor : textColorNotActive
+                lastCurrentItem.itemTextColor = lastCurrentItem.componentActive ? textColor : textColorNotActive
+                lastCurrentItem.itemExtraColor = "#636363"
                 lastCurrentItem.itemArrowPic = listview.arrowDark
                 lastCurrentItem.itemIconPic = lastCurrentItem.iconNormal
             }
@@ -100,6 +103,7 @@ ListView {
             /* selection effect */
             if (currentItem != null && currentItem.componentActive) {
                 currentItem.itemTextColor = textColorHover
+                currentItem.itemExtraColor = "white"
                 currentItem.itemArrowPic = listview.arrowDarkHover
                 currentItem.itemIconPic = currentItem.iconHover
             }
@@ -107,6 +111,7 @@ ListView {
             /* clear selection effect */
             if (lastCurrentItem != null) {
                 lastCurrentItem.itemTextColor = lastCurrentItem.componentActive ? textColor : textColorNotActive
+                lastCurrentItem.itemExtraColor = "#636363"
                 lastCurrentItem.itemArrowPic = listview.arrowLight
                 lastCurrentItem.itemIconPic = lastCurrentItem.iconNormal
             }
@@ -119,6 +124,7 @@ ListView {
             }
             if (currentItem != null && currentItem.componentActive) {
                 currentItem.itemTextColor = textColorHover
+                currentItem.itemExtraColor = "white"                
                 currentItem.itemArrowPic = listview.arrowLightHover
                 currentItem.itemIconPic = currentItem.iconHover
             }
@@ -203,10 +209,12 @@ ListView {
         var _width = 0
         var _height = 0
         for (var i in items) {
-            if (_injection.getStringWidth(items[i].itemText.replace("_", ""), textSize)
-                + textLeftMargin + textRightMargin + horizontalPadding > _width) {
-                _width = _injection.getStringWidth(items[i].itemText.replace("_", ""), textSize)
-                + textLeftMargin + textRightMargin + horizontalPadding
+            var menuTextWidth = _injection.getStringWidth(items[i].itemText.replace("_", ""), textSize)
+            var extraTextWidth = _injection.getStringWidth(items[i].itemExtra || "", textSize)
+            var itemWidth = items[i].itemExtra ?  Math.max(menuTextWidth + textLeftMargin + textRightMargin + horizontalPadding, 100) + extraTextWidth + 30 : menuTextWidth + textLeftMargin + textRightMargin + horizontalPadding
+            
+            if (itemWidth > _width) {
+                _width = itemWidth
             }
 
             if (items[i].itemText == undefined || items[i].itemText == "") {
