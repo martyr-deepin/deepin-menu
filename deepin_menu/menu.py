@@ -106,8 +106,8 @@ class MenuItem(QObject):
         return json.dumps(self.serializableContent)
 
 class CheckableMenuItem(MenuItem):
-    def __init__(self, id, text, checked=False, showCheckmark=True):
-        super(CheckableMenuItem, self).__init__(id, text, isCheckable=True, 
+    def __init__(self, id, text, extra="", checked=False, showCheckmark=True):
+        super(CheckableMenuItem, self).__init__(id, text, extra=extra, isCheckable=True, 
             checked=checked, showCheckmark=showCheckmark)
 
 class MenuSeparator(MenuItem):
