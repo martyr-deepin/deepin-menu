@@ -89,18 +89,7 @@ Component {
                 if (componentChecked ) {
                     checkThis()
                 } else {
-                    var thisInfo = componentId.split(":")
-                    // implys that this item is part of a radio group
-                    if (thisInfo.length == 3) {
-                        var itemInfo = componentId.split(":")
-                        var itemGroupType = itemInfo[1]
-
-                        if (itemGroupType=="checkbox") {
-                            undoCheckThis()
-                        }
-                    } else {
-                        undoCheckThis()
-                    }
+                    undoCheckThis()
                 }
             }
         }

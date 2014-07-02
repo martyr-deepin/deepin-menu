@@ -1,13 +1,15 @@
 function onClicked(index, menuItem, menu) {
     if (JSON.parse(menuItem.componentSubMenu).items.length == 0 && menuItem.componentActive == true) {
         _menu_view.invokeItem(menuItem.componentId, menuItem.componentCheckable && !menuItem.componentChecked);
-
+		
         if (menuItem.componentCheckable) {
-
+			var thisInfo = menuItem.componentId.split(":")
+			var itemGroupType = thisInfo.length == 3 ? thisInfo[1] : null
+			
             if (!menuItem.componentChecked) {
 				menuItem.componentChecked = true
                 menuItem.ListView.view.itemChecked(index, menuItem)
-            } else if (!menu.isSingleCheck) {
+            } else if (itemGroupType ? itemGroupType == "checkbox" : !menu.isSingleCheck) {
 				menuItem.componentChecked = false				
                 menuItem.ListView.view.itemUnchecked(index, menuItem)
             }

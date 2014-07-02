@@ -425,7 +425,7 @@ class Menu(QQuickView):
         self.setDBusObj(dbusObj)
         
         # self.installEventFilter(self)
-        qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
+        # qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
 
     def setDBusObj(self, dbusObj):
         self.dbusObj = dbusObj
