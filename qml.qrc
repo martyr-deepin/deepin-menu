@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
+        <file>MenuContent.qml</file>
+        <file>DesktopMenu.qml</file>
+        <file>FullscreenBackground.qml</file>
     </qresource>
 </RCC>

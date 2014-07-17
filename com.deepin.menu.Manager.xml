@@ -1,0 +1,10 @@
+<node>
+    <interface name="com.deepin.menu.Manager">
+        <method name="RegisterMenu">
+            <arg direction="out" type="o" name="menuObjectPath"/>
+        </method>
+        <method name="UnregisterMenu">
+             <arg direction="in" type="s" name="menuObjectPath"/>
+        </method>
+    </interface>
+</node>
