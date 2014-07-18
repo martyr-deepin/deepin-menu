@@ -39,8 +39,27 @@ ListView {
 
     function setContent(content) {
         var itemContent = JSON.parse(content)
-        for (var i = 0; i< itemContent.length; i++) {
-            model.append(itemContent[i])
+        for (var i = 0; i < itemContent.length; i++) {
+            var pattern = /_(.)/
+            var shortcutMatch = pattern.exec(itemContent[i].itemText)
+            if (shortcutMatch != null) {
+                itemContent[i].itemShortcut = shortcutMatch[1]
+                itemContent[i].itemText = itemContent[i].itemText.replace(
+                            pattern, "<u>" + shortcutMatch[1] + "</u>")
+            }
+            model.append({
+                             itemId: itemContent[i].itemId,
+                             itemIcon: itemContent[i].itemIcon,
+                             itemIconHover: itemContent[i].itemIconHover,
+                             itemIconPressed: itemContent[i].itemIconHover,
+                             itemIconInactive: itemContent[i].itemIconInactive,
+                             itemText: itemContent[i].itemText,
+                             itemShortcut: itemContent[i].itemShortcut || "",
+                             itemExtra: itemContent[i].itemExtra || "",
+                             itemSubMenu: itemContent[i].itemSubMenu,
+                             isActive: itemContent[i].isActive,
+                             checked: itemContent[i].checked
+                         })
         }
     }
 
@@ -143,7 +162,7 @@ ListView {
                 if (listview.currentIndex == index) {
                     item.state = item.isActive ? "hover" : "inactive"
                     item.hasSubMenu && item.showSubMenu()
-                } else if (listview.currentIndex != -1){
+                } else if (listview.currentIndex != -1) {
                     item.state = item.isActive ? "normal" : "inactive"
                     global_menu.destroySubMenu()
                 }
@@ -154,7 +173,8 @@ ListView {
             global_menu.destroySubMenu()
 
             var itemGlobalPos = item.mapToItem(global_screen, 0, 0)
-            global_menu.showSubMenu(itemGlobalPos.x + item.width, itemGlobalPos.y, itemSubMenu)
+            global_menu.showSubMenu(itemGlobalPos.x + item.width,
+                                    itemGlobalPos.y, itemSubMenu)
         }
 
         Image {
@@ -176,11 +196,15 @@ ListView {
             anchors.leftMargin: listview.iconTextSpacing
             anchors.verticalCenter: parent.verticalCenter
 
-            onWidthChanged: listview.width = Math.max((listview.textExtraMinSpacing + icon_image.width + icon_image.anchors.leftMargin
-                                                       + menu_item_text.width + menu_item_text.anchors.leftMargin +
-                                                       menu_item_extra.implicitWidth + menu_item_extra.anchors.rightMargin +
-                                                       sub_menu_indicator.width + sub_menu_indicator.anchors.rightMargin), listview.width)
-            Component.onCompleted: listview.maxTextWidth = Math.max(width, listview.maxTextWidth)
+            onWidthChanged: listview.width = Math.max(
+                                (listview.textExtraMinSpacing + icon_image.width
+                                 + icon_image.anchors.leftMargin + menu_item_text.width
+                                 + menu_item_text.anchors.leftMargin + menu_item_extra.implicitWidth
+                                 + menu_item_extra.anchors.rightMargin + sub_menu_indicator.width
+                                 + sub_menu_indicator.anchors.rightMargin),
+                                listview.width)
+            Component.onCompleted: listview.maxTextWidth = Math.max(
+                                       width, listview.maxTextWidth)
         }
 
         Text {
@@ -204,10 +228,13 @@ ListView {
         }
 
         Component.onCompleted: {
-            listview.width = Math.max((listview.textExtraMinSpacing + icon_image.width + icon_image.anchors.leftMargin
-                                       + menu_item_text.width + menu_item_text.anchors.leftMargin +
-                                       menu_item_extra.implicitWidth + menu_item_extra.anchors.rightMargin +
-                                       sub_menu_indicator.width + sub_menu_indicator.anchors.rightMargin), listview.width)
+            listview.width = Math.max(
+                        (listview.textExtraMinSpacing + icon_image.width
+                         + icon_image.anchors.leftMargin + menu_item_text.width
+                         + menu_item_text.anchors.leftMargin + menu_item_extra.implicitWidth
+                         + menu_item_extra.anchors.rightMargin + sub_menu_indicator.width
+                         + sub_menu_indicator.anchors.rightMargin),
+                        listview.width)
             listview.height += height
         }
 
@@ -227,5 +254,6 @@ ListView {
         }
     }
 
-    model: ListModel {}
+    model: ListModel {
+    }
 }

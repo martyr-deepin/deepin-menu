@@ -8,6 +8,8 @@
 ManagerObject::ManagerObject(QObject *parent) :
     QObject(parent)
 {
+    menuObject = NULL;
+    menuAdaptor = NULL;
 }
 
 ManagerObject::~ManagerObject()
@@ -41,4 +43,9 @@ void ManagerObject::UnregisterMenu(const QString &menuObjectPath)
 {
     QDBusConnection connection = QDBusConnection::sessionBus();
     connection.unregisterObject(menuObjectPath);
+
+    delete menuObject;
+    delete menuAdaptor;
+    menuObject = NULL;
+    menuAdaptor = NULL;
 }

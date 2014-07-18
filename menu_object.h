@@ -2,12 +2,14 @@
 #define MENU_OBJECT_H
 
 #include <QObject>
+#include <QQuickView>
 
 class MenuObject : public QObject
 {
     Q_OBJECT
 public:
     explicit MenuObject(QObject *parent = 0);
+    ~MenuObject();
 
 signals:
     void ItemActivitySet(const QString &itemId, bool isActive);
@@ -20,6 +22,9 @@ public slots:
     void SetItemChecked(const QString &itemId, bool checked);
     void SetItemText(const QString &itemId, const QString &text);
     void ShowMenu(const QString &menuJsonContent);
+
+private:
+    QQuickView *menu;
 };
 
 #endif // MENU_OBJECT_H
