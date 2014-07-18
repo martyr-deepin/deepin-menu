@@ -37,8 +37,6 @@ ListView {
     // logical variables
     property int maxTextWidth: 0
 
-    property QtObject menu: null
-
     function setContent(content) {
         var itemContent = JSON.parse(content)
         for (var i = 0; i< itemContent.length; i++) {
@@ -47,7 +45,7 @@ ListView {
     }
 
     Keys.onEscapePressed: Qt.quit()
-    Keys.onLeftPressed: { global_menu.parentMenu.requestFocus() }
+    Keys.onLeftPressed: global_menu.parentMenu.requestFocus()
     Keys.onRightPressed: global_menu.childMenu.requestFocus()
 
     delegate: Rectangle {

@@ -1,8 +1,12 @@
 TEMPLATE = app
 
-QT += qml quick
+QT += qml quick dbus
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    dbus_manager_adaptor.cpp \
+    dbus_menu_adaptor.cpp \
+    manager_object.cpp \
+    menu_object.cpp
 
 RESOURCES += qml.qrc \
     images.qrc
@@ -13,4 +17,7 @@ QML_IMPORT_PATH =
 # Default rules for deployment.
 include(deployment.pri)
 
-HEADERS +=
+HEADERS += dbus_manager_adaptor.h \
+    dbus_menu_adaptor.h \
+    manager_object.h \
+    menu_object.h
