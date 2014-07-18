@@ -17,9 +17,9 @@ int main(int argc, char *argv[])
     menu.show();
     menu.requestActivate();
 
-    QVariant x = 300;
+    QVariant x = 1200;
     QVariant y = 300;
-    QVariant content =
+    QVariant content = "";
     QMetaObject::invokeMethod(menu.rootObject(), "showMenu",
             Q_ARG(QVariant, x), Q_ARG(QVariant, y), Q_ARG(QVariant, content));
 

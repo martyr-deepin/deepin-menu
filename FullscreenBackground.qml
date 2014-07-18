@@ -6,6 +6,9 @@ Item {
     width: Screen.width
     height: Screen.height
 
+    property int desktopAvailableWidth: Screen.desktopAvailableWidth
+    property int desktopAvailableHeight: Screen.desktopAvailableHeight
+
     function showMenu(x, y, content) {
         var checkbox1 = {
             "itemId": "checkbox:checkbox:checkbox_1",

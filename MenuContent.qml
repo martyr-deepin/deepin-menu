@@ -46,6 +46,10 @@ ListView {
         }
     }
 
+    Keys.onEscapePressed: Qt.quit()
+    Keys.onLeftPressed: { global_menu.parentMenu.requestFocus() }
+    Keys.onRightPressed: global_menu.childMenu.requestFocus()
+
     delegate: Rectangle {
         id: item
         state: isActive ? "normal" : "inactive"
@@ -138,20 +142,15 @@ ListView {
         Connections {
             target: listview
             onCurrentIndexChanged: {
-                print(currentIndex)
-
-                if (listview.currentIndex == -1) return
                 if (listview.currentIndex == index) {
                     item.state = item.isActive ? "hover" : "inactive"
                     item.hasSubMenu && item.showSubMenu()
-                } else {
+                } else if (listview.currentIndex != -1){
                     item.state = item.isActive ? "normal" : "inactive"
                     global_menu.destroySubMenu()
                 }
             }
         }
-
-        Keys.onEscapePressed: Qt.quit()
 
         function showSubMenu() {
             global_menu.destroySubMenu()
@@ -223,8 +222,6 @@ ListView {
                 listview.currentIndex = index
             }
             onExited: {
-                parent.state = parent.isActive ? "normal" : "inactive"
-
                 listview.currentIndex = -1
             }
             onPressed: parent.state = parent.isActive ? "pressed" : "inactive"

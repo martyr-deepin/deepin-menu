@@ -1,4 +1,5 @@
 import QtQuick 2.2
+import QtQuick.Window 2.0
 
 Rectangle {
     id: global_menu
@@ -7,6 +8,12 @@ Rectangle {
 
     property QtObject parentMenu: null
     property QtObject childMenu: null
+
+    onWidthChanged: {
+        if (x + width > global_screen.desktopAvailableWidth) {
+            x = parentMenu.x - width
+        }
+    }
 
     function startDestroy() { destroy_timer.restart() }
     function stopDestroy() { destroy_timer.stop() }
@@ -24,6 +31,8 @@ Rectangle {
             childMenu.startDestroy()
         }
     }
+
+    function requestFocus() { content.focus = true }
 
     function setContent(_content) { content.setContent(_content) }
 
