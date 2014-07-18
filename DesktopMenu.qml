@@ -14,6 +14,7 @@ Rectangle {
     function showSubMenu(x, y, content) {
         childMenu = Qt.createQmlObject("import QtQuick 2.1; DesktopMenu{x: %1; y: %2}".arg(x).arg(y),
                                        global_screen, "menu1")
+        childMenu.setContent(content)
         childMenu.parentMenu = global_menu
     }
 
@@ -23,6 +24,8 @@ Rectangle {
             childMenu.startDestroy()
         }
     }
+
+    function setContent(_content) { content.setContent(_content) }
 
     Timer {
         id: destroy_timer

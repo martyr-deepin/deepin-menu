@@ -15,11 +15,13 @@ int main(int argc, char *argv[])
     menu.setColor(QColor(0, 0, 0, 0));
     menu.setSource(QUrl(QStringLiteral("qrc:///FullscreenBackground.qml")));
     menu.show();
+    menu.requestActivate();
 
     QVariant x = 300;
     QVariant y = 300;
-    QMetaObject::invokeMethod(menu.rootObject(), "setPosition",
-            Q_ARG(QVariant, x), Q_ARG(QVariant, y));
+    QVariant content =
+    QMetaObject::invokeMethod(menu.rootObject(), "showMenu",
+            Q_ARG(QVariant, x), Q_ARG(QVariant, y), Q_ARG(QVariant, content));
 
     QQmlEngine *engine = menu.rootContext()->engine();
     QObject::connect(engine, SIGNAL(quit()), &app, SLOT(quit()));

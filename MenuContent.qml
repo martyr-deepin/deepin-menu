@@ -4,7 +4,8 @@ ListView {
     id: listview
     width: 0
     height: 0
-    interactive: false
+    focus: true
+    interactive: true
 
     // style and predefined variables
     property int leftPadding: 5
@@ -40,12 +41,14 @@ ListView {
 
     function setContent(content) {
         var itemContent = JSON.parse(content)
-
+        for (var i = 0; i< itemContent.length; i++) {
+            model.append(itemContent[i])
+        }
     }
 
     delegate: Rectangle {
         id: item
-        state: "normal"
+        state: isActive ? "normal" : "inactive"
         width: listview.width
         height: 24
 
@@ -132,6 +135,31 @@ ListView {
             }
         ]
 
+        Connections {
+            target: listview
+            onCurrentIndexChanged: {
+                print(currentIndex)
+
+                if (listview.currentIndex == -1) return
+                if (listview.currentIndex == index) {
+                    item.state = item.isActive ? "hover" : "inactive"
+                    item.hasSubMenu && item.showSubMenu()
+                } else {
+                    item.state = item.isActive ? "normal" : "inactive"
+                    global_menu.destroySubMenu()
+                }
+            }
+        }
+
+        Keys.onEscapePressed: Qt.quit()
+
+        function showSubMenu() {
+            global_menu.destroySubMenu()
+
+            var itemGlobalPos = item.mapToItem(global_screen, 0, 0)
+            global_menu.showSubMenu(itemGlobalPos.x + item.width, itemGlobalPos.y, itemSubMenu)
+        }
+
         Image {
             id: icon_image
             width: 14
@@ -190,78 +218,19 @@ ListView {
             hoverEnabled: true
             anchors.fill: parent
             onEntered: {
-                global_menu.destroySubMenu()
                 global_menu.stopDestroy()
 
-                parent.state = "hover"
-
-               var itemGlobalPos = item.mapToItem(global_screen, 0, 0)
-               item.hasSubMenu && global_menu.showSubMenu(itemGlobalPos.x + item.width, itemGlobalPos.y, "")
+                listview.currentIndex = index
             }
             onExited: {
-                parent.state = "normal"
+                parent.state = parent.isActive ? "normal" : "inactive"
 
-                global_menu.destroySubMenu()
+                listview.currentIndex = -1
             }
-            onPressed: parent.state = "pressed"
-            onReleased: parent.state = "hover"
+            onPressed: parent.state = parent.isActive ? "pressed" : "inactive"
+            onReleased: parent.state = parent.isActive ? "hover" : "inactive"
         }
     }
-    model: ListModel {
-    }
 
-    Component.onCompleted: {
-        model.append({
-                         itemId: "hello:radio:one",
-                         itemText: "hello",
-                         itemIcon: "",
-                         itemIconHover: "",
-                         itemIconPressed: "",
-                         itemExtra: "",
-                         itemSubMenu: "[
-                             itemText: \"hello\",
-                             itemIcon: \"\",
-                             itemIconHover: \"\",
-                             itemIconPressed:\"\",
-                             itemExtra: \"Ctrl-X\"
-                             itemSubMenu: \"[]\"
-                         ]"
-                     })
-        model.append({
-                         itemId: "copy",
-                         itemText: "Copy",
-                         itemIcon: "",
-                         itemIconHover: "",
-                         itemIconPressed: "",
-                         itemExtra: "Ctrl-C",
-                         itemSubMenu: "[]"
-                     })
-        model.append({
-                         itemId: "paste",
-                         itemText: "Paste",
-                         itemIcon: "",
-                         itemIconHover: "",
-                         itemIconPressed: "",
-                         itemExtra: "Ctrl-V",
-                         itemSubMenu: "[]"
-                     })
-        model.append({
-                         itemId: "cut",
-                         itemText: "Cut",
-                         itemIcon: "",
-                         itemIconHover: "",
-                         itemIconPressed: "",
-                         itemExtra: "Ctrl-X",
-                         itemSubMenu: "[]"
-                     })
-        model.append({
-                         itemId: "hello",
-                         itemText: "Hello World",
-                         itemIcon: "",
-                         itemIconHover: "",
-                         itemIconPressed: "",
-                         itemExtra: "",
-                         itemSubMenu: "[]"
-                     })
-    }
+    model: ListModel {}
 }
