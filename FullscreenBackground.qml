@@ -74,19 +74,21 @@ Item {
             "itemSubMenu": JSON.stringify([copy, paste])
         }
 
-        var content = JSON.stringify([checkbox1, checkbox2, radio1, radio2, edit])
+//        var content = JSON.stringify([checkbox1, checkbox2, radio1, radio2, edit])
 
-        desktop_menu.x = 1200
-        desktop_menu.y = 300
+//        desktop_menu.x = 1200
+//        desktop_menu.y = 300
 
-        desktop_menu.setContent(content)
+//        desktop_menu.setContent(content)
 
-//        var content = JSON.parse(menuJsonContent);
+        var content = JSON.parse(menuJsonContent);
 
-//        desktop_menu.x = content.x
-//        desktop_menu.y = content.y
+        print(content.x, content.y)
 
-//        desktop_menu.setContent(content.menuJsonContent)
+        desktop_menu.x = content.x
+        desktop_menu.y = content.y
+
+        desktop_menu.setContent(JSON.parse(content.menuJsonContent))
     }
 
     MouseArea {

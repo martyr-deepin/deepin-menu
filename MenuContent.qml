@@ -5,6 +5,7 @@ ListView {
     width: 0
     height: 0
     focus: true
+    currentIndex: -1
     interactive: true
 
     // style and predefined variables
@@ -43,7 +44,8 @@ ListView {
     property int maxTextWidth: 0
 
     function setContent(content) {
-        var itemContent = JSON.parse(content)
+        var itemContent = content.items
+
         for (var i = 0; i < itemContent.length; i++) {
             var pattern = /_(.)/
             var shortcutMatch = pattern.exec(itemContent[i].itemText)
@@ -80,7 +82,7 @@ ListView {
 
         property bool isCheckable: itemId.split(":") != itemId
         property bool isActive: true
-        property bool hasSubMenu: itemSubMenu && itemSubMenu != "[]"
+        property bool hasSubMenu: itemSubMenu.items.length != 0
 
         states: [
             State {
@@ -182,10 +184,9 @@ ListView {
             onCurrentIndexChanged: {
                 if (listview.currentIndex == index) {
                     item.state = item.isActive ? "hover" : "inactive"
-                    item.hasSubMenu && item.showSubMenu()
+                    item.showSubMenu()
                 } else if (listview.currentIndex != -1) {
                     item.state = item.isActive ? "normal" : "inactive"
-                    global_menu.destroySubMenu()
                 }
             }
         }
@@ -194,8 +195,8 @@ ListView {
             global_menu.destroySubMenu()
 
             var itemGlobalPos = item.mapToItem(global_screen, 0, 0)
-            global_menu.showSubMenu(itemGlobalPos.x + item.width,
-                                    itemGlobalPos.y, itemSubMenu)
+            item.hasSubMenu && global_menu.showSubMenu(itemGlobalPos.x + item.width,
+                                                       itemGlobalPos.y, itemSubMenu)
         }
 
         Image {

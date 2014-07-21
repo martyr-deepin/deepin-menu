@@ -28,6 +28,13 @@ Rectangle {
     function destroySubMenu() {
         if (childMenu) {
             childMenu.destroySubMenu()
+            childMenu.destroy()
+        }
+    }
+
+    function destroySubMenuLater() {
+        if (childMenu) {
+            childMenu.destroySubMenu()
             childMenu.startDestroy()
         }
     }
@@ -39,7 +46,7 @@ Rectangle {
     Timer {
         id: destroy_timer
         interval: 100
-        onTriggered: global_menu.destroy()
+        onTriggered: global_menu.destroySubMenu()
     }
 
     MenuContent {
