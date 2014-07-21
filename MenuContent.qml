@@ -34,6 +34,11 @@ ListView {
     property color itemTextPressedColor: "blue"
     property color itemTextInactiveColor: "grey"
 
+    property color itemExtraColor: "black"
+    property color itemExtraHoverColor: "red"
+    property color itemExtraPressedColor: "blue"
+    property color itemExtraInactiveColor: "grey"
+
     // logical variables
     property int maxTextWidth: 0
 
@@ -89,6 +94,10 @@ ListView {
                     color: listview.itemTextColor
                 }
                 PropertyChanges {
+                    target: menu_item_extra
+                    color: listview.itemExtraColor
+                }
+                PropertyChanges {
                     target: icon_image
                     source: item.isCheckable ? listview.checkmark : itemIcon
                 }
@@ -106,6 +115,10 @@ ListView {
                 PropertyChanges {
                     target: menu_item_text
                     color: listview.itemTextHoverColor
+                }
+                PropertyChanges {
+                    target: menu_item_extra
+                    color: listview.itemExtraHoverColor
                 }
                 PropertyChanges {
                     target: icon_image
@@ -127,6 +140,10 @@ ListView {
                     color: listview.itemTextPressedColor
                 }
                 PropertyChanges {
+                    target: menu_item_extra
+                    color: listview.itemExtraPressedColor
+                }
+                PropertyChanges {
                     target: icon_image
                     source: item.isCheckable ? listview.checkmarkPressed : itemIconPressed
                 }
@@ -144,6 +161,10 @@ ListView {
                 PropertyChanges {
                     target: menu_item_text
                     color: listview.itemTextInactiveColor
+                }
+                PropertyChanges {
+                    target: menu_item_extra
+                    color: listview.itemExtraInactiveColor
                 }
                 PropertyChanges {
                     target: icon_image

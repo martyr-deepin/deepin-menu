@@ -37,6 +37,8 @@ void MenuObject::SetItemText(const QString &itemId, const QString &text)
 
 void MenuObject::ShowMenu(const QString &menuJsonContent)
 {
+    qDebug() << menuJsonContent;
+
     menu->setFlags(Qt::Tool | Qt::BypassWindowManagerHint);
     menu->setResizeMode(QQuickView::SizeViewToRootObject);
     menu->setColor(QColor(0, 0, 0, 0));
@@ -44,11 +46,7 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
     menu->show();
     menu->requestActivate();
 
-    QVariant x = 1200;
-    QVariant y = 300;
-    QVariant content = "";
-    QMetaObject::invokeMethod(menu->rootObject(), "showMenu",
-            Q_ARG(QVariant, x), Q_ARG(QVariant, y), Q_ARG(QVariant, content));
+    QMetaObject::invokeMethod(menu->rootObject(), "showMenu", Q_ARG(QVariant, menuJsonContent));
 
     QQmlEngine *engine = menu->rootContext()->engine();
     QObject::connect(engine, SIGNAL(quit()), QGuiApplication::instance(), SLOT(quit()));

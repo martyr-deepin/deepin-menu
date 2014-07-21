@@ -9,7 +9,7 @@ Item {
     property int desktopAvailableWidth: Screen.desktopAvailableWidth
     property int desktopAvailableHeight: Screen.desktopAvailableHeight
 
-    function showMenu(x, y, content) {
+    function showMenu(menuJsonContent) {
         var checkbox1 = {
             "itemId": "checkbox:checkbox:checkbox_1",
             "itemText": "Checkbox One",
@@ -74,12 +74,19 @@ Item {
             "itemSubMenu": JSON.stringify([copy, paste])
         }
 
-        content = JSON.stringify([checkbox1, checkbox2, radio1, radio2, edit])
+        var content = JSON.stringify([checkbox1, checkbox2, radio1, radio2, edit])
 
-        desktop_menu.x = x
-        desktop_menu.y = y
+        desktop_menu.x = 1200
+        desktop_menu.y = 300
 
         desktop_menu.setContent(content)
+
+//        var content = JSON.parse(menuJsonContent);
+
+//        desktop_menu.x = content.x
+//        desktop_menu.y = content.y
+
+//        desktop_menu.setContent(content.menuJsonContent)
     }
 
     MouseArea {

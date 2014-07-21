@@ -15,7 +15,6 @@ ManagerObject::ManagerObject(QObject *parent) :
 ManagerObject::~ManagerObject()
 {
     if(menuObject) delete menuObject;
-    if(menuAdaptor) delete menuAdaptor;
 }
 
 QDBusObjectPath ManagerObject::RegisterMenu()
@@ -27,12 +26,10 @@ QDBusObjectPath ManagerObject::RegisterMenu()
     menuObjectPath = "/com/deepin/menu/" + uuid;
 
     if(menuObject) delete menuObject;
-    if(menuAdaptor) delete menuAdaptor;
     menuObject = new MenuObject();
     menuAdaptor = new MenuAdaptor(menuObject);
 
     QDBusConnection connection = QDBusConnection::sessionBus();
-    connection.registerService("com.deepin.menu");
     connection.registerObject(menuObjectPath, menuObject);
 
     QDBusObjectPath result(menuObjectPath);
@@ -45,7 +42,6 @@ void ManagerObject::UnregisterMenu(const QString &menuObjectPath)
     connection.unregisterObject(menuObjectPath);
 
     delete menuObject;
-    delete menuAdaptor;
     menuObject = NULL;
     menuAdaptor = NULL;
 }
