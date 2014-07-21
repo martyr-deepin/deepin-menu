@@ -7,6 +7,7 @@
 #include <QDBusConnection>
 #include <QGuiApplication>
 
+#include "utils.h"
 #include "menu_object.h"
 
 MenuObject::MenuObject(QObject *parent) :
@@ -50,4 +51,8 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
 
     QQmlEngine *engine = menu->rootContext()->engine();
     QObject::connect(engine, SIGNAL(quit()), QGuiApplication::instance(), SLOT(quit()));
+
+    Utils::instance()->grabKeyboard(menu->winId());
+//    Utils::instance()->grabPointer(menu->winId());
+//    Utils::instance()->grabAll(menu->winId());
 }
