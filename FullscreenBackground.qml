@@ -10,83 +10,12 @@ Item {
     property int desktopAvailableHeight: Screen.desktopAvailableHeight
 
     function showMenu(menuJsonContent) {
-        var checkbox1 = {
-            "itemId": "checkbox:checkbox:checkbox_1",
-            "itemText": "Checkbox One",
-            "itemIcon": "",
-            "itemIconHover": "",
-            "itemIconPressed": "",
-            "itemExtra": "Ctrl-C",
-            "itemSubMenu": "[]"
-        }
-        var checkbox2 = {
-            "itemId": "checkbox:checkbox:checkbox_1",
-            "itemText": "Checkbox One",
-            "itemIcon": "",
-            "itemIconHover": "",
-            "itemIconPressed": "",
-            "itemExtra": "Ctrl-C",
-            "itemSubMenu": "[]"
-        }
-        var radio1 = {
-            "itemId": "radio:radio:radio_1",
-            "itemText": "Radio One",
-            "itemIcon": "",
-            "itemIconHover": "",
-            "itemIconPressed": "",
-            "itemExtra": "Ctrl-C",
-            "itemSubMenu": "[]"
-        }
-        var radio2 = {
-            "itemId": "radio:radio:radio_2",
-            "itemText": "Radio Two",
-            "itemIcon": "",
-            "itemIconHover": "",
-            "itemIconPressed": "",
-            "itemExtra": "Ctrl-C",
-            "itemSubMenu": "[]"
-        }
-        var copy = {
-            "itemId": "copy",
-            "itemText": "Copy",
-            "itemIcon": "",
-            "itemIconHover": "",
-            "itemIconPressed": "",
-            "itemExtra": "Ctrl-C",
-            "itemSubMenu": "[]"
-        }
-        var paste = {
-            "itemId": "paste",
-            "itemText": "Paste",
-            "itemIcon": "",
-            "itemIconHover": "",
-            "itemIconPressed": "",
-            "itemExtra": "Ctrl-V",
-            "itemSubMenu": "[]"
-        }
-        var edit = {
-            "itemId": "edit",
-            "itemText": "Edit",
-            "itemIcon": "",
-            "itemIconHover": "",
-            "itemIconPressed": "",
-            "itemExtra": "",
-            "itemSubMenu": JSON.stringify([copy, paste])
-        }
-
-//        var content = JSON.stringify([checkbox1, checkbox2, radio1, radio2, edit])
-
-//        desktop_menu.x = 1200
-//        desktop_menu.y = 300
-
-//        desktop_menu.setContent(content)
-
         var content = JSON.parse(menuJsonContent);
 
-        print(content.x, content.y)
-
-        desktop_menu.x = content.x
-        desktop_menu.y = content.y
+        desktop_menu.originX = content.x - desktop_menu.glowRadius
+        desktop_menu.originY = content.y - desktop_menu.glowRadius
+        desktop_menu.x = desktop_menu.originX
+        desktop_menu.y = desktop_menu.originY
 
         desktop_menu.setContent(JSON.parse(content.menuJsonContent))
     }

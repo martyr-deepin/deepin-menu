@@ -8,6 +8,8 @@ ListView {
     currentIndex: -1
     interactive: true
 
+    property Component selection: DesktopMenuSelection {}
+
     // style and predefined variables
     property int leftPadding: 5
     property int rightPadding: 5
@@ -25,19 +27,12 @@ ListView {
     property url arrowPressed: "images/arrow-light-hover.png"
     property url arrowInactive: "images/arrow-light.png"
 
-    property color itemColor: "transparent"
-    property color itemHoverColor: "blue"
-    property color itemPressedColor: "blue"
-    property color itemInactiveColor: "transparent"
-
     property color itemTextColor: "black"
-    property color itemTextHoverColor: "red"
-    property color itemTextPressedColor: "blue"
-    property color itemTextInactiveColor: "grey"
+    property color itemTextHoverColor: "white"
+    property color itemTextInactiveColor: "#b4b4b4"
 
     property color itemExtraColor: "black"
     property color itemExtraHoverColor: "red"
-    property color itemExtraPressedColor: "blue"
     property color itemExtraInactiveColor: "grey"
 
     // logical variables
@@ -58,7 +53,6 @@ ListView {
                              itemId: itemContent[i].itemId,
                              itemIcon: itemContent[i].itemIcon,
                              itemIconHover: itemContent[i].itemIconHover,
-                             itemIconPressed: itemContent[i].itemIconHover,
                              itemIconInactive: itemContent[i].itemIconInactive,
                              itemText: itemContent[i].itemText,
                              itemShortcut: itemContent[i].itemShortcut || "",
@@ -78,18 +72,19 @@ ListView {
         id: item
         state: isActive ? "normal" : "inactive"
         width: listview.width
-        height: 24
+        height: isSeparator ? 6 : 24
 
         property bool isCheckable: itemId.split(":") != itemId
         property bool isActive: true
+        property bool isSeparator: itemText == ""
         property bool hasSubMenu: itemSubMenu.items.length != 0
 
         states: [
             State {
                 name: "normal"
                 PropertyChanges {
-                    target: item
-                    color: "transparent"
+                    target: selection_loader
+                    active: false
                 }
                 PropertyChanges {
                     target: menu_item_text
@@ -111,8 +106,8 @@ ListView {
             State {
                 name: "hover"
                 PropertyChanges {
-                    target: item
-                    color: listview.itemHoverColor
+                    target: selection_loader
+                    active: true
                 }
                 PropertyChanges {
                     target: menu_item_text
@@ -132,33 +127,10 @@ ListView {
                 }
             },
             State {
-                name: "pressed"
-                PropertyChanges {
-                    target: item
-                    color: listview.itemPressedColor
-                }
-                PropertyChanges {
-                    target: menu_item_text
-                    color: listview.itemTextPressedColor
-                }
-                PropertyChanges {
-                    target: menu_item_extra
-                    color: listview.itemExtraPressedColor
-                }
-                PropertyChanges {
-                    target: icon_image
-                    source: item.isCheckable ? listview.checkmarkPressed : itemIconPressed
-                }
-                PropertyChanges {
-                    target: sub_menu_indicator
-                    source: item.hasSubMenu ? listview.arrowPressed : ""
-                }
-            },
-            State {
                 name: "inactive"
                 PropertyChanges {
-                    target: item
-                    color: "transparent"
+                    target: selection_loader
+                    active: false
                 }
                 PropertyChanges {
                     target: menu_item_text
@@ -194,9 +166,16 @@ ListView {
         function showSubMenu() {
             global_menu.destroySubMenu()
 
-            var itemGlobalPos = item.mapToItem(global_screen, 0, 0)
-            item.hasSubMenu && global_menu.showSubMenu(itemGlobalPos.x + item.width,
-                                                       itemGlobalPos.y, itemSubMenu)
+            var itemPos = item.mapToItem(global_screen, 0, 0)
+            item.hasSubMenu && global_menu.showSubMenu(itemPos.x + item.width,
+                                                       itemPos.y, itemSubMenu)
+        }
+
+        Loader {
+            id: selection_loader
+            visible: !item.isSeparator
+            sourceComponent: listview.selection
+            anchors.fill: parent
         }
 
         Image {
@@ -249,6 +228,46 @@ ListView {
             anchors.verticalCenter: parent.verticalCenter
         }
 
+        Item {
+            id: separator
+            width: parent.width
+            height: 2
+            visible: item.isSeparator
+            anchors.centerIn: parent
+
+            Rectangle {
+                x: 0
+                y: 1
+                width: 1
+                height: parent.width
+
+                transformOrigin: Item.TopLeft
+                rotation: -90
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.2) }
+                    GradientStop { position: 0.5; color: Qt.rgba(0, 0, 0, 0.25) }
+                    GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.2) }
+                }
+            }
+
+            Rectangle {
+                x: 0
+                y: 2
+                width: 1
+                height: parent.width
+
+                transformOrigin: Item.TopLeft
+                rotation: -90
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.1)}
+                    GradientStop { position: 0.5; color: Qt.rgba(1, 1, 1, 0.15) }
+                    GradientStop { position: 1.0; color: Qt.rgba(1, 1, 1, 0.1) }
+                }
+
+                anchors.centerIn: parent
+            }
+        }
+
         Component.onCompleted: {
             listview.width = Math.max(
                         (listview.textExtraMinSpacing + icon_image.width
@@ -271,8 +290,6 @@ ListView {
             onExited: {
                 listview.currentIndex = -1
             }
-            onPressed: parent.state = parent.isActive ? "pressed" : "inactive"
-            onReleased: parent.state = parent.isActive ? "hover" : "inactive"
         }
     }
 

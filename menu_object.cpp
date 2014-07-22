@@ -38,8 +38,6 @@ void MenuObject::SetItemText(const QString &itemId, const QString &text)
 
 void MenuObject::ShowMenu(const QString &menuJsonContent)
 {
-    qDebug() << menuJsonContent;
-
     menu->setFlags(Qt::Tool | Qt::BypassWindowManagerHint);
     menu->setResizeMode(QQuickView::SizeViewToRootObject);
     menu->setColor(QColor(0, 0, 0, 0));
@@ -52,7 +50,7 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
     QQmlEngine *engine = menu->rootContext()->engine();
     QObject::connect(engine, SIGNAL(quit()), QGuiApplication::instance(), SLOT(quit()));
 
-    Utils::instance()->grabKeyboard(menu->winId());
+//    Utils::instance()->grabKeyboard(menu->winId());
 //    Utils::instance()->grabPointer(menu->winId());
 //    Utils::instance()->grabAll(menu->winId());
 }
