@@ -4,11 +4,13 @@
 #include <QObject>
 #include <QQuickView>
 
+class ManagerObject;
+
 class MenuObject : public QObject
 {
     Q_OBJECT
 public:
-    explicit MenuObject(QObject *parent = 0);
+    MenuObject(ManagerObject *manager);
     ~MenuObject();
 
 signals:
@@ -25,6 +27,7 @@ public slots:
 
 private:
     QQuickView *menu;
+    ManagerObject *manager;
 };
 
 #endif // MENU_OBJECT_H

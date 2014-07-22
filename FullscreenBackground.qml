@@ -22,7 +22,7 @@ Item {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: Qt.quit()
+        onClicked: _utils_.menuDisappeared()
     }
 
     DesktopMenu {

@@ -19,6 +19,7 @@ signals:
 
 public slots:
     QDBusObjectPath RegisterMenu();
+    void UnregisterMenu();
     void UnregisterMenu(const QString &menuObjectPath);
 
 private:

@@ -9,16 +9,23 @@
 
 #include "utils.h"
 #include "menu_object.h"
+#include "manager_object.h"
 
-MenuObject::MenuObject(QObject *parent) :
-    QObject(parent)
+MenuObject::MenuObject(ManagerObject *manager):
+    QObject()
 {
-    menu = new QQuickView();
+    this->manager = manager;
+    this->menu = new QQuickView();
+
+    connect(Utils::instance(), SIGNAL(itemClicked(QString,bool)), this, SIGNAL(ItemInvoked(QString,bool)));
+    connect(Utils::instance(), SIGNAL(menuDisappeared()), manager, SLOT(UnregisterMenu()));
 }
 
 MenuObject::~MenuObject()
 {
     if(menu) delete menu;
+
+    emit MenuUnregistered();
 }
 
 void MenuObject::SetItemActivity(const QString &itemId, bool isActive)
@@ -42,6 +49,7 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
     menu->setResizeMode(QQuickView::SizeViewToRootObject);
     menu->setColor(QColor(0, 0, 0, 0));
     menu->setSource(QUrl(QStringLiteral("qrc:///FullscreenBackground.qml")));
+    menu->rootContext()->setContextProperty("_utils_", Utils::instance());
     menu->show();
     menu->requestActivate();
 

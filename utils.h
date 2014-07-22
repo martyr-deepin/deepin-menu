@@ -21,6 +21,8 @@ private:
     Utils& operator=(const Utils &);
 
 signals:
+    void itemClicked(const QString &id, bool checked);
+    void menuDisappeared();
 
 public slots:
     void grabKeyboard(xcb_window_t);

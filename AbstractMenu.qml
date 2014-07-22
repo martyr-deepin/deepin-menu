@@ -15,9 +15,6 @@ Item {
     property int originX
     property int originY
     onWidthChanged: {
-        print(originX)
-        print(width)
-        print(global_screen.desktopAvailableWidth)
         if (originX + width - glowRadius > global_screen.desktopAvailableWidth) {
             x = parentMenu ? parentMenu.x - width + 2 * glowRadius
                            : global_screen.desktopAvailableWidth - width + glowRadius

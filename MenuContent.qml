@@ -75,7 +75,6 @@ ListView {
         height: isSeparator ? 6 : 24
 
         property bool isCheckable: itemId.split(":") != itemId
-        property bool isActive: true
         property bool isSeparator: itemText == ""
         property bool hasSubMenu: itemSubMenu.items.length != 0
 
@@ -155,10 +154,10 @@ ListView {
             target: listview
             onCurrentIndexChanged: {
                 if (listview.currentIndex == index) {
-                    item.state = item.isActive ? "hover" : "inactive"
+                    item.state = isActive ? "hover" : "inactive"
                     item.showSubMenu()
                 } else if (listview.currentIndex != -1) {
-                    item.state = item.isActive ? "normal" : "inactive"
+                    item.state = isActive ? "normal" : "inactive"
                 }
             }
         }
@@ -182,6 +181,7 @@ ListView {
             id: icon_image
             width: 14
             height: 14
+            visible: item.isCheckable ? checked : true
 
             anchors.left: parent.left
             anchors.leftMargin: listview.leftPadding
@@ -289,6 +289,17 @@ ListView {
             }
             onExited: {
                 listview.currentIndex = -1
+            }
+            onClicked: {
+                if (isActive && !item.isSeparator) {
+                    _utils_.itemClicked(itemId, !checked)
+
+                    if (item.isCheckable) {
+                        global_screen.setChecked(itemId, !checked)
+                        return
+                    }
+                    _utils_.menuDisappeared()
+                }
             }
         }
     }

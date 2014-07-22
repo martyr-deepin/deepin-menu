@@ -50,7 +50,8 @@ void Utils::grabPointer(xcb_window_t window) {
     }
 }
 
-void Utils::grabAll(xcb_window_t window) {
+void Utils::grabAll(xcb_window_t window)
+{
     grabPointer(window);
     grabKeyboard(window);
 }
