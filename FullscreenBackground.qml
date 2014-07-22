@@ -21,6 +21,7 @@ Item {
     }
 
     MouseArea {
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
         anchors.fill: parent
         onClicked: _utils_.menuDisappeared()
     }
