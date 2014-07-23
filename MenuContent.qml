@@ -64,7 +64,7 @@ ListView {
         }
     }
 
-    Keys.onEscapePressed: Qt.quit()
+    Keys.onEscapePressed: _utils_.menuDisappeared()
     Keys.onLeftPressed: global_menu.parentMenu.requestFocus()
     Keys.onRightPressed: global_menu.childMenu.requestFocus()
 

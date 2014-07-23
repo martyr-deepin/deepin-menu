@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick dbus
+QT += qml quick dbus x11extras
 
 SOURCES += main.cpp \
     dbus_manager_adaptor.cpp \

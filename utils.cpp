@@ -3,13 +3,13 @@
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
 
+#include <QtX11Extras/QX11Info>
 #include <QDebug>
 
 Utils::Utils()
 {
-    conn = xcb_connect(NULL, NULL);
+    conn = QX11Info::connection();
 }
-
 
 void Utils::grabKeyboard(xcb_window_t window)
 {
@@ -48,10 +48,4 @@ void Utils::grabPointer(xcb_window_t window) {
             qDebug() << "successfully grabbed the pointer\n";
         free(reply);
     }
-}
-
-void Utils::grabAll(xcb_window_t window)
-{
-    grabPointer(window);
-    grabKeyboard(window);
 }

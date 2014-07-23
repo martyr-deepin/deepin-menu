@@ -5,6 +5,8 @@
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
 
+class QX11Info;
+
 class Utils : public QObject
 {
     Q_OBJECT
@@ -27,11 +29,9 @@ signals:
 public slots:
     void grabKeyboard(xcb_window_t);
     void grabPointer(xcb_window_t);
-    void grabAll(xcb_window_t);
 
 private:
     xcb_connection_t *conn;
-    xcb_screen_t *screen;
 };
 
 #endif // UTILS_H
