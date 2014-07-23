@@ -5,3 +5,6 @@ deepin_menu.egg-info
 build
 dist
 core
+*.o
+moc_*
+qrc_*.cpp
