@@ -11,10 +11,10 @@ AbstractMenu {
 
         childMenu = Qt.createQmlObject("import QtQuick 2.1; DesktopMenu{x: %1; y: %2}".arg(originX).arg(originY),
                                        global_screen, "menu1")
+        childMenu.parentMenu = global_menu
         childMenu.originX = originX
         childMenu.originY = originY
         childMenu.setContent(content)
-        childMenu.parentMenu = global_menu
     }
 
     DesktopMenuBackground {
