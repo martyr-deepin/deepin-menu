@@ -6,5 +6,7 @@
         <file>DesktopMenuBackground.qml</file>
         <file>DesktopMenu.qml</file>
         <file>DesktopMenuSelection.qml</file>
+        <file>DockMenuBackground.qml</file>
+        <file>DockMenu.qml</file>
     </qresource>
 </RCC>

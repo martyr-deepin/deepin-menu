@@ -31,12 +31,14 @@ ListView {
     property color itemTextHoverColor: "white"
     property color itemTextInactiveColor: "#b4b4b4"
 
-    property color itemExtraColor: "black"
-    property color itemExtraHoverColor: "red"
-    property color itemExtraInactiveColor: "grey"
+    property color itemExtraColor: "#636363"
+    property color itemExtraHoverColor: "#636363"
+    property color itemExtraInactiveColor: "#636363"
 
     // logical variables
     property int maxTextWidth: 0
+
+    property bool isDockMenu: false
 
     function setContent(content) {
         var itemContent = content.items
@@ -62,13 +64,15 @@ ListView {
                              checked: itemContent[i].checked
                          })
         }
+
+        forceLayout()
     }
 
     Keys.onEscapePressed: _utils_.menuDisappeared()
     Keys.onLeftPressed: global_menu.parentMenu.requestFocus()
     Keys.onRightPressed: global_menu.childMenu.requestFocus()
 
-    delegate: Rectangle {
+    delegate: Item {
         id: item
         state: isActive ? "normal" : "inactive"
         width: listview.width
@@ -256,7 +260,7 @@ ListView {
                 width: 1
                 height: parent.width
 
-                transformOrigin: Item.TopLeft
+                transformOrigin: Item.Center
                 rotation: -90
                 gradient: Gradient {
                     GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.1)}
