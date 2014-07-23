@@ -37,8 +37,12 @@ ListView {
 
     // logical variables
     property int maxTextWidth: 0
+    property string naviDirection
 
     property bool isDockMenu: false
+
+    Keys.onUpPressed: { naviDirection = "up"; event.accepted = false }
+    Keys.onDownPressed: { naviDirection = "down"; event.accepted = false }
 
     function setContent(content) {
         var itemContent = content.items
@@ -158,7 +162,13 @@ ListView {
             target: listview
             onCurrentIndexChanged: {
                 if (listview.currentIndex == index) {
-                    item.state = isActive ? "hover" : "inactive"
+                    if (isActive && !item.isSeparator) {
+                        item.state = "hover"
+                    } else {
+                        item.state = "inactive"
+                        listview.naviDirection == "down" ? listview.currentIndex += 1 : ""
+                        listview.naviDirection == "up" ? listview.currentIndex -= 1 : ""
+                    }
                     item.showSubMenu()
                 } else if (listview.currentIndex != -1) {
                     item.state = isActive ? "normal" : "inactive"
