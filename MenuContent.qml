@@ -41,8 +41,7 @@ ListView {
 
     property bool isDockMenu: false
 
-    Keys.onUpPressed: { naviDirection = "up"; event.accepted = false }
-    Keys.onDownPressed: { naviDirection = "down"; event.accepted = false }
+    signal enterPressed
 
     function setContent(content) {
         var itemContent = content.items
@@ -72,9 +71,40 @@ ListView {
         forceLayout()
     }
 
+    function getNextItemsHasShortcut(startPos, key) {
+        if (!key) return null
+
+        for (var i = Math.max(startPos, 0); i < listview.count; i++) {
+            // a trick here, using currentIndex as the cursor.
+            if (key == listview.model.get(i).itemShortcut.toLowerCase()){
+                return i
+            }
+        }
+
+        for (var i = 0; i < listview.count; i++) {
+            // we do the check another time to support wrapping.
+            if (key == listview.model.get(i).itemShortcut.toLowerCase()) {
+                return i
+            }
+        }
+        return null
+    }
+
     Keys.onEscapePressed: _utils_.menuDisappeared()
     Keys.onLeftPressed: global_menu.parentMenu.requestFocus()
     Keys.onRightPressed: global_menu.childMenu.requestFocus()
+    Keys.onUpPressed: { naviDirection = "up"; event.accepted = false }
+    Keys.onDownPressed: { naviDirection = "down"; event.accepted = false }
+    Keys.onReturnPressed: { enterPressed() }
+    Keys.onPressed: {
+        var _next_index_has_shortcut = getNextItemsHasShortcut(currentIndex + 1, event.text)
+        if (_next_index_has_shortcut != null) {
+            listview.currentIndex = _next_index_has_shortcut
+            if (_next_index_has_shortcut == getNextItemsHasShortcut(_next_index_has_shortcut + 1, event.text)) {
+                enterPressed()
+            }
+        }
+    }
 
     delegate: Item {
         id: item
@@ -172,6 +202,23 @@ ListView {
                     item.showSubMenu()
                 } else if (listview.currentIndex != -1) {
                     item.state = isActive ? "normal" : "inactive"
+                }
+            }
+            onEnterPressed: {
+                if (listview.currentIndex == index) {
+                    item.doClicked()
+                }
+            }
+        }
+
+        function doClicked() {
+            if (isActive && !item.isSeparator && !item.hasSubMenu) {
+                _utils_.itemClicked(itemId, !checked)
+
+                if (item.isCheckable) {
+                    global_screen.setChecked(itemId, !checked)
+                } else {
+                    _utils_.menuDisappeared()
                 }
             }
         }
@@ -305,15 +352,7 @@ ListView {
                 listview.currentIndex = -1
             }
             onClicked: {
-                if (isActive && !item.isSeparator) {
-                    _utils_.itemClicked(itemId, !checked)
-
-                    if (item.isCheckable) {
-                        global_screen.setChecked(itemId, !checked)
-                    } else {
-                        _utils_.menuDisappeared()
-                    }
-                }
+                item.doClicked()
             }
         }
     }
