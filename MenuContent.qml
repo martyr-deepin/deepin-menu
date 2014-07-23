@@ -296,9 +296,9 @@ ListView {
 
                     if (item.isCheckable) {
                         global_screen.setChecked(itemId, !checked)
-                        return
+                    } else {
+                        _utils_.menuDisappeared()
                     }
-                    _utils_.menuDisappeared()
                 }
             }
         }

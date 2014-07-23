@@ -30,17 +30,17 @@ MenuObject::~MenuObject()
 
 void MenuObject::SetItemActivity(const QString &itemId, bool isActive)
 {
-    qDebug() << "SetItemActivity";
+    QMetaObject::invokeMethod(menu->rootObject(), "setActive", Q_ARG(QString, itemId), Q_ARG(bool, isActive));
 }
 
 void MenuObject::SetItemChecked(const QString &itemId, bool checked)
 {
-    qDebug() << "SetItemChecked";
+    QMetaObject::invokeMethod(menu->rootObject(), "setChecked", Q_ARG(QString, itemId), Q_ARG(bool, checked));
 }
 
 void MenuObject::SetItemText(const QString &itemId, const QString &text)
 {
-    qDebug() << "SetItemText";
+    QMetaObject::invokeMethod(menu->rootObject(), "setText", Q_ARG(QString, itemId), Q_ARG(QString, text));
 }
 
 void MenuObject::ShowMenu(const QString &menuJsonContent)

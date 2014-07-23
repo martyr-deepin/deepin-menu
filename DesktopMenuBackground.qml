@@ -6,7 +6,7 @@ Item {
     width: holder.width
     height: holder.height
 
-    property int leftMaring: 0
+    property int leftMargin: 0
     property int rightMargin: 0
     property int topMargin: 5
     property int bottomMargin: 5
@@ -24,7 +24,7 @@ Item {
             id: bg_rect
             radius: 4
             color: "white"
-            width: content_item.width + root.leftMaring + root.rightMargin
+            width: content_item.width + root.leftMargin + root.rightMargin
             height: content_item.height + root.topMargin + root.bottomMargin
             anchors.centerIn: parent
         }
@@ -34,7 +34,7 @@ Item {
         id: shadow_effect
 
         anchors.fill: holder
-        horizontalOffset: 2
+        horizontalOffset: 0
         verticalOffset: 3
         radius: 16
         samples: 16
@@ -48,7 +48,7 @@ Item {
         height: childrenRect.height
 
         anchors.left: holder.left
-        anchors.leftMargin: shadow_effect.radius + root.leftMaring
+        anchors.leftMargin: shadow_effect.radius + root.leftMargin
         anchors.top: holder.top
         anchors.topMargin: shadow_effect.radius + root.topMargin
     }

@@ -2,6 +2,7 @@ import QtQuick 2.0
 
 AbstractMenu {
     id: global_menu
+    menuContent: content
     glowRadius: desktop_menu_background.glowRadius
 
     function showSubMenu(x, y, content) {
@@ -15,12 +16,6 @@ AbstractMenu {
         childMenu.setContent(content)
         childMenu.parentMenu = global_menu
     }
-
-    function setContent(contnt) {
-        content.setContent(contnt)
-    }
-
-    function requestFocus() { content.focus = true }
 
     DesktopMenuBackground {
         id: desktop_menu_background

@@ -20,6 +20,10 @@ Item {
         desktop_menu.setContent(JSON.parse(content.menuJsonContent))
     }
 
+    function setChecked(id , checked) { desktop_menu.setChecked(id, checked) }
+    function setText(id, text) { desktop_menu.setText(id, text) }
+    function setActive(id, active) { desktop_menu.setActive(id, active) }
+
     MouseArea {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         anchors.fill: parent
