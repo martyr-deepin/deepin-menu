@@ -2,10 +2,6 @@
 
 from setuptools import setup
 import os
-import subprocess
-
-subprocess.call("qmake", shell=True)
-subprocess.call("make", shell=True)
 
 def list_files(target_dir, install_dir):
     '''List files for option `data_files`.'''
@@ -29,10 +25,5 @@ setup(name='deepin_menu',
       download_url="git://github.com/linuxdeepin/deepin-menu.git",
       platforms = ['Linux'],
       packages = ['deepin_menu',],
-      data_files = list_files("deepin_menu","deepin_menu") + [
-      		('/usr/share/dbus-1/services/', ['com.deepin.menu.service']),
-      		('/usr/share/deepin-menu/', ['deepin-menu']),
-      		('/etc/xdg/autostart', ['deepin-menu.desktop'])
-      	]
-      )
+      data_files = list_files("deepin_menu","deepin_menu"))
 
