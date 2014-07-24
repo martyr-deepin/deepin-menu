@@ -227,8 +227,8 @@ ListView {
             global_menu.destroySubMenu()
 
             var itemPos = item.mapToItem(global_screen, 0, 0)
-            item.hasSubMenu && global_menu.showSubMenu(itemPos.x + item.width,
-                                                       itemPos.y, itemSubMenu)
+            isActive && item.hasSubMenu && global_menu.showSubMenu(itemPos.x + item.width,
+                                                                   itemPos.y, itemSubMenu)
         }
 
         Loader {
