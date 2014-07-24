@@ -26,4 +26,4 @@ HEADERS += dbus_manager_adaptor.h \
 
 LIBS += -lxcb
 
-target.path = /usr/share/
+target.path = /usr/lib/

@@ -1,3 +1,3 @@
 [D-BUS Service]
 Name=com.deepin.menu
-Exec=/usr/share/deepin-menu/deepin-menu
+Exec=/usr/lib/deepin-menu/deepin-menu
