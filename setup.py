@@ -32,6 +32,7 @@ setup(name='deepin_menu',
       data_files = list_files("deepin_menu","deepin_menu") + [
       		('/usr/share/dbus-1/services/', ['com.deepin.menu.service']),
       		('/usr/share/deepin-menu/', ['deepin-menu']),
+      		('/etc/xdg/autostart', ['deepin-menu.desktop'])
       	]
       )
 
