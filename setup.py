@@ -4,8 +4,8 @@ from setuptools import setup
 import os
 import subprocess
 
-subprocess.call("qmake")
-subprocess.call("make")
+subprocess.call("qmake", shell=True)
+subprocess.call("make", shell=True)
 
 def list_files(target_dir, install_dir):
     '''List files for option `data_files`.'''
