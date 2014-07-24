@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
 Name=Deepin Menu
-Exec=python /usr/share/pyshared/deepin_menu/main.py
+Exec=/usr/share/deepin-menu/deepin-menu
 NoDisplay=true
 OnlyShowIn=Deepin
