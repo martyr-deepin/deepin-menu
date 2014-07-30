@@ -6,7 +6,7 @@ ListView {
     height: 0
     focus: true
     currentIndex: -1
-    interactive: true
+    interactive: false
 
     property Component selection: DesktopMenuSelection {}
 
@@ -93,8 +93,8 @@ ListView {
     Keys.onEscapePressed: _utils_.menuDisappeared()
     Keys.onLeftPressed: global_menu.parentMenu.requestFocus()
     Keys.onRightPressed: global_menu.childMenu.requestFocus()
-    Keys.onUpPressed: { naviDirection = "up"; event.accepted = false }
-    Keys.onDownPressed: { naviDirection = "down"; event.accepted = false }
+    Keys.onUpPressed: { currentIndex = Math.max(-1, currentIndex-1); naviDirection = "up"; event.accepted = false }
+    Keys.onDownPressed: { currentIndex = Math.min(count, currentIndex+1); naviDirection = "down"; event.accepted = false }
     Keys.onReturnPressed: { enterPressed() }
     Keys.onPressed: {
         var _next_index_has_shortcut = getNextItemsHasShortcut(currentIndex + 1, event.text)
