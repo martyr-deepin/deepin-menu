@@ -24,6 +24,7 @@ MenuObject::MenuObject(ManagerObject *manager):
 MenuObject::~MenuObject()
 {
     if(menu) delete menu;
+    menu = NULL;
 
     emit MenuUnregistered();
 }
