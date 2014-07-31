@@ -51,18 +51,6 @@ class MenuAdaptor: public QDBusAbstractAdaptor
 "      <arg direction=\"out\" type=\"s\" name=\"itemId\"/>\n"
 "      <arg direction=\"out\" type=\"b\" name=\"checked\"/>\n"
 "    </signal>\n"
-"    <signal name=\"ItemTextSet\">\n"
-"      <arg direction=\"out\" type=\"s\" name=\"itemId\"/>\n"
-"      <arg direction=\"out\" type=\"s\" name=\"text\"/>\n"
-"    </signal>\n"
-"    <signal name=\"ItemActivitySet\">\n"
-"      <arg direction=\"out\" type=\"s\" name=\"itemId\"/>\n"
-"      <arg direction=\"out\" type=\"b\" name=\"isActive\"/>\n"
-"    </signal>\n"
-"    <signal name=\"ItemCheckedSet\">\n"
-"      <arg direction=\"out\" type=\"s\" name=\"itemId\"/>\n"
-"      <arg direction=\"out\" type=\"b\" name=\"checked\"/>\n"
-"    </signal>\n"
 "    <signal name=\"MenuUnregistered\"/>\n"
 "  </interface>\n"
         "")
@@ -77,10 +65,7 @@ public Q_SLOTS: // METHODS
     void SetItemText(const QString &itemId, const QString &text);
     void ShowMenu(const QString &menuJsonContent);
 Q_SIGNALS: // SIGNALS
-    void ItemActivitySet(const QString &itemId, bool isActive);
-    void ItemCheckedSet(const QString &itemId, bool checked);
     void ItemInvoked(const QString &itemId, bool checked);
-    void ItemTextSet(const QString &itemId, const QString &text);
     void MenuUnregistered();
 };
 

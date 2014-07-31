@@ -14,10 +14,7 @@ public:
     ~MenuObject();
 
 signals:
-    void ItemActivitySet(const QString &itemId, bool isActive);
-    void ItemCheckedSet(const QString &itemId, bool checked);
     void ItemInvoked(const QString &itemId, bool checked);
-    void ItemTextSet(const QString &itemId, const QString &text);
     void MenuUnregistered();
 public slots:
     void SetItemActivity(const QString &itemId, bool isActive);
