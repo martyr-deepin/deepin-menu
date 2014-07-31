@@ -1,17 +1,36 @@
 import QtQuick 2.0
 import QtQuick.Window 2.0
+import DBus.Com.Deepin.Daemon.Display 1.0
 
 Item {
     id: global_screen
-    width: Screen.width
-    height: Screen.height
+    width: Screen.desktopAvailableWidth
+    height: Screen.desktopAvailableHeight
 
-    property int desktopAvailableWidth: Screen.desktopAvailableWidth
-    property int desktopAvailableHeight: Screen.desktopAvailableHeight
+    property int desktopAvailableWidth: width
+    property int desktopAvailableHeight: height
+
+    Display { id: dbus_display }
+    Monitor { id: dbus_monitor }
+
+    function _calculateDesktopAvailableSize(x, y) {
+        var monitors = dbus_display.monitors
+        for(var i = 0; i < monitors.length; i++) {
+            dbus_monitor.path = monitors[i]
+            if(dbus_monitor.x < x
+                    && dbus_monitor.y < y
+                    && dbus_monitor.x + dbus_monitor.width > x
+                    && dbus_monitor.y + dbus_monitor.height > y)
+            {
+                desktopAvailableWidth = dbus_monitor.x + dbus_monitor.width
+                desktopAvailableHeight = dbus_monitor.y + dbus_monitor.height
+            }
+        }
+    }
 
     function showMenu(menuJsonContent) {
         var content = JSON.parse(menuJsonContent)
-
+        _calculateDesktopAvailableSize(content.x, content.y)
         content.isDockMenu ? _showDockMenu(content.x, content.y, JSON.parse(content.menuJsonContent))
                            : _showDesktopMenu(content.x, content.y, JSON.parse(content.menuJsonContent));
     }
