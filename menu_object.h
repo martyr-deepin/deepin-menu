@@ -25,6 +25,8 @@ public slots:
     void SetItemText(const QString &itemId, const QString &text);
     void ShowMenu(const QString &menuJsonContent);
 
+    void destroyMenu();
+
 private:
     QQuickView *menu;
     ManagerObject *manager;

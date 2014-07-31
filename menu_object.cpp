@@ -25,8 +25,6 @@ MenuObject::~MenuObject()
 {
     if(menu) delete menu;
     menu = NULL;
-
-    emit MenuUnregistered();
 }
 
 void MenuObject::SetItemActivity(const QString &itemId, bool isActive)
@@ -60,4 +58,9 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
     QObject::connect(engine, SIGNAL(quit()), QGuiApplication::instance(), SLOT(quit()));
 
     Utils::instance()->grabKeyboard(menu->winId());
+}
+
+void MenuObject::destroyMenu()
+{
+    emit MenuUnregistered();
 }

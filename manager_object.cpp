@@ -47,9 +47,12 @@ void ManagerObject::UnregisterMenu()
 
 void ManagerObject::UnregisterMenu(const QString &menuObjectPath)
 {
-    QDBusConnection connection = QDBusConnection::sessionBus();
-    connection.unregisterObject(menuObjectPath);
+    if (menuObject) {
+        menuObject->destroyMenu();
+        menuObject->deleteLater();
+        menuObject = NULL;
 
-    if (menuObject) menuObject->deleteLater();
-    menuObject = NULL;
+        QDBusConnection connection = QDBusConnection::sessionBus();
+        connection.unregisterObject(menuObjectPath);
+    }
 }
