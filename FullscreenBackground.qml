@@ -4,8 +4,31 @@ import DBus.Com.Deepin.Daemon.Display 1.0
 
 Item {
     id: global_screen
-    width: Screen.desktopAvailableWidth
-    height: Screen.desktopAvailableHeight
+    width: {
+        var result = 0
+
+        var monitors = dbus_display.monitors
+        for(var i = 0; i < monitors.length; i++) {
+            dbus_monitor.path = monitors[i]
+
+            result += dbus_monitor.width
+        }
+
+        return result
+    }
+
+    height: {
+        var result = 0
+
+        var monitors = dbus_display.monitors
+        for(var i = 0; i < monitors.length; i++) {
+            dbus_monitor.path = monitors[i]
+
+            result = Math.max(dbus_monitor.width, result)
+        }
+
+        return result
+    }
 
     property int desktopAvailableWidth: width
     property int desktopAvailableHeight: height
