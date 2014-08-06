@@ -1,0 +1,461 @@
+deepin-menu (1.1+20140805101707~943394c3e3) trusty; urgency=low
+
+  * Build from git 943394c3e3abfe615961e11249fb90b85aaf1b18
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Tue, 05 Aug 2014 10:17:08 +0800
+
+deepin-menu (1.1+20140731224938~7dcf1df0bf) trusty; urgency=low
+
+  * Build from git 7dcf1df0bf35b31840dd7800edf92b4cc5affdf8
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 31 Jul 2014 22:49:38 +0800
+
+deepin-menu (1.1+20140730105532~09dec1ab88) trusty; urgency=low
+
+  * Build from git 09dec1ab88883738374514b16efe67733c63cec1
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Wed, 30 Jul 2014 10:55:32 +0800
+
+deepin-menu (1.1+20140725092013~b761f7271d) trusty; urgency=low
+
+  * Build from git b761f7271d6aeb11c551a86d78979559b19ddfc8
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Fri, 25 Jul 2014 09:20:14 +0800
+
+deepin-menu (1.1+20140724174752~b761f7271d) trusty; urgency=low
+
+  * Build from git b761f7271d6aeb11c551a86d78979559b19ddfc8
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 17:47:52 +0800
+
+deepin-menu (1.1+20140724151900~e7a4173e99) trusty; urgency=low
+
+  * Build from git e7a4173e991cf59897b1b7224bc9cd8dc41bc3a3
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 15:19:01 +0800
+
+deepin-menu (1.1+20140724145055~031b0e4a1c) trusty; urgency=low
+
+  * Build from git 031b0e4a1c9931ff6a45123131c98f776494ab68
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 14:50:55 +0800
+
+deepin-menu (1.1+20140724142636~031b0e4a1c) trusty; urgency=low
+
+  * Build from git 031b0e4a1c9931ff6a45123131c98f776494ab68
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 14:26:37 +0800
+
+deepin-menu (1.1+20140724142129~f752a97bec) trusty; urgency=low
+
+  * Build from git f752a97bec5d974826684839f746d14900b925ba
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 14:21:30 +0800
+
+deepin-menu (1.1+20140724132712~a6e1f234a5) trusty; urgency=low
+
+  * Build from git a6e1f234a5eee420a0a7750629c2a130d0428af5
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 13:27:12 +0800
+
+deepin-menu (1.1+20140724132441~a6e1f234a5) trusty; urgency=low
+
+  * Build from git a6e1f234a5eee420a0a7750629c2a130d0428af5
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 13:24:41 +0800
+
+deepin-menu (1.1+20140724131740~a6e1f234a5) trusty; urgency=low
+
+  * Build from git a6e1f234a5eee420a0a7750629c2a130d0428af5
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 13:17:41 +0800
+
+deepin-menu (1.1+20140724122634~57d24f360d) trusty; urgency=low
+
+  * Build from git 57d24f360d05b53ddfa916f0d06430fa9752b843
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 12:26:34 +0800
+
+deepin-menu (1.1+20140724102729~dee97b85e3) trusty; urgency=low
+
+  * Build from git dee97b85e3f8a1724c5bf844a7e89e048310ab46
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 10:27:30 +0800
+
+deepin-menu (1.1+20140724100236~dee97b85e3) trusty; urgency=low
+
+  * Build from git dee97b85e3f8a1724c5bf844a7e89e048310ab46
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 10:02:36 +0800
+
+deepin-menu (1.1+20140724095816~dee97b85e3) trusty; urgency=low
+
+  * Build from git dee97b85e3f8a1724c5bf844a7e89e048310ab46
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 09:58:17 +0800
+
+deepin-menu (1.1+20140724095557~dee97b85e3) trusty; urgency=low
+
+  * Build from git dee97b85e3f8a1724c5bf844a7e89e048310ab46
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 09:55:58 +0800
+
+deepin-menu (1.1+20140724095408~dee97b85e3) trusty; urgency=low
+
+  * Build from git dee97b85e3f8a1724c5bf844a7e89e048310ab46
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 24 Jul 2014 09:54:09 +0800
+
+deepin-menu (1.1+20140711163935~5dc955685e) trusty; urgency=low
+
+  * Build from git 5dc955685e880a910c67854e0451a7ab989fa07d
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Fri, 11 Jul 2014 16:39:36 +0800
+
+deepin-menu (1.1+20140703162932~d1b23d1d5f) trusty; urgency=low
+
+  * Build from git d1b23d1d5fb6b65a1513ea4287c263455f9a27b6
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 03 Jul 2014 16:29:33 +0800
+
+deepin-menu (1.1+20140703160108~d1b23d1d5f) trusty; urgency=low
+
+  * Build from git d1b23d1d5fb6b65a1513ea4287c263455f9a27b6
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 03 Jul 2014 16:01:08 +0800
+
+deepin-menu (1.1+20140702111138~d1b23d1d5f) trusty; urgency=low
+
+  * Build from git d1b23d1d5fb6b65a1513ea4287c263455f9a27b6
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Wed, 02 Jul 2014 11:11:39 +0800
+
+deepin-menu (1.1-20140701175529~16f14e84a5) trusty; urgency=low
+
+  * Build from git 16f14e84a5006fd38ae7aca115575acc2da84a09
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Tue, 01 Jul 2014 17:55:29 +0800
+
+deepin-menu (1.1-20140701172459~9ed33c8e8c) trusty; urgency=low
+
+  * Build from git 9ed33c8e8cf4f559773eb7f0a0bb589107be303d
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Tue, 01 Jul 2014 17:25:00 +0800
+
+deepin-menu (1.1-20140701165511~f6da68785f) trusty; urgency=low
+
+  * Build from git f6da68785f3867c722218394dd1e18b0003c65ed
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Tue, 01 Jul 2014 16:55:12 +0800
+
+deepin-menu (1.1-20140701104642~c80d4b548a) trusty; urgency=low
+
+  * Build from git c80d4b548a89473a3c186832d3889a7663546ccb
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Tue, 01 Jul 2014 10:46:43 +0800
+
+deepin-menu (1.1-20140701103749~04ce2b2e33) trusty; urgency=low
+
+  * Build from git 04ce2b2e33a7a7a9999433ba6621f1614beeac0f
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Tue, 01 Jul 2014 10:37:49 +0800
+
+deepin-menu (1.1-20140620111720~551c948769) trusty; urgency=low
+
+  * Build from git 551c9487697f2b520c0cb5b84378426ad312e284
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Fri, 20 Jun 2014 11:17:21 +0800
+
+deepin-menu (1.1-20140523154436~bb6e603e38) trusty; urgency=low
+
+  * Build from git bb6e603e38562a5c058a9f0619bfe5bcc3e84473
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Fri, 23 May 2014 15:44:37 +0800
+
+deepin-menu (1.1-20140521094515~626753249d) trusty; urgency=low
+
+  * Build from git 626753249d2ce73b09ae98520996d1a814ef1b6e
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Wed, 21 May 2014 09:45:15 +0800
+
+deepin-menu (1.1-20140512150235~bb06a06aad) trusty; urgency=low
+
+  * Build from git bb06a06aadcca619e14f47cc8b6d385fb5acca07
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Mon, 12 May 2014 15:02:35 +0800
+
+deepin-menu (1.1-20140508103033~39483095d9) trusty; urgency=low
+
+  * Build from git 39483095d9192ebddbdf80c6d919604b54155831
+
+ -- Yueqian Zhang <zhangyueqian@linuxdeepin.com>  Thu, 08 May 2014 10:30:34 +0800
+
+deepin-menu (1+git20140504140925~13ece1ca7a~xmenu) trusty; urgency=low
+
+  * Build from git revision 13ece1ca7a528156732464c13f2ed7a218bde82b
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sun, 04 May 2014 14:09:25 +0800
+
+deepin-menu (1+git20140430134721~478e766095~xmenu) trusty; urgency=low
+
+  * Build from git revision 478e766095765226d98feb47a560fc6839e9bfb6
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 30 Apr 2014 13:47:22 +0800
+
+deepin-menu (1+git20140425113119~ac0e3b3dae~xmenu) trusty; urgency=low
+
+  * Build from git revision ac0e3b3daeb185fe794826351533e3f4e12234c3
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 25 Apr 2014 11:31:19 +0800
+
+deepin-menu (1+git20140424170806~383c08db41~xmenu) trusty; urgency=low
+
+  * Build from git revision 383c08db41d815fdd92dbce7c26886a00d126a5d
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 24 Apr 2014 17:08:06 +0800
+
+deepin-menu (1+git20140423134540~6ea6f200dc~xmenu) trusty; urgency=low
+
+  * Build from git revision 6ea6f200dc0a194643af0086ad4f6aec5a0a8eae
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 23 Apr 2014 13:45:40 +0800
+
+deepin-menu (1+git20140422171748~d7d77b0cd4~xmenu) trusty; urgency=low
+
+  * Build from git revision d7d77b0cd41344eb84e03b1f0aad13ef24a37914
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 22 Apr 2014 17:17:48 +0800
+
+deepin-menu (1+git20140422162534~53b27f31e3~xmenu) trusty; urgency=low
+
+  * Build from git revision 53b27f31e381e4c743059c704499010923b4478f
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 22 Apr 2014 16:25:34 +0800
+
+deepin-menu (1+git20140422143810~53b27f31e3~xmenu) trusty; urgency=low
+
+  * Build from git revision 53b27f31e381e4c743059c704499010923b4478f
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 22 Apr 2014 14:38:10 +0800
+
+deepin-menu (1+git20140422140937~53b27f31e3~xmenu) trusty; urgency=low
+
+  * Build from git revision 53b27f31e381e4c743059c704499010923b4478f
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 22 Apr 2014 14:09:38 +0800
+
+deepin-menu (1+git20140421174655~d2e5e6ee50~xmenu) trusty; urgency=low
+
+  * Build from git revision d2e5e6ee500afc66b6e0266a13f1c3a68fe44f46
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 21 Apr 2014 17:46:56 +0800
+
+deepin-menu (1+git20140415162910~223f88589d~xmenu) trusty; urgency=low
+
+  * Build from git revision 223f88589d25c0d820f1f12c8f5cb12813356a10
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 15 Apr 2014 16:29:11 +0800
+
+deepin-menu (1+git20140403150725~a63ae4b7a2~xmenu) trusty; urgency=low
+
+  * Build from git revision a63ae4b7a2ed3a0465637bad6d68c71e19a3736f
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 03 Apr 2014 15:07:25 +0800
+
+deepin-menu (1+git20140403104656~c58cfb524b~xmenu) trusty; urgency=low
+
+  * Build from git revision c58cfb524b7b0a1f2258bc6bc7a39373d798af55
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 03 Apr 2014 10:46:56 +0800
+
+deepin-menu (1+git20140403103349~83d5f5efa5~xmenu) trusty; urgency=low
+
+  * Build from git revision 83d5f5efa56dfa25ec8641cc2054406b504b1e2b
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 03 Apr 2014 10:33:50 +0800
+
+deepin-menu (1+git20140327102402~2db411e473~xmenu) trusty; urgency=low
+
+  * Build from git revision 2db411e473bb472d8cafb45484806beeee938c6c
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 27 Mar 2014 10:24:03 +0800
+
+deepin-menu (1+git20140326171121~a43246c45d~xmenu) trusty; urgency=low
+
+  * Build from git revision a43246c45d78644cfdeb6d8e3545c268d8c18346
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 26 Mar 2014 17:11:21 +0800
+
+deepin-menu (1+git20140326170131~02ed99d283~xmenu) trusty; urgency=low
+
+  * Build from git revision 02ed99d28372e302b84637bf76d801d63dd03c9c
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 26 Mar 2014 17:01:32 +0800
+
+deepin-menu (1+git20140326164625~adf54692b6~xmenu) trusty; urgency=low
+
+  * Build from git revision adf54692b60c6189dd38d8dbf3bd257990015bf8
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 26 Mar 2014 16:46:26 +0800
+
+deepin-menu (1+git20140326145741~9b42fba2c9~xmenu) trusty; urgency=low
+
+  * Build from git revision 9b42fba2c91c6ea72af84aa714e6b65b82506863
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 26 Mar 2014 14:57:42 +0800
+
+deepin-menu (1+git20140326144314~c474217abe~xmenu) trusty; urgency=low
+
+  * Build from git revision c474217abe3b78428d8335e6aeb2c1cf4fabada4
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 26 Mar 2014 14:43:15 +0800
+
+deepin-menu (1+git20140326101543~1725aaa22f~xmenu) trusty; urgency=low
+
+  * Build from git revision 1725aaa22fa5e84d4faea893f1d09985fb51ae7c
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 26 Mar 2014 10:15:44 +0800
+
+deepin-menu (1+git20140325125851~1725aaa22f~xmenu) trusty; urgency=low
+
+  * Build from git revision 1725aaa22fa5e84d4faea893f1d09985fb51ae7c
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 25 Mar 2014 12:58:51 +0800
+
+deepin-menu (1+git20140325105028~c3fe629bd5~xmenu) trusty; urgency=low
+
+  * Build from git revision c3fe629bd51936356017fb156f0ec6a96ef5577a
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 25 Mar 2014 10:50:28 +0800
+
+deepin-menu (1+git20140325103218~f826a02fe9~xmenu) trusty; urgency=low
+
+  * Build from git revision f826a02fe9c2e80803a78a4481792d9efdf68a81
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 25 Mar 2014 10:32:19 +0800
+
+deepin-menu (1+git20140314154807~1d55b7fd1c~xmenu) trusty; urgency=low
+
+  * Build from git revision 1d55b7fd1c07bffb8904ad7325ed70d79b65ef05
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 14 Mar 2014 15:48:08 +0800
+
+deepin-menu (1+git20140208103539~7ff3b287bc~xmenu) saucy; urgency=low
+
+  * Build from git revision 7ff3b287bcef76d863afec8f313806396bb22522
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Sat, 08 Feb 2014 10:35:39 +0800
+
+deepin-menu (1+git20140123105529~7b02491ad2~xmenu) saucy; urgency=low
+
+  * Build from git revision 7b02491ad215ca57e822c12f14639931db08a05b
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Thu, 23 Jan 2014 10:55:29 +0800
+
+deepin-menu (1+git20140113103240~86ce125235~xmenu) saucy; urgency=low
+
+  * Build from git revision 86ce125235ebd743d28194caad3bdd58e17cc05e
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 13 Jan 2014 10:32:40 +0800
+
+deepin-menu (1+git20140108143518~7712b19ef9~xmenu) saucy; urgency=low
+
+  * Build from git revision 7712b19ef98f19a22f45114e61ad236a95dc00be
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 08 Jan 2014 14:35:18 +0800
+
+deepin-menu (1+git20140107145656~be8c9e94ab~xmenu) saucy; urgency=low
+
+  * Build from git revision be8c9e94abc8b05d9ccce17aadc90cecb59f5899
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Tue, 07 Jan 2014 14:56:56 +0800
+
+deepin-menu (1+git20140103144024~745dd781cf~xmenu) saucy; urgency=low
+
+  * Build from git revision 745dd781cfed66641aaa2341c7e6515d0dd7949c
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 03 Jan 2014 14:40:25 +0800
+
+deepin-menu (1+git20140103105247~82dc94a266~xmenu) saucy; urgency=low
+
+  * Build from git revision 82dc94a266fcdba0f6e3b617a58644cd649193dc
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 03 Jan 2014 10:52:47 +0800
+
+deepin-menu (1+git20131227101135~9b0ca5ad81~xmenu) saucy; urgency=low
+
+  * Build from git revision 9b0ca5ad8190b1150cafc1d1a06f3b0417b958d4
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 27 Dec 2013 10:11:35 +0800
+
+deepin-menu (1+git20131223161840~6915fb1097~xmenu) saucy; urgency=low
+
+  * Build from git revision 6915fb1097776141ee85c1347a8d281409a603ba
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 23 Dec 2013 16:18:40 +0800
+
+deepin-menu (1+git20131216171029~6915fb1097~xmenu) raring; urgency=low
+
+  * Build from git revision 6915fb1097776141ee85c1347a8d281409a603ba
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 16 Dec 2013 17:10:30 +0800
+
+deepin-menu (1+git20131216140612~6915fb1097~xmenu) raring; urgency=low
+
+  * Build from git revision 6915fb1097776141ee85c1347a8d281409a603ba
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 16 Dec 2013 14:06:12 +0800
+
+deepin-menu (1+git20131216125622~f754a354ff~xmenu) raring; urgency=low
+
+  * Build from git revision f754a354ff5fd43e04dfdfd94e16c8390ab1b358
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Mon, 16 Dec 2013 12:56:22 +0800
+
+deepin-menu (1+git20131213181210~761ce0eed5~xmenu) raring; urgency=low
+
+  * Build from git revision 761ce0eed5847af2a20e16d4af69d112f3e458f0
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 13 Dec 2013 18:12:10 +0800
+
+deepin-menu (1+git20131213174855~acaf904051~xmenu) raring; urgency=low
+
+  * Build from git revision acaf9040513794218c0dfbb37f3e8f22a2be9639
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 13 Dec 2013 17:48:55 +0800
+
+deepin-menu (1+git20131213174255~b6cf6dfb81~xmenu) raring; urgency=low
+
+  * Build from git revision b6cf6dfb814f3648f3ead60e528beba7e5ee7f2b
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 13 Dec 2013 17:42:56 +0800
+
+deepin-menu (1+git20131213165522~b6cf6dfb81~xmenu) raring; urgency=low
+
+  * Build from git revision b6cf6dfb814f3648f3ead60e528beba7e5ee7f2b
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 13 Dec 2013 16:55:22 +0800
+
+deepin-menu (1+git20131213165325~b6cf6dfb81~xmenu) raring; urgency=low
+
+  * Build from git revision b6cf6dfb814f3648f3ead60e528beba7e5ee7f2b
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 13 Dec 2013 16:53:25 +0800
+
+deepin-menu (1+git20131213162732~b6cf6dfb81~xmenu) raring; urgency=low
+
+  * Build from git revision b6cf6dfb814f3648f3ead60e528beba7e5ee7f2b
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 13 Dec 2013 16:27:32 +0800
+
+deepin-menu (1+git20131213145332~b6cf6dfb81~xmenu) raring; urgency=low
+
+  * Build from git revision b6cf6dfb814f3648f3ead60e528beba7e5ee7f2b
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 13 Dec 2013 14:53:32 +0800
+
+deepin-menu (1+git20131122144648~e369b783df) raring; urgency=low
+
+  * Build from git revision e369b783dfae31955a08e51a46f951a34d2f09e2
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Fri, 08 Nov 2013 16:46:48 +0800
