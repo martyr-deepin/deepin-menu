@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>MenuContent.qml</file>
+        <file>AbstractMenu.qml</file>
+        <file>FullscreenBackground.qml</file>
+        <file>DesktopMenuBackground.qml</file>
+        <file>DesktopMenu.qml</file>
+        <file>DesktopMenuSelection.qml</file>
+        <file>DockMenuBackground.qml</file>
+        <file>DockMenu.qml</file>
+    </qresource>
+</RCC>

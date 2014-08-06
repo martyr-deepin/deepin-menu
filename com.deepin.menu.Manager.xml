@@ -1,0 +1,12 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="com.deepin.menu.Manager">
+    <method name="RegisterMenu">
+      <arg direction="out" type="o" name="menuObjectPath"/>
+    </method>
+    <method name="UnregisterMenu">
+      <arg direction="in" type="s" name="menuObjectPath"/>
+    </method>
+  </interface>
+</node>

@@ -1,4 +1,11 @@
 .#*
+*.pyc
+*.pyo
 deepin_menu.egg-info
 build
 dist
+core
+*.o
+moc_*
+qrc_*.cpp
+deepin-menu.pro.user
