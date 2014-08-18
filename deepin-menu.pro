@@ -1,29 +1,19 @@
+#-------------------------------------------------
+#
+# Project created by QtCreator 2014-08-14T14:55:09
+#
+#-------------------------------------------------
+
+QT       += core gui
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+TARGET = deepin-menu
 TEMPLATE = app
 
-QT += qml quick dbus x11extras
 
 SOURCES += main.cpp \
-    dbus_manager_adaptor.cpp \
-    dbus_menu_adaptor.cpp \
-    manager_object.cpp \
-    menu_object.cpp \
-    utils.cpp
+    dmenu.cpp
 
-RESOURCES += qml.qrc \
-    images.qrc
-
-# Additional import path used to resolve QML modules in Qt Creator's code model
-QML_IMPORT_PATH =
-
-# Default rules for deployment.
-include(deployment.pri)
-
-HEADERS += dbus_manager_adaptor.h \
-    dbus_menu_adaptor.h \
-    manager_object.h \
-    menu_object.h \
-    utils.h
-
-LIBS += -lxcb
-
-target.path = /usr/lib/
+HEADERS  += \
+    dmenu.h
