@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui x11extras
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,7 +13,15 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    dmenu.cpp
+    dmenubase.cpp \
+    ddesktopmenu.cpp \
+    utils.cpp \
+    dmenucontent.cpp
 
 HEADERS  += \
-    dmenu.h
+    dmenubase.h \
+    ddesktopmenu.h \
+    utils.h \
+    dmenucontent.h
+
+LIBS += -lxcb
