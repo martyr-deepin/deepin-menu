@@ -17,10 +17,15 @@ public:
     int contentWidth();
     int contentHeight();
 
+    int currentIndex();
+    void setCurrentIndex(int);
+
 protected:
-    void paintEvent(QPaintEvent * event);
+    void paintEvent(QPaintEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
 
 private:
+    int _currentIndex;
     QRect getRectOfActionAtIndex(int index);
 };
 
