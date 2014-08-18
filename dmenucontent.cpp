@@ -3,14 +3,16 @@
 #include <QBrush>
 #include <QAction>
 #include <QtGlobal>
+#include <QMouseEvent>
 
 #include "ddesktopmenu.h"
 #include "dmenucontent.h"
 
 DMenuContent::DMenuContent(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent),
+    _currentIndex(-1)
 {
-    this->setGeometry(0, 0, contentWidth(), contentHeight());
+    this->setMouseTracking(true);
 
     this->addAction(new QAction("hello", this));
     this->addAction(new QAction("hello", this));
@@ -18,6 +20,16 @@ DMenuContent::DMenuContent(QWidget *parent) :
     this->addAction(new QAction("hello", this));
     this->addAction(new QAction("hello", this));
     this->addAction(new QAction("hello", this));
+}
+
+int DMenuContent::currentIndex()
+{
+    return _currentIndex;
+}
+
+void DMenuContent::setCurrentIndex(int index)
+{
+    _currentIndex = index;
 }
 
 int DMenuContent::contentWidth()
@@ -42,18 +54,27 @@ int DMenuContent::contentHeight()
 void DMenuContent::paintEvent(QPaintEvent * event)
 {
     DDesktopMenu *parent = dynamic_cast<DDesktopMenu*>(this->parent());
-    QRect rect = this->rect();
     QFont font;
     font.setPixelSize(MENU_ITEM_FONT_SIZE);
     QPainter painter(this);
     painter.setFont(font);
 
-    DMenuBase::ItemState itemState = DMenuBase::NormalState;
-    parent->setItemState(itemState);
-
     for(int i = 0; i < this->actions().count(); i++) {
-        painter.drawText(this->getRectOfActionAtIndex(i), Qt::AlignVCenter, this->actions().at(i)->text());
+        DMenuBase::ItemState itemState = i == _currentIndex ? DMenuBase::HoverState : DMenuBase::NormalState;
+        parent->setItemState(itemState);
+
+        QRect actionRect = this->getRectOfActionAtIndex(i);
+        QRect actionRectWidthMargins = actionRect.marginsRemoved(QMargins(this->contentsMargins().left(), 0, this->contentsMargins().right(), 0));
+        painter.fillRect(actionRect, QBrush(parent->itemBackgroundColor()));
+        painter.setPen(QPen(parent->itemTextColor()));
+        painter.drawText(actionRectWidthMargins, Qt::AlignVCenter, this->actions().at(i)->text());
     }
+}
+
+void DMenuContent::mouseMoveEvent(QMouseEvent *event)
+{
+    _currentIndex = event->y() / MENU_ITEM_HEIGHT;
+    this->update();
 }
 
 // private methods

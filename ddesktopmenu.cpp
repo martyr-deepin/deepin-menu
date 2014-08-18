@@ -11,17 +11,19 @@ DDesktopMenu::DDesktopMenu():
     DMenuBase()
 {
     this->setShadowMargins(QMargins(10, 10, 10, 10));
-    this->setContentsMargins(QMargins(10, 10, 10, 10));
+    this->setContentsMargins(this->shadowMargins());
     this->setItemLeftSpacing(10);
     this->setItemCenterSpacing(10);
     this->setItemRightSpacing(10);
 
+    QMargins menuContentMargins = QMargins(10, 10, 10, 10);
     DMenuContent *content = new DMenuContent(this);
+    content->setContentsMargins(menuContentMargins);
     this->resize(content->contentWidth()
                  + this->shadowMargins().left()
                  + this->shadowMargins().right()
-                 + this->contentsMargins().left()
-                 + this->contentsMargins().right(),
+                 + menuContentMargins.left()
+                 + menuContentMargins.right(),
                  content->contentHeight()
                  + this->shadowMargins().top()
                  + this->shadowMargins().bottom()
@@ -29,7 +31,7 @@ DDesktopMenu::DDesktopMenu():
                  + this->contentsMargins().bottom());
 
     QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(this->contentsMargins());
+    layout->setContentsMargins(QMargins(0, menuContentMargins.top(), 0, menuContentMargins.bottom()));
     layout->addWidget(content);
 
     this->setLayout(layout);
