@@ -20,7 +20,8 @@ SOURCES += main.cpp \
     dbus_manager_adaptor.cpp \
     dbus_menu_adaptor.cpp \
     manager_object.cpp \
-    menu_object.cpp
+    menu_object.cpp \
+    ddockmenu.cpp
 
 HEADERS  += \
     dmenubase.h \
@@ -30,6 +31,7 @@ HEADERS  += \
     dbus_manager_adaptor.h \
     dbus_menu_adaptor.h \
     manager_object.h \
-    menu_object.h
+    menu_object.h \
+    ddockmenu.h
 
 LIBS += -lxcb
