@@ -2,10 +2,9 @@
 #define MENU_OBJECT_H
 
 #include <QObject>
-#include <QQuickView>
 
 class ManagerObject;
-
+class DDesktopMenu;
 class MenuObject : public QObject
 {
     Q_OBJECT
@@ -25,7 +24,7 @@ public slots:
     void destroyMenu();
 
 private:
-    QQuickView *menu;
+    DDesktopMenu *menu;
     ManagerObject *manager;
 };
 

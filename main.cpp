@@ -1,15 +1,18 @@
 #include <QApplication>
 
-#include "ddesktopmenu.h"
-#include "dmenucontent.h"
+#include "dbus_manager_adaptor.h"
+#include "manager_object.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    DDesktopMenu menu;
-    menu.move(100, 100);
-    menu.show();
+    ManagerObject manager;
+    ManagerAdaptor manger(&manager);
+
+    QDBusConnection connection = QDBusConnection::sessionBus();
+    connection.registerService("com.deepin.menu");
+    connection.registerObject("/com/deepin/menu", &manager);
 
     return a.exec();
 }
