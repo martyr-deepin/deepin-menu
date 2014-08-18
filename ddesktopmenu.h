@@ -8,6 +8,8 @@ class DDesktopMenu : public DMenuBase
 public:
     DDesktopMenu();
 
+    void setItemState(ItemState);
+
 protected:
     void paintEvent(QPaintEvent * event);
 };

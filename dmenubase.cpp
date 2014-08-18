@@ -48,3 +48,87 @@ void DMenuBase::setShadowMargins(QMargins shadowMargins)
         emit shadowMarginsChanged(shadowMargins);
     }
 }
+
+QColor DMenuBase::itemBackgroundColor()
+{
+    return _itemBackgroundColor;
+}
+
+void DMenuBase::setItemBackgroundColor(QColor color)
+{
+    if (_itemBackgroundColor != color) {
+        _itemBackgroundColor = color;
+
+        emit itemBackgroundColorChanged(color);
+    }
+}
+
+QColor DMenuBase::itemTextColor()
+{
+    return _itemTextColor;
+}
+
+void DMenuBase::setItemTextColor(QColor color)
+{
+    if (_itemTextColor != color) {
+        _itemTextColor = color;
+
+        emit itemTextColorChanged(color);
+    }
+}
+
+QColor DMenuBase::itemShortcutColor()
+{
+    return _itemShortcutColor;
+}
+
+void DMenuBase::setItemShortcutColor(QColor color)
+{
+    if (_itemShortcutColor != color) {
+        _itemShortcutColor = color;
+
+        emit itemShortcutColorChanged(color);
+    }
+}
+
+int DMenuBase::itemLeftSpacing()
+{
+    return _itemLeftSpacing;
+}
+
+void DMenuBase::setItemLeftSpacing(int spacing)
+{
+    if (_itemLeftSpacing != spacing) {
+        _itemLeftSpacing = spacing;
+
+        emit itemLeftSpacingChanged(spacing);
+    }
+}
+
+int DMenuBase::itemCenterSpacing()
+{
+    return _itemCenterSpacing;
+}
+
+void DMenuBase::setItemCenterSpacing(int spacing)
+{
+    if (_itemCenterSpacing != spacing) {
+        _itemCenterSpacing = spacing;
+
+        emit itemCenterSpacingChanged(spacing);
+    }
+}
+
+int DMenuBase::itemRightSpacing()
+{
+    return _itemRightSpacing;
+}
+
+void DMenuBase::setItemRightSpacing(int spacing)
+{
+    if (_itemRightSpacing != spacing) {
+        _itemRightSpacing = spacing;
+
+        emit itemRightSpacingChanged(spacing);
+    }
+}
