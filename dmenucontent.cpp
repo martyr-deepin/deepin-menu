@@ -4,8 +4,9 @@
 #include <QAction>
 #include <QtGlobal>
 #include <QMouseEvent>
+#include <QDebug>
 
-#include "ddesktopmenu.h"
+#include "dmenubase.h"
 #include "dmenucontent.h"
 
 DMenuContent::DMenuContent(QWidget *parent) :
@@ -14,7 +15,7 @@ DMenuContent::DMenuContent(QWidget *parent) :
 {
     this->setMouseTracking(true);
 
-    this->addAction(new QAction("hello", this));
+    this->addAction(new QAction("hello hello", this));
     this->addAction(new QAction("hello", this));
     this->addAction(new QAction("hello", this));
     this->addAction(new QAction("hello", this));
@@ -53,7 +54,7 @@ int DMenuContent::contentHeight()
 // override methods
 void DMenuContent::paintEvent(QPaintEvent * event)
 {
-    DDesktopMenu *parent = dynamic_cast<DDesktopMenu*>(this->parent());
+    DMenuBase *parent = dynamic_cast<DMenuBase*>(this->parent());
     QFont font;
     font.setPixelSize(MENU_ITEM_FONT_SIZE);
     QPainter painter(this);
