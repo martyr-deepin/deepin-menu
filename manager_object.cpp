@@ -12,10 +12,6 @@ ManagerObject::ManagerObject(QObject *parent) :
     menuObject = NULL;
 }
 
-ManagerObject::~ManagerObject()
-{
-}
-
 QDBusObjectPath ManagerObject::RegisterMenu()
 {
     this->UnregisterMenu();
@@ -26,8 +22,6 @@ QDBusObjectPath ManagerObject::RegisterMenu()
     uuid = uuid.replace("-", "_");
     menuObjectPath = "/com/deepin/menu/" + uuid;
 
-    if (menuObject) delete menuObject;
-    menuObject = NULL;
     menuObject = new MenuObject(this);
     menuAdaptor = new MenuAdaptor(menuObject);
 

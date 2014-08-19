@@ -1,6 +1,8 @@
 #include <QMargins>
 #include <QtGlobal>
 #include <QGraphicsDropShadowEffect>
+#include <QJsonArray>
+#include <QJsonObject>
 
 #include "dmenubase.h"
 
@@ -130,5 +132,21 @@ void DMenuBase::setItemRightSpacing(int spacing)
         _itemRightSpacing = spacing;
 
         emit itemRightSpacingChanged(spacing);
+    }
+}
+
+
+void DMenuBase::setContent(const QJsonArray *items)
+{
+}
+
+void DMenuBase::destroyAll()
+{
+    if(this->parent()) {
+        DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+        Q_ASSERT(parent);
+        parent->destroyAll();
+    } else {
+        this->deleteLater();
     }
 }

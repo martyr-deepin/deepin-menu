@@ -72,3 +72,8 @@ void DDesktopMenu::setItemState(ItemState state)
     default: break;
     }
 }
+
+void DDesktopMenu::setPosition(int x, int y)
+{
+    this->move(x - this->shadowMargins().left(), y - this->shadowMargins().top());
+}

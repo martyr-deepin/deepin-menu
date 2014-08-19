@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QAction>
 
+#include <dmenubase.h>
+
 #define MENU_ITEM_HEIGHT 24
 #define MENU_ITEM_FONT_SIZE 14
 
@@ -12,7 +14,7 @@ class DMenuContent : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DMenuContent(QWidget *parent = 0);
+    explicit DMenuContent(DMenuBase *parent = 0);
 
     int contentWidth();
     int contentHeight();
@@ -21,8 +23,8 @@ public:
     void setCurrentIndex(int);
 
 protected:
-    void paintEvent(QPaintEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
+    virtual void paintEvent(QPaintEvent *event);
+    virtual void mouseMoveEvent(QMouseEvent *event);
 
 private:
     int _currentIndex;

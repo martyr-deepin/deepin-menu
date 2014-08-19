@@ -6,6 +6,7 @@
 
 class QColor;
 class QMargins;
+class QJsonArray;
 class DMenuBase : public QWidget
 {
     Q_OBJECT
@@ -46,6 +47,12 @@ public:
     int itemRightSpacing();
     void setItemRightSpacing(int);
 
+    void setContent(const QJsonArray *items);
+    void destroyAll();
+
+    virtual void setItemState(ItemState) = 0;
+    virtual void setPosition(int, int) = 0;
+
 signals:
     void radiusChanged(int radius);
     void shadowMarginsChanged(QMargins shadowWidth);
@@ -55,8 +62,6 @@ signals:
     void itemLeftSpacingChanged(int itemLeftSpacing);
     void itemCenterSpacingChanged(int itemCenterSpacing);
     void itemRightSpacingChanged(int itemRightSpacing);
-
-    virtual void setItemState(ItemState) = 0;
 
 private:
     int _radius;

@@ -9,7 +9,7 @@
 #include "dmenubase.h"
 #include "dmenucontent.h"
 
-DMenuContent::DMenuContent(QWidget *parent) :
+DMenuContent::DMenuContent(DMenuBase *parent) :
     QWidget(parent),
     _currentIndex(-1)
 {
@@ -54,7 +54,7 @@ int DMenuContent::contentHeight()
 // override methods
 void DMenuContent::paintEvent(QPaintEvent * event)
 {
-    DMenuBase *parent = dynamic_cast<DMenuBase*>(this->parent());
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
     QFont font;
     font.setPixelSize(MENU_ITEM_FONT_SIZE);
     QPainter painter(this);

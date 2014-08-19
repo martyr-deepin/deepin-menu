@@ -13,7 +13,6 @@ class ManagerObject : public QObject
     Q_OBJECT
 public:
     explicit ManagerObject(QObject *parent = 0);
-    ~ManagerObject();
 
 signals:
 

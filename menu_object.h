@@ -4,13 +4,12 @@
 #include <QObject>
 
 class ManagerObject;
-class DDesktopMenu;
+class DMenuBase;
 class MenuObject : public QObject
 {
     Q_OBJECT
 public:
     MenuObject(ManagerObject *manager);
-    ~MenuObject();
 
 signals:
     void ItemInvoked(const QString &itemId, bool checked);
@@ -24,8 +23,7 @@ public slots:
     void destroyMenu();
 
 private:
-    DDesktopMenu *menu;
-    ManagerObject *manager;
+    DMenuBase *menu;
 };
 
 #endif // MENU_OBJECT_H

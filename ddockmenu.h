@@ -11,10 +11,11 @@ class DDockMenu : public DMenuBase
 public:
     DDockMenu();
 
-    void setItemState(ItemState);
+    virtual void setItemState(ItemState);
+    virtual void setPosition(int, int);
 
 protected:
-    void paintEvent(QPaintEvent *);
+    virtual void paintEvent(QPaintEvent *);
 };
 
 #endif // DDOCKMENU_H
