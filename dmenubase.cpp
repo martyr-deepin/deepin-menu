@@ -3,13 +3,20 @@
 #include <QGraphicsDropShadowEffect>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QHBoxLayout>
+#include <QStringList>
+#include <QSharedPointer>
+#include <QDebug>
 
 #include "dmenubase.h"
+#include <dmenucontent.h>
 
 DMenuBase::DMenuBase(QWidget *parent) :
     QWidget(parent, Qt::Popup),
     _radius(4),
-    _shadowMargins(QMargins(0, 0, 0, 0))
+    _shadowMargins(QMargins(0, 0, 0, 0)),
+    _checkmarkIcon(""),
+    _subMenuIndicatorIcon("")
 {
     this->setAttribute(Qt::WA_TranslucentBackground);
 
@@ -48,6 +55,20 @@ void DMenuBase::setShadowMargins(QMargins shadowMargins)
                                         qMax(_shadowMargins.right(), _shadowMargins.bottom())));
 
         emit shadowMarginsChanged(shadowMargins);
+    }
+}
+
+QMargins DMenuBase::menuContentMargins()
+{
+    return _menuContentMargins;
+}
+
+void DMenuBase::setMenuContentMargins(QMargins margins)
+{
+    if(_menuContentMargins != margins) {
+        _menuContentMargins = margins;
+
+        emit menuContentMarginsChanged(margins);
     }
 }
 
@@ -135,9 +156,80 @@ void DMenuBase::setItemRightSpacing(int spacing)
     }
 }
 
-
-void DMenuBase::setContent(const QJsonArray *items)
+QString DMenuBase::checkmarkIcon()
 {
+    return _checkmarkIcon;
+}
+
+void DMenuBase::setCheckmarkIcon(QString icon)
+{
+    if(icon != _checkmarkIcon) {
+        _checkmarkIcon = icon;
+    }
+}
+
+QString DMenuBase::subMenuIndicatorIcon()
+{
+    return _subMenuIndicatorIcon;
+}
+
+void DMenuBase::setSubMenuIndicatorIcon(QString icon)
+{
+    if(icon != _subMenuIndicatorIcon) {
+        _subMenuIndicatorIcon = icon;
+    }
+}
+
+QSharedPointer<DMenuContent> DMenuBase::menuContent()
+{
+    return _menuContent;
+}
+
+void DMenuBase::setMenuContent(QSharedPointer<DMenuContent> content)
+{
+    _menuContent = content;
+    _menuContent->setContentsMargins(_menuContentMargins);
+
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->setContentsMargins(QMargins(0, _menuContentMargins.top(), 0, _menuContentMargins.bottom()));
+    layout->addWidget(_menuContent.data());
+
+    this->setLayout(layout);
+}
+
+void DMenuBase::setContent(QJsonArray items)
+{
+    Q_ASSERT(this->menuContent());
+    this->menuContent()->actions().clear();
+
+    foreach (QJsonValue item, items) {
+        QJsonObject itemObj = item.toObject();
+
+        QAction *action = new QAction(this->menuContent().data());
+        action->setText(itemObj["itemText"].toString());
+        action->setEnabled(itemObj["isActive"].toBool());
+        action->setCheckable(menuItemCheckableFromId(itemObj["itemId"].toString()));
+        action->setChecked(itemObj["checked"].toBool());
+        action->setProperty("itemId", itemObj["itemId"].toString());
+        action->setProperty("itemIcon", itemObj["itemIcon"].toString());
+        action->setProperty("itemIconHover", itemObj["itemIconHover"].toString());
+        action->setProperty("itemIconInactive", itemObj["itemIconInactive"].toString());
+        action->setProperty("hasSubMenu", itemObj["itemSubMenu"].toObject()["items"].toArray().count() != 0);
+
+        _menuContent->addAction(action);
+    }
+
+    // adjust its size according to its content.
+    this->resize(_menuContent->contentWidth()
+                 + _shadowMargins.left()
+                 + _shadowMargins.right()
+                 + _menuContentMargins.left()
+                 + _menuContentMargins.right(),
+                 _menuContent->contentHeight()
+                 + _shadowMargins.top()
+                 + _shadowMargins.bottom()
+                 + _menuContentMargins.top()
+                 + _menuContentMargins.bottom());
 }
 
 void DMenuBase::destroyAll()
@@ -149,4 +241,10 @@ void DMenuBase::destroyAll()
     } else {
         this->deleteLater();
     }
+}
+
+bool DMenuBase::menuItemCheckableFromId(QString id)
+{
+    return id.split(':').count() == 3;
+
 }

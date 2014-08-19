@@ -4,6 +4,8 @@
 #include <QPen>
 #include <QBrush>
 #include <QHBoxLayout>
+#include <QDebug>
+
 #include "ddockmenu.h"
 #include "dmenubase.h"
 #include "dmenucontent.h"
@@ -13,29 +15,13 @@ DDockMenu::DDockMenu():
 {
     this->setShadowMargins(QMargins(10, 10, 10, 10));
     this->setContentsMargins(this->shadowMargins());
+    this->setMenuContentMargins(QMargins(20, 5, 10, 5));
     this->setItemLeftSpacing(10);
     this->setItemCenterSpacing(10);
     this->setItemRightSpacing(10);
 
-    QMargins menuContentMargins = QMargins(10, 10, 10, 10);
-    DMenuContent *content = new DMenuContent(this);
-    content->setContentsMargins(menuContentMargins);
-    this->resize(content->contentWidth()
-                 + this->shadowMargins().left()
-                 + this->shadowMargins().right()
-                 + menuContentMargins.left()
-                 + menuContentMargins.right(),
-                 content->contentHeight()
-                 + this->shadowMargins().top()
-                 + this->shadowMargins().bottom()
-                 + this->contentsMargins().top()
-                 + this->contentsMargins().bottom());
-
-    QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(QMargins(0, menuContentMargins.top(), 0, menuContentMargins.bottom()));
-    layout->addWidget(content);
-
-    this->setLayout(layout);
+    QSharedPointer<DMenuContent> ptr(new DMenuContent(this));
+    this->setMenuContent(ptr);
 }
 
 // override methods
@@ -78,18 +64,23 @@ void DDockMenu::setItemState(ItemState state)
         this->setItemBackgroundColor(Qt::transparent);
         this->setItemTextColor(Qt::black);
         this->setItemShortcutColor(Qt::black);
+        this->setCheckmarkIcon(":/images/check_dark_normal.png");
+        this->setSubMenuIndicatorIcon(":/images/arrow-dark.png");
         break;
     case HoverState:
         this->setItemBackgroundColor(Qt::gray);
         this->setItemTextColor(Qt::white);
         this->setItemShortcutColor(Qt::white);
+        this->setCheckmarkIcon(":/images/check_dark_hover.png");
+        this->setSubMenuIndicatorIcon(":/images/arrow-dark.png");
         break;
     case InactiveState:
         this->setItemBackgroundColor(Qt::transparent);
         this->setItemTextColor(Qt::gray);
         this->setItemShortcutColor(Qt::gray);
+        this->setCheckmarkIcon(":/images/check_dark_inactive.png");
+        this->setSubMenuIndicatorIcon(":/images/arrow-dark.png");
         break;
-    default: break;
     }
 }
 
