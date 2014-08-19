@@ -92,3 +92,8 @@ void DDockMenu::setItemState(ItemState state)
     default: break;
     }
 }
+
+void DDockMenu::setPosition(int x, int y)
+{
+    this->move(x - this->width() / 2, y - this->height() + this->shadowMargins().bottom());
+}
