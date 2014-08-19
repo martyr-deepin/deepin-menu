@@ -7,9 +7,13 @@
 #include <dmenubase.h>
 
 #define MENU_ITEM_HEIGHT 24
-#define MENU_ITEM_FONT_SIZE 14
+#define MENU_ITEM_FONT_SIZE 12
+#define MENU_ICON_SIZE 14
+#define SUB_MENU_INDICATOR_SIZE 14
+#define SEPARATOR_HEIGHT 6
 
 class QRect;
+class DMenuBase;
 class DMenuContent : public QWidget
 {
     Q_OBJECT
@@ -27,6 +31,10 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *event);
 
 private:
+    int _iconWidth;
+    int _shortcutWidth;
+    int _subMenuIndicatorWidth;
+
     int _currentIndex;
     QRect getRectOfActionAtIndex(int index);
 };

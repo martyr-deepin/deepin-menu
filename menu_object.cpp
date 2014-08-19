@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QtGlobal>
+#include <QDebug>
 
 #include "utils.h"
 #include "menu_object.h"
@@ -41,14 +42,21 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
 
     QByteArray bytes;
     bytes.append(menuJsonContent);
-    QJsonDocument doc = QJsonDocument::fromJson(bytes);
-    QJsonObject jsonObj = doc.object();
+    QJsonDocument menuDocument = QJsonDocument::fromJson(bytes);
+    QJsonObject jsonObj = menuDocument.object();
 
     if(jsonObj["isDockMenu"].toBool()) {
         this->menu = new DDockMenu();
     } else {
         this->menu = new DDesktopMenu();
     }
+
+    bytes.clear();
+    bytes.append(jsonObj["menuJsonContent"].toString());
+    QJsonDocument menuContent = QJsonDocument::fromJson(bytes);
+    QJsonObject menuContentObj = menuContent.object();
+
+    this->menu->setContent(menuContentObj["items"].toArray());
     this->menu->setPosition(jsonObj["x"].toInt(), jsonObj["y"].toInt());
     this->menu->show();
 

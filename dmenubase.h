@@ -2,11 +2,13 @@
 #define DMENUBASE_H
 
 #include <QWidget>
+#include <QSharedPointer>
 #include <QGraphicsDropShadowEffect>
 
 class QColor;
 class QMargins;
 class QJsonArray;
+class DMenuContent;
 class DMenuBase : public QWidget
 {
     Q_OBJECT
@@ -22,6 +24,7 @@ public:
 
     Q_PROPERTY(int radius READ radius WRITE setRadius NOTIFY radiusChanged)
     Q_PROPERTY(QMargins shadowMargins READ shadowMargins WRITE setShadowMargins NOTIFY shadowMarginsChanged)
+    Q_PROPERTY(QMargins menuContentMargins READ menuContentMargins WRITE setMenuContentMargins NOTIFY menuContentMarginsChanged)
     Q_PROPERTY(QColor itemBackgroundColor READ itemBackgroundColor WRITE setItemBackgroundColor NOTIFY itemBackgroundColorChanged)
     Q_PROPERTY(QColor itemTextColor READ itemTextColor WRITE setItemTextColor NOTIFY itemTextColorChanged)
     Q_PROPERTY(QColor itemShortcutColor READ itemShortcutColor WRITE setItemShortcutColor NOTIFY itemShortcutColorChanged)
@@ -33,6 +36,8 @@ public:
     void setRadius(int);
     QMargins shadowMargins();
     void setShadowMargins(QMargins);
+    QMargins menuContentMargins();
+    void setMenuContentMargins(QMargins);
     QColor itemBackgroundColor();
     void setItemBackgroundColor(QColor);
     QColor itemTextColor();
@@ -47,7 +52,15 @@ public:
     int itemRightSpacing();
     void setItemRightSpacing(int);
 
-    void setContent(const QJsonArray *items);
+    QSharedPointer<DMenuContent> menuContent();
+    void setMenuContent(QSharedPointer<DMenuContent> content);
+
+    QString checkmarkIcon();
+    void setCheckmarkIcon(QString icon);
+    QString subMenuIndicatorIcon();
+    void setSubMenuIndicatorIcon(QString icon);
+
+    void setContent(QJsonArray items);
     void destroyAll();
 
     virtual void setItemState(ItemState) = 0;
@@ -56,6 +69,7 @@ public:
 signals:
     void radiusChanged(int radius);
     void shadowMarginsChanged(QMargins shadowWidth);
+    void menuContentMarginsChanged(QMargins menuContentMargins);
     void itemBackgroundColorChanged(QColor itemBackgroundColor);
     void itemTextColorChanged(QColor itemTextColor);
     void itemShortcutColorChanged(QColor itemShortcutColor);
@@ -66,6 +80,9 @@ signals:
 private:
     int _radius;
     QMargins _shadowMargins;
+    QMargins _menuContentMargins;
+    QString _checkmarkIcon;
+    QString _subMenuIndicatorIcon;
 
     QColor _itemBackgroundColor;
     QColor _itemTextColor;
@@ -74,7 +91,10 @@ private:
     int _itemCenterSpacing;
     int _itemRightSpacing;
 
+    QSharedPointer<DMenuContent> _menuContent;
     QGraphicsDropShadowEffect *_dropShadow;
+
+    bool menuItemCheckableFromId(QString);
 };
 
 #endif // DMENUBASE_H
