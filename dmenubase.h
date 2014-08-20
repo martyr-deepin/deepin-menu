@@ -60,11 +60,16 @@ public:
     QString subMenuIndicatorIcon();
     void setSubMenuIndicatorIcon(QString icon);
 
+    DMenuBase *subMenu();
+
     void setContent(QJsonArray items);
     void destroyAll();
+    void grabFocus();
+    bool pointInMenuArea(QPoint);
 
     virtual void setItemState(ItemState) = 0;
     virtual void setPosition(int, int) = 0;
+    virtual void showSubMenu(int, int, QJsonObject) = 0;
 
 signals:
     void radiusChanged(int radius);
@@ -76,6 +81,11 @@ signals:
     void itemLeftSpacingChanged(int itemLeftSpacing);
     void itemCenterSpacingChanged(int itemCenterSpacing);
     void itemRightSpacingChanged(int itemRightSpacing);
+
+    void itemClicked(QString id, bool checked);
+
+protected:
+    DMenuBase *_subMenu;
 
 private:
     int _radius;
@@ -93,8 +103,6 @@ private:
 
     QSharedPointer<DMenuContent> _menuContent;
     QGraphicsDropShadowEffect *_dropShadow;
-
-    bool menuItemCheckableFromId(QString);
 };
 
 #endif // DMENUBASE_H

@@ -2,36 +2,35 @@
 #define UTILS_H
 
 #include <QObject>
+#include <QStringList>
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
 
 class QX11Info;
+class QString;
+class QPoint;
+class QRect;
 
 class Utils : public QObject
 {
     Q_OBJECT
 
 public:
-    static Utils* instance() {
-        static Utils *utils = new Utils();
-        return utils;
+    static bool menuItemCheckableFromId(QString id) {
+        return id.split(':').count() == 3;
     }
+
+    static QString toMenuItemText(QString text);
+
+    static void grabKeyboard(xcb_window_t);
+    static void grabPointer(xcb_window_t);
+
+    static bool pointInRect(QPoint, QRect);
 
 private:
     Utils();
     Utils(const Utils &);
     Utils& operator=(const Utils &);
-
-signals:
-    void itemClicked(const QString &id, bool checked);
-    void menuDisappeared();
-
-public slots:
-    void grabKeyboard(xcb_window_t);
-    void grabPointer(xcb_window_t);
-
-private:
-    xcb_connection_t *conn;
 };
 
 #endif // UTILS_H

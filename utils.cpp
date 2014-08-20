@@ -4,15 +4,13 @@
 #include <xcb/xproto.h>
 
 #include <QtX11Extras/QX11Info>
+#include <QPoint>
+#include <QRect>
 #include <QDebug>
-
-Utils::Utils()
-{
-    conn = QX11Info::connection();
-}
 
 void Utils::grabKeyboard(xcb_window_t window)
 {
+    xcb_connection_t *conn = QX11Info::connection();
     xcb_grab_keyboard_cookie_t cookie = xcb_grab_keyboard(conn,
                                                           true,                /* report events */
                                                           window,
@@ -31,6 +29,7 @@ void Utils::grabKeyboard(xcb_window_t window)
 }
 
 void Utils::grabPointer(xcb_window_t window) {
+    xcb_connection_t *conn = QX11Info::connection();
     xcb_grab_pointer_cookie_t cookie = xcb_grab_pointer(conn,
                                                         true,               /* get all pointer events specified by the following mask */
                                                         window,
@@ -48,4 +47,13 @@ void Utils::grabPointer(xcb_window_t window) {
             qDebug() << "successfully grabbed the pointer\n";
         free(reply);
     }
+}
+
+bool Utils::pointInRect(QPoint point, QRect rect)
+{
+    return rect.x() <= point.x() &&
+            point.x() <= rect.x() + rect.width() &&
+            rect.y() <= point.y() &&
+            point.y() <= rect.y() + rect.height();
+
 }

@@ -22,6 +22,9 @@ public slots:
 
     void destroyMenu();
 
+private slots:
+    void menuDestroiedSlot();
+
 private:
     DMenuBase *menu;
 };
