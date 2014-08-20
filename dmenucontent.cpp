@@ -96,13 +96,16 @@ void DMenuContent::doCurrentAction()
     Q_ASSERT(parent);
 
     QAction *currentAction = this->actions().at(_currentIndex);
+    QString itemId = currentAction->property("itemId").toString();
+    QVariant checkedCache = parent->getRootMenu()->property(itemId.toLatin1());
+    bool checked = checkedCache.isNull() ? currentAction->isChecked() : checkedCache.toBool();
+
     if (currentAction->isCheckable()) {
-        if (currentAction->isChecked()) {
+        if (checked) {
             this->doUnCheck(_currentIndex);
         } else {
             this->doCheck(_currentIndex);
         }
-        this->sendItemClickedSignal(currentAction->property("itemId").toString(), currentAction->isChecked());
     } else if (!currentAction->text().isEmpty() && currentAction->isEnabled()) {
         this->sendItemClickedSignal(currentAction->property("itemId").toString(), false);
         parent->destroyAll();
@@ -110,7 +113,7 @@ void DMenuContent::doCurrentAction()
 }
 
 // override methods
-void DMenuContent::paintEvent(QPaintEvent * event)
+void DMenuContent::paintEvent(QPaintEvent *)
 {
     DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
     QFont font;
@@ -120,11 +123,15 @@ void DMenuContent::paintEvent(QPaintEvent * event)
 
     for(int i = 0; i < this->actions().count(); i++) {
     	QAction *action = this->actions().at(i);
-        DMenuBase::ItemState itemState = i == _currentIndex ? DMenuBase::HoverState : DMenuBase::NormalState;
-        parent->setItemState(itemState);
-
         QRect actionRect = this->getRectOfActionAtIndex(i);
         QRect actionRectWidthMargins = actionRect.marginsRemoved(QMargins(this->contentsMargins().left(), 0, this->contentsMargins().right(), 0));
+        QString itemId = action->property("itemId").toString();
+
+        QString prop("%1Active");
+        QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
+        bool active = activeCache.isNull() ? action->isEnabled() : activeCache.toBool();
+        DMenuBase::ItemState itemState = active ? i == _currentIndex ? DMenuBase::HoverState : DMenuBase::NormalState : DMenuBase::InactiveState;
+        parent->setItemState(itemState);
 
         // indicates that this item is a separator
         if (action->text().isEmpty()) {
@@ -146,21 +153,30 @@ void DMenuContent::paintEvent(QPaintEvent * event)
 
             // draw icon
             if(_iconWidth) {
+                qDebug() << action->property("itemId").toString() << action->isCheckable() << action->isChecked();
                 QRect iconRect = QRect(actionRectWidthMargins.x(),
                                        actionRectWidthMargins.y() + (MENU_ITEM_HEIGHT - MENU_ICON_SIZE) / 2,
                                        MENU_ICON_SIZE, MENU_ICON_SIZE);
+                QString prop("%1Checked");
+                QVariant checkedCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
+                bool checked = checkedCache.isNull() ? action->isChecked() : checkedCache.toBool();
 
-                if (!action->property("itemIcon").isNull() || \
-                    !action->property("itemIconHover").isNull() || \
-                    !action->property("itemIconInactive").isNull())
+                if (!action->property("itemIcon").toString().isEmpty() || \
+                    !action->property("itemIconHover").toString().isEmpty() || \
+                    !action->property("itemIconInactive").toString().isEmpty())
                 {
+                    qDebug() << "draw icon";
                     painter.drawPixmap(iconRect, action->icon().pixmap(MENU_ICON_SIZE, MENU_ICON_SIZE));
-                } else if (action->isCheckable()) {
+                } else if (action->isCheckable() && checked) {
+                    qDebug() << "draw checkmark";
                     painter.drawImage(iconRect, QImage(parent->checkmarkIcon()));
                 }
             }
 
             // draw text
+            QString prop("%1Text");
+            QVariant textCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
+            QString text = textCache.isNull() ? action->text() : textCache.toString();
             QRect textRect = painter.boundingRect(QRect(actionRectWidthMargins.x() + _iconWidth,
                                                         actionRectWidthMargins.y(),
                                                         actionRectWidthMargins.width(),
@@ -193,21 +209,27 @@ void DMenuContent::mouseMoveEvent(QMouseEvent *event)
 {
     DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
     Q_ASSERT(parent);
-    int previousHeight = this->rect().y();
 
-    for (int i = 0; i < this->actions().count(); i++) {
-        QAction *action = this->actions().at(i);
-        int itemHeight = this->actions().at(i)->text().isEmpty() ? SEPARATOR_HEIGHT : MENU_ITEM_HEIGHT;
+    DMenuBase *menuUnderCursor = parent->menuUnderPoint(event->globalPos());
+    if (menuUnderCursor == parent) {
+        int previousHeight = this->rect().y();
 
-        if (previousHeight <= event->y() &&
-                event->y() <= previousHeight + itemHeight &&
-                this->rect().x() <= event->x() &&
-                event->x() <= this->rect().x() + this->rect().width()) {
-            this->setCurrentIndex(i);
-            break;
-        } else {
-            previousHeight += itemHeight;
+        for (int i = 0; i < this->actions().count(); i++) {
+            QAction *action = this->actions().at(i);
+            int itemHeight = action->text().isEmpty() ? SEPARATOR_HEIGHT : MENU_ITEM_HEIGHT;
+
+            if (previousHeight <= event->y() &&
+                    event->y() <= previousHeight + itemHeight &&
+                    this->rect().x() <= event->x() &&
+                    event->x() <= this->rect().x() + this->rect().width()) {
+                this->setCurrentIndex(i);
+                break;
+            } else {
+                previousHeight += itemHeight;
+            }
         }
+    } else if (menuUnderCursor){
+        menuUnderCursor->grabFocus();
     }
 }
 
@@ -217,7 +239,7 @@ void DMenuContent::mousePressEvent(QMouseEvent *event)
     DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
     Q_ASSERT(parent);
 
-    if (!parent->pointInMenuArea(event->globalPos())) {
+    if (!parent->menuUnderPoint(event->globalPos())) {
         parent->destroyAll();
     } else if (Utils::pointInRect(event->globalPos(), parent->geometry())){
         this->doCurrentAction();
@@ -312,12 +334,44 @@ int DMenuContent::getNextItemsHasShortcut(int startPos, QString keyText) {
 }
 
 void DMenuContent::doCheck(int index) {
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
 
+    QAction *action = this->actions().at(index);
+    QString itemId = action->property("itemId").toString();
+    QString prop("%1Checked");
+    parent->getRootMenu()->setProperty(prop.arg(itemId).toLatin1(), true);
+    this->sendItemClickedSignal(itemId, true);
+
+    QStringList components = itemId.split(':');
+    QString group = components.at(0);
+
+    foreach (QAction *act, this->actions()) {
+        if (act != action && act->isCheckable()) {
+            QString _itemId = act->property("itemId").toString();
+            QStringList _components = _itemId.split(':');
+            QString _group = _components.at(0);
+            QString _type = _components.at(1);
+
+            if (_type == "radio" && _group == group) {
+                parent->getRootMenu()->setProperty(prop.arg(_itemId).toLatin1(), false);
+            }
+        }
+    }
+
+    this->update();
 }
 
 void DMenuContent::doUnCheck(int index)
 {
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
 
+    QAction *action = this->actions().at(index);
+    parent->getRootMenu()->setProperty(action->property("itemId").toString().toLatin1(), false);
+    this->sendItemClickedSignal(action->property("itemId").toString(), false);
+
+    this->update();
 }
 
 void DMenuContent::sendItemClickedSignal(QString id, bool checked)

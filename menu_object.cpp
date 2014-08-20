@@ -20,17 +20,17 @@ MenuObject::MenuObject(ManagerObject *manager):
 
 void MenuObject::SetItemActivity(const QString &itemId, bool isActive)
 {
-
+    if (this->menu) this->menu->setItemActivity(itemId, isActive);
 }
 
 void MenuObject::SetItemChecked(const QString &itemId, bool checked)
 {
-
+    if (this->menu) this->menu->setItemChecked(itemId, checked);
 }
 
 void MenuObject::SetItemText(const QString &itemId, const QString &text)
 {
-
+    if (this->menu) this->menu->setItemText(itemId, text);
 }
 
 void MenuObject::ShowMenu(const QString &menuJsonContent)
