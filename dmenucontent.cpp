@@ -17,6 +17,12 @@
 #include "dmenubase.h"
 #include "dmenucontent.h"
 
+#define MENU_ITEM_HEIGHT 24
+#define MENU_ITEM_FONT_SIZE 12
+#define MENU_ICON_SIZE 14
+#define SUB_MENU_INDICATOR_SIZE 14
+#define SEPARATOR_HEIGHT 6
+
 DMenuContent::DMenuContent(DMenuBase *parent) :
     QWidget(parent),
     _currentIndex(-1)
@@ -39,9 +45,18 @@ void DMenuContent::setCurrentIndex(int index)
     DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
     Q_ASSERT(parent);
 
+    QAction *action = this->actions().at(index);
     QRect actionRect = this->getRectOfActionAtIndex(index);
     QPoint point = this->mapToGlobal(QPoint(this->width(), actionRect.y()));
-    QJsonObject subMenuJsonObj = this->actions().at(index)->property("itemSubMenu").value<QJsonObject>();
+    QString itemId = action->property("itemId").toString();
+
+    QString prop("%1Active");
+    QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
+    bool active = activeCache.isNull() ? action->isEnabled() : activeCache.toBool();
+
+    QJsonObject subMenuJsonObj = active ?
+                this->actions().at(index)->property("itemSubMenu").value<QJsonObject>()
+              : QJsonObject();
     parent->showSubMenu(point.x(), point.y(), subMenuJsonObj);
 }
 
@@ -57,15 +72,19 @@ int DMenuContent::contentWidth()
     font.setPixelSize(MENU_ITEM_FONT_SIZE);
     QFontMetrics metrics(font);
     foreach (QAction *action, this->actions()) {
+        /*
         if(!action->property("itemIcon").toString().isEmpty() || \
            !action->property("itemIconHover").toString().isEmpty() || \
            !action->property("itemIconInactive").toString().isEmpty() || \
            action->isCheckable()) {
             _iconWidth = MENU_ICON_SIZE + parent->itemLeftSpacing();
         }
+        */
+        _iconWidth = MENU_ICON_SIZE + parent->itemLeftSpacing();
         if(!action->shortcut().isEmpty()) _shortcutWidth = qMax(_shortcutWidth, metrics.width(action->shortcut().toString()) + parent->itemCenterSpacing());
-        bool hasSubMenu = action->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0;
-        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
+//        bool hasSubMenu = action->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0;
+//        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
+        _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
 
         result = qMax(result, metrics.width(action->text()));
     }
@@ -99,6 +118,7 @@ void DMenuContent::doCurrentAction()
     QString itemId = currentAction->property("itemId").toString();
     QVariant checkedCache = parent->getRootMenu()->property(itemId.toLatin1());
     bool checked = checkedCache.isNull() ? currentAction->isChecked() : checkedCache.toBool();
+    bool currentActionHasSubMenu = currentAction->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0;
 
     if (currentAction->isCheckable()) {
         if (checked) {
@@ -106,7 +126,9 @@ void DMenuContent::doCurrentAction()
         } else {
             this->doCheck(_currentIndex);
         }
-    } else if (!currentAction->text().isEmpty() && currentAction->isEnabled()) {
+    } else if (!currentActionHasSubMenu &&
+               !currentAction->text().isEmpty() &&
+               currentAction->isEnabled()) {
         this->sendItemClickedSignal(currentAction->property("itemId").toString(), false);
         parent->destroyAll();
     }
@@ -130,8 +152,7 @@ void DMenuContent::paintEvent(QPaintEvent *)
         QString prop("%1Active");
         QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
         bool active = activeCache.isNull() ? action->isEnabled() : activeCache.toBool();
-        DMenuBase::ItemState itemState = active ? i == _currentIndex ? DMenuBase::HoverState : DMenuBase::NormalState : DMenuBase::InactiveState;
-        parent->setItemState(itemState);
+        DMenuBase::ItemStyle itemStyle = active ? i == _currentIndex ? parent->hoverStyle() : parent->normalStyle() : parent->inactiveStyle();
 
         // indicates that this item is a separator
         if (action->text().isEmpty()) {
@@ -148,12 +169,11 @@ void DMenuContent::paintEvent(QPaintEvent *)
             painter.setPen(QPen(QColor::fromRgbF(1, 1, 1, 0.1)));
             painter.drawLine(bottomLineX1, bottomLineY1, bottomLineX2, bottomLineY2);
         } else {
-            painter.fillRect(actionRect, QBrush(parent->itemBackgroundColor()));
-            painter.setPen(QPen(parent->itemTextColor()));
+            painter.fillRect(actionRect, QBrush(itemStyle.itemBackgroundColor));
+            painter.setPen(QPen(itemStyle.itemTextColor));
 
             // draw icon
             if(_iconWidth) {
-                qDebug() << action->property("itemId").toString() << action->isCheckable() << action->isChecked();
                 QRect iconRect = QRect(actionRectWidthMargins.x(),
                                        actionRectWidthMargins.y() + (MENU_ITEM_HEIGHT - MENU_ICON_SIZE) / 2,
                                        MENU_ICON_SIZE, MENU_ICON_SIZE);
@@ -166,10 +186,16 @@ void DMenuContent::paintEvent(QPaintEvent *)
                     !action->property("itemIconInactive").toString().isEmpty())
                 {
                     qDebug() << "draw icon";
-                    painter.drawPixmap(iconRect, action->icon().pixmap(MENU_ICON_SIZE, MENU_ICON_SIZE));
+                    if (!active) {
+                        painter.drawImage(iconRect, QImage(action->property("itemIconInactive").toString()));
+                    } else if (_currentIndex == i) {
+                        painter.drawImage(iconRect, QImage(action->property("itemIconHover").toString()));
+                    } else {
+                        painter.drawImage(iconRect, QImage(action->property("itemIcon").toString()));
+                    }
                 } else if (action->isCheckable() && checked) {
                     qDebug() << "draw checkmark";
-                    painter.drawImage(iconRect, QImage(parent->checkmarkIcon()));
+                    painter.drawImage(iconRect, QImage(itemStyle.checkmarkIcon));
                 }
             }
 
@@ -200,7 +226,7 @@ void DMenuContent::paintEvent(QPaintEvent *)
                 painter.drawImage(QRect(actionRectWidthMargins.x() + actionRectWidthMargins.width() - SUB_MENU_INDICATOR_SIZE,
                                         actionRectWidthMargins.y() + (MENU_ITEM_HEIGHT - MENU_ICON_SIZE) / 2,
                                         SUB_MENU_INDICATOR_SIZE, SUB_MENU_INDICATOR_SIZE),
-                                  QImage(parent->subMenuIndicatorIcon()));
+                                  QImage(itemStyle.subMenuIndicatorIcon));
         }
     }
 }
@@ -230,19 +256,6 @@ void DMenuContent::mouseMoveEvent(QMouseEvent *event)
         }
     } else if (menuUnderCursor){
         menuUnderCursor->grabFocus();
-    }
-}
-
-void DMenuContent::mousePressEvent(QMouseEvent *event)
-{
-    qDebug() << event->globalPos();
-    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
-    Q_ASSERT(parent);
-
-    if (!parent->menuUnderPoint(event->globalPos())) {
-        parent->destroyAll();
-    } else if (Utils::pointInRect(event->globalPos(), parent->geometry())){
-        this->doCurrentAction();
     }
 }
 

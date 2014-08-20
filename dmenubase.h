@@ -8,6 +8,7 @@
 class QColor;
 class QMargins;
 class QJsonArray;
+class QByteArray;
 class DMenuContent;
 class DMenuBase : public QWidget
 {
@@ -16,18 +17,17 @@ class DMenuBase : public QWidget
 public:
     explicit DMenuBase(QWidget *parent = 0);
 
-    enum ItemState {
-        NormalState,
-        HoverState,
-        InactiveState
+    struct ItemStyle {
+        QColor itemBackgroundColor;
+        QColor itemTextColor;
+        QColor itemShortcutColor;
+        QString checkmarkIcon;
+        QString subMenuIndicatorIcon;
     };
 
     Q_PROPERTY(int radius READ radius WRITE setRadius NOTIFY radiusChanged)
     Q_PROPERTY(QMargins shadowMargins READ shadowMargins WRITE setShadowMargins NOTIFY shadowMarginsChanged)
     Q_PROPERTY(QMargins menuContentMargins READ menuContentMargins WRITE setMenuContentMargins NOTIFY menuContentMarginsChanged)
-    Q_PROPERTY(QColor itemBackgroundColor READ itemBackgroundColor WRITE setItemBackgroundColor NOTIFY itemBackgroundColorChanged)
-    Q_PROPERTY(QColor itemTextColor READ itemTextColor WRITE setItemTextColor NOTIFY itemTextColorChanged)
-    Q_PROPERTY(QColor itemShortcutColor READ itemShortcutColor WRITE setItemShortcutColor NOTIFY itemShortcutColorChanged)
     Q_PROPERTY(int itemLeftSpacing READ itemLeftSpacing WRITE setItemLeftSpacing NOTIFY itemLeftSpacingChanged)
     Q_PROPERTY(int itemCenterSpacing READ itemCenterSpacing WRITE setItemCenterSpacing NOTIFY itemCenterSpacingChanged)
     Q_PROPERTY(int itemRightSpacing READ itemRightSpacing WRITE setItemRightSpacing NOTIFY itemRightSpacingChanged)
@@ -38,12 +38,6 @@ public:
     void setShadowMargins(QMargins);
     QMargins menuContentMargins();
     void setMenuContentMargins(QMargins);
-    QColor itemBackgroundColor();
-    void setItemBackgroundColor(QColor);
-    QColor itemTextColor();
-    void setItemTextColor(QColor);
-    QColor itemShortcutColor();
-    void setItemShortcutColor(QColor);
 
     int itemLeftSpacing();
     void setItemLeftSpacing(int);
@@ -54,11 +48,6 @@ public:
 
     QSharedPointer<DMenuContent> menuContent();
     void setMenuContent(QSharedPointer<DMenuContent> content);
-
-    QString checkmarkIcon();
-    void setCheckmarkIcon(QString icon);
-    QString subMenuIndicatorIcon();
-    void setSubMenuIndicatorIcon(QString icon);
 
     DMenuBase *subMenu();
 
@@ -72,7 +61,10 @@ public:
     void setItemChecked(const QString &itemId, bool checked);
     void setItemText(const QString &itemId, const QString &text);
 
-    virtual void setItemState(ItemState) = 0;
+    const ItemStyle normalStyle();
+    const ItemStyle hoverStyle();
+    const ItemStyle inactiveStyle();
+
     virtual void setPosition(int, int) = 0;
     virtual void showSubMenu(int, int, QJsonObject) = 0;
 
@@ -91,17 +83,17 @@ signals:
 
 protected:
     DMenuBase *_subMenu;
+    ItemStyle _normalStyle;
+    ItemStyle _hoverStyle;
+    ItemStyle _inactiveStyle;
+
+    bool nativeEvent(const QByteArray &, void *, long *);
 
 private:
     int _radius;
     QMargins _shadowMargins;
     QMargins _menuContentMargins;
-    QString _checkmarkIcon;
-    QString _subMenuIndicatorIcon;
 
-    QColor _itemBackgroundColor;
-    QColor _itemTextColor;
-    QColor _itemShortcutColor;
     int _itemLeftSpacing;
     int _itemCenterSpacing;
     int _itemRightSpacing;

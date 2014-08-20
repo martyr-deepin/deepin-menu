@@ -9,7 +9,6 @@ class DDesktopMenu : public DMenuBase
 public:
     DDesktopMenu(DDesktopMenu *parent=0);
 
-    virtual void setItemState(ItemState);
     virtual void setPosition(int, int);
 
 protected:
