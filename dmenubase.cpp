@@ -266,21 +266,54 @@ void DMenuBase::grabFocus()
     this->menuContent()->grabKeyboard();
 }
 
-bool DMenuBase::pointInMenuArea(QPoint point)
+DMenuBase *DMenuBase::menuUnderPoint(QPoint point)
 {
     if(this->parent()) {
         DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
         Q_ASSERT(parent);
 
-        return parent->pointInMenuArea(point);
+        return parent->menuUnderPoint(point);
     } else {
         DMenuBase *subMenu =this;
         while (subMenu) {
             if (Utils::pointInRect(point, subMenu->geometry())) {
-                return true;
+                return subMenu;
             }
             subMenu = subMenu->subMenu();
         }
-        return false;
+        return NULL;
     }
+}
+
+void DMenuBase::setItemActivity(const QString &itemId, bool isActive)
+{
+    QString prop("%1Activity");
+    this->setProperty(prop.arg(itemId).toLatin1(), isActive);
+}
+
+void DMenuBase::setItemChecked(const QString &itemId, bool checked)
+{
+    QString prop("%1Checked");
+    this->setProperty(prop.arg(itemId).toLatin1(), checked);
+}
+
+void DMenuBase::setItemText(const QString &itemId, const QString &text)
+{
+    QString prop("%1Text");
+    this->setProperty(prop.arg(itemId).toLatin1(), text);
+}
+
+
+DMenuBase *DMenuBase::getRootMenu()
+{
+    DMenuBase *root = this;
+    while (root) {
+        if (root->parent()) {
+            root = qobject_cast<DMenuBase *>(root->parent());
+            Q_ASSERT(root);
+        } else {
+            break;
+        }
+    }
+    return root;
 }

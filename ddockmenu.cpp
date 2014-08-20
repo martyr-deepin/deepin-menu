@@ -93,6 +93,6 @@ void DDockMenu::setPosition(int x, int y)
     this->move(x - this->width() / 2, y - this->height() + this->shadowMargins().bottom());
 }
 
-void DDockMenu::showSubMenu(int x, int y, QJsonObject obj)
+void DDockMenu::showSubMenu(int, int, QJsonObject)
 {
 }
