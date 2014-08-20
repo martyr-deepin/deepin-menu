@@ -14,7 +14,7 @@ DDesktopMenu::DDesktopMenu(DDesktopMenu *parent):
 {
     this->setShadowMargins(QMargins(10, 10, 10, 10));
     this->setContentsMargins(this->shadowMargins());
-    this->setMenuContentMargins(QMargins(20, 5, 10, 5));
+    this->setMenuContentMargins(QMargins(20, 5, 15, 5));
     this->setItemLeftSpacing(10);
     this->setItemCenterSpacing(20);
     this->setItemRightSpacing(20);
@@ -24,7 +24,7 @@ DDesktopMenu::DDesktopMenu(DDesktopMenu *parent):
 }
 
 // override methods
-void DDesktopMenu::paintEvent(QPaintEvent * event)
+void DDesktopMenu::paintEvent(QPaintEvent *)
 {
     QRect rect = this->rect().marginsRemoved(shadowMargins());
 

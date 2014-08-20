@@ -65,7 +65,12 @@ public:
     void setContent(QJsonArray items);
     void destroyAll();
     void grabFocus();
-    bool pointInMenuArea(QPoint);
+    DMenuBase *menuUnderPoint(QPoint);
+    DMenuBase *getRootMenu();
+
+    void setItemActivity(const QString &itemId, bool isActive);
+    void setItemChecked(const QString &itemId, bool checked);
+    void setItemText(const QString &itemId, const QString &text);
 
     virtual void setItemState(ItemState) = 0;
     virtual void setPosition(int, int) = 0;
