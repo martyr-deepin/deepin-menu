@@ -6,7 +6,11 @@
 #include <QHBoxLayout>
 #include <QSharedPointer>
 #include <QRegExp>
+#include <QPoint>
 #include <QDebug>
+
+#include <xcb/xcb.h>
+#include <xcb/xproto.h>
 
 #include "dmenubase.h"
 #include "dmenucontent.h"
@@ -16,9 +20,7 @@ DMenuBase::DMenuBase(QWidget *parent) :
     QWidget(parent, Qt::Tool | Qt::BypassWindowManagerHint),
     _subMenu(NULL),
     _radius(4),
-    _shadowMargins(QMargins(0, 0, 0, 0)),
-    _checkmarkIcon(""),
-    _subMenuIndicatorIcon("")
+    _shadowMargins(QMargins(0, 0, 0, 0))
 {
     this->setAttribute(Qt::WA_TranslucentBackground);
 
@@ -74,48 +76,6 @@ void DMenuBase::setMenuContentMargins(QMargins margins)
     }
 }
 
-QColor DMenuBase::itemBackgroundColor()
-{
-    return _itemBackgroundColor;
-}
-
-void DMenuBase::setItemBackgroundColor(QColor color)
-{
-    if (_itemBackgroundColor != color) {
-        _itemBackgroundColor = color;
-
-        emit itemBackgroundColorChanged(color);
-    }
-}
-
-QColor DMenuBase::itemTextColor()
-{
-    return _itemTextColor;
-}
-
-void DMenuBase::setItemTextColor(QColor color)
-{
-    if (_itemTextColor != color) {
-        _itemTextColor = color;
-
-        emit itemTextColorChanged(color);
-    }
-}
-
-QColor DMenuBase::itemShortcutColor()
-{
-    return _itemShortcutColor;
-}
-
-void DMenuBase::setItemShortcutColor(QColor color)
-{
-    if (_itemShortcutColor != color) {
-        _itemShortcutColor = color;
-
-        emit itemShortcutColorChanged(color);
-    }
-}
-
 int DMenuBase::itemLeftSpacing()
 {
     return _itemLeftSpacing;
@@ -155,30 +115,6 @@ void DMenuBase::setItemRightSpacing(int spacing)
         _itemRightSpacing = spacing;
 
         emit itemRightSpacingChanged(spacing);
-    }
-}
-
-QString DMenuBase::checkmarkIcon()
-{
-    return _checkmarkIcon;
-}
-
-void DMenuBase::setCheckmarkIcon(QString icon)
-{
-    if(icon != _checkmarkIcon) {
-        _checkmarkIcon = icon;
-    }
-}
-
-QString DMenuBase::subMenuIndicatorIcon()
-{
-    return _subMenuIndicatorIcon;
-}
-
-void DMenuBase::setSubMenuIndicatorIcon(QString icon)
-{
-    if(icon != _subMenuIndicatorIcon) {
-        _subMenuIndicatorIcon = icon;
     }
 }
 
@@ -260,10 +196,8 @@ void DMenuBase::destroyAll()
 
 void DMenuBase::grabFocus()
 {
-//    Utils::grabPointer(this->winId());
-//    Utils::grabKeyboard(this->winId());
-    this->menuContent()->grabMouse();
     this->menuContent()->grabKeyboard();
+    this->menuContent()->grabMouse();
 }
 
 DMenuBase *DMenuBase::menuUnderPoint(QPoint point)
@@ -303,6 +237,20 @@ void DMenuBase::setItemText(const QString &itemId, const QString &text)
     this->setProperty(prop.arg(itemId).toLatin1(), text);
 }
 
+const DMenuBase::ItemStyle DMenuBase::normalStyle()
+{
+    return _normalStyle;
+}
+
+const DMenuBase::ItemStyle DMenuBase::hoverStyle()
+{
+    return _hoverStyle;
+}
+
+const DMenuBase::ItemStyle DMenuBase::inactiveStyle()
+{
+    return _inactiveStyle;
+}
 
 DMenuBase *DMenuBase::getRootMenu()
 {
@@ -319,4 +267,25 @@ DMenuBase *DMenuBase::getRootMenu()
     Q_ASSERT(result);
 
     return result;
+}
+
+// override methods
+bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
+{
+    if (eventType=="xcb_generic_event_t") {
+        xcb_generic_event_t *event = static_cast<xcb_generic_event_t*>(message);
+        const uint8_t responseType = event->response_type & ~0x80;
+
+        if (responseType == XCB_BUTTON_PRESS) {
+            xcb_button_press_event_t *ev = reinterpret_cast<xcb_button_press_event_t*>(event);
+            qDebug() << "nativeEvent" <<  responseType <<
+                        ev->detail << ev->child << ev->root_x << ev->root_y;
+            if (!this->menuUnderPoint(QPoint(ev->root_x, ev->root_y))) {
+                this->destroyAll();
+            } else if (_menuContent){
+                _menuContent->doCurrentAction();
+            }
+        }
+    }
+    return false;
 }

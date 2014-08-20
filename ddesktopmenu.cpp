@@ -3,8 +3,10 @@
 #include <QBrush>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QtGlobal>
 #include <QDebug>
 
+#include "utils.h"
 #include "dmenubase.h"
 #include "ddesktopmenu.h"
 #include "dmenucontent.h"
@@ -14,10 +16,26 @@ DDesktopMenu::DDesktopMenu(DDesktopMenu *parent):
 {
     this->setShadowMargins(QMargins(10, 10, 10, 10));
     this->setContentsMargins(this->shadowMargins());
-    this->setMenuContentMargins(QMargins(20, 5, 15, 5));
+    this->setMenuContentMargins(QMargins(5, 5, 5, 5));
     this->setItemLeftSpacing(10);
     this->setItemCenterSpacing(20);
     this->setItemRightSpacing(20);
+
+    this->_normalStyle = { Qt::transparent,
+                           Qt::black,
+                           QColor("#636363"),
+                           ":/images/check_light_normal.png",
+                           ":/images/arrow-light.png" };
+    this->_hoverStyle = { QColor("#535353"),
+                          Qt::white,
+                          QColor("#636363"),
+                          ":/images/check_light_hover.png",
+                          ":/images/arrow-light-hover.png" };
+    this->_inactiveStyle = { Qt::transparent,
+                             QColor("#b4b4b4"),
+                             QColor("#636363"),
+                             ":/images/check_light_inactive.png",
+                             ":/images/arrow-light.png" };
 
     QSharedPointer<DMenuContent> ptr(new DMenuContent(this));
     this->setMenuContent(ptr);
@@ -37,36 +55,52 @@ void DDesktopMenu::paintEvent(QPaintEvent *)
     painter.fillPath(border, QBrush(Qt::white));
 }
 
-void DDesktopMenu::setItemState(ItemState state)
-{
-    switch (state) {
-    case NormalState:
-        this->setItemBackgroundColor(Qt::transparent);
-        this->setItemTextColor(Qt::black);
-        this->setItemShortcutColor(QColor("#636363"));
-        this->setCheckmarkIcon(":/images/check_light_normal.png");
-        this->setSubMenuIndicatorIcon(":/images/arrow-light.png");
-        break;
-    case HoverState:
-        this->setItemBackgroundColor(QColor("#535353"));
-        this->setItemTextColor(Qt::white);
-        this->setItemShortcutColor(QColor("#636363"));
-        this->setCheckmarkIcon(":/images/check_light_hover.png");
-        this->setSubMenuIndicatorIcon(":/images/arrow-light-hover.png");
-        break;
-    case InactiveState:
-        this->setItemBackgroundColor(Qt::transparent);
-        this->setItemTextColor(QColor("#b4b4b4"));
-        this->setItemShortcutColor(QColor("#636363"));
-        this->setCheckmarkIcon(":/images/check_light_inactive.png");
-        this->setSubMenuIndicatorIcon(":/images/arrow-light.png");
-        break;
-    }
-}
-
 void DDesktopMenu::setPosition(int x, int y)
 {
-    this->move(x - this->shadowMargins().left(), y - this->shadowMargins().top());
+//    DMenuBase *rootMenu = this->getRootMenu();
+//    QPoint rootMenuPos = rootMenu->mapToGlobal(QPoint(1, 1));
+//    qDebug() << rootMenuPos;
+    QPoint point(x - this->shadowMargins().left(),
+                 y - this->shadowMargins().top());
+//    QRect currentMonitorRect = Utils::currentMonitorRect(rootMenuPos.x(), rootMenuPos.y());
+        QRect currentMonitorRect = Utils::currentMonitorRect(point.x(), point.y());
+
+    if (point.x()
+            + this->width()
+            - this->shadowMargins().left()
+            - this->shadowMargins().right()
+            > currentMonitorRect.x()
+            + currentMonitorRect.width()) {
+        if (this->parent()) {
+            DMenuBase *parent = qobject_cast<DMenuBase *>(this->parent());
+            Q_ASSERT(parent);
+
+            point.setX(parent->x()
+                       + parent->shadowMargins().left()
+                       - this->width()
+                       + this->shadowMargins().right());
+        } else {
+            point.setX(currentMonitorRect.x()
+                       + currentMonitorRect.width()
+                       - this->width()
+                       + this->shadowMargins().right());
+        }
+    }
+
+    if (point.y()
+            + this->height()
+            - this->shadowMargins().top()
+            - this->shadowMargins().bottom()
+            > currentMonitorRect.y()
+            + currentMonitorRect.height()) {
+        point.setY(currentMonitorRect.y()
+                   + currentMonitorRect.height()
+                   - this->height()
+                   + this->shadowMargins().bottom());
+
+    }
+
+    this->move(point);
 }
 
 void DDesktopMenu::showSubMenu(int x, int y, QJsonObject subMenuJsonObject)
@@ -80,6 +114,7 @@ void DDesktopMenu::showSubMenu(int x, int y, QJsonObject subMenuJsonObject)
         _subMenu->setPosition(x, y);
         _subMenu->show();
     } else if (_subMenu && _subMenu->isVisible()) {
-        _subMenu->hide();
+        _subMenu->deleteLater();
+        _subMenu = NULL;
     }
 }

@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = deepin-menu
 TEMPLATE = app
 
+CONFIG += c++11
 
 SOURCES += main.cpp \
     dmenubase.cpp \
@@ -38,3 +39,6 @@ LIBS += -lxcb
 
 RESOURCES += \
     images.qrc
+
+target.path = /usr/lib
+INSTALLS += target

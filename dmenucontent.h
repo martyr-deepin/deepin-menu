@@ -6,12 +6,6 @@
 
 #include <dmenubase.h>
 
-#define MENU_ITEM_HEIGHT 24
-#define MENU_ITEM_FONT_SIZE 12
-#define MENU_ICON_SIZE 14
-#define SUB_MENU_INDICATOR_SIZE 14
-#define SEPARATOR_HEIGHT 6
-
 class QRect;
 class DMenuBase;
 class DMenuContent : public QWidget
@@ -32,7 +26,6 @@ public:
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
-    virtual void mousePressEvent(QMouseEvent *event);
     virtual void keyPressEvent(QKeyEvent *event);
 
 private:

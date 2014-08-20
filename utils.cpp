@@ -6,9 +6,25 @@
 #include <QtX11Extras/QX11Info>
 #include <QPoint>
 #include <QRect>
+#include <QDBusConnection>
+#include <QDBusInterface>
+#include <QDBusReply>
+#include <QDBusObjectPath>
+#include <QDBusVariant>
+#include <QApplication>
+#include <QDesktopWidget>
 #include <QDebug>
 
-void Utils::grabKeyboard(xcb_window_t window)
+static QRect s_currentMonitorRect(0, 0, 0, 0);
+
+namespace Utils {
+
+bool menuItemCheckableFromId(QString id)
+{
+    return id.split(':').count() == 3;
+}
+
+void grabKeyboard(xcb_window_t window)
 {
     xcb_connection_t *conn = QX11Info::connection();
     xcb_grab_keyboard_cookie_t cookie = xcb_grab_keyboard(conn,
@@ -28,7 +44,7 @@ void Utils::grabKeyboard(xcb_window_t window)
     }
 }
 
-void Utils::grabPointer(xcb_window_t window) {
+void grabPointer(xcb_window_t window) {
     xcb_connection_t *conn = QX11Info::connection();
     xcb_grab_pointer_cookie_t cookie = xcb_grab_pointer(conn,
                                                         true,               /* get all pointer events specified by the following mask */
@@ -49,11 +65,79 @@ void Utils::grabPointer(xcb_window_t window) {
     }
 }
 
-bool Utils::pointInRect(QPoint point, QRect rect)
+bool pointInRect(QPoint point, QRect rect)
 {
     return rect.x() <= point.x() &&
             point.x() <= rect.x() + rect.width() &&
             rect.y() <= point.y() &&
             point.y() <= rect.y() + rect.height();
+
+}
+
+// NOTE: this function is deprecated because of speed problem,
+// use the function which is at the bottom of this file instead.
+QRect _currentMonitorRect(int x, int y)
+{
+    qDebug() << "currentMonitorRect" << x << y;
+
+    if (pointInRect(QPoint(x, y), s_currentMonitorRect)) return s_currentMonitorRect;
+
+    QDBusInterface displayIface(DISPLAY_SERVICE,
+                                DISPLAY_PATH,
+                                PROPERTIES_INTERFACE,
+                                QDBusConnection::sessionBus());
+
+    if (displayIface.isValid()) {
+        QDBusReply<QDBusVariant> reply = displayIface.call("Get", DISPLAY_INTERFACE, "Monitors");
+        if (reply.isValid()) {
+            qDebug() << reply.value().variant();
+            QDBusArgument argument = reply.value().variant().value<QDBusArgument>();
+
+            argument.beginArray();
+            while (!argument.atEnd()) {
+                QDBusObjectPath path;
+                argument >> path;
+                qDebug() << path.path();
+
+                QDBusInterface monitorIface(DISPLAY_SERVICE,
+                                            path.path(),
+                                            PROPERTIES_INTERFACE,
+                                            QDBusConnection::sessionBus());
+
+                if (displayIface.isValid()) {
+                    QRect _rect(0, 0, 0, 0);
+                    QDBusReply<QDBusVariant> reply = monitorIface.call("Get", MONITOR_INTERFACE, "X");
+                    if (reply.isValid()) {
+                        _rect.setX(reply.value().variant().value<uint>());
+                    }
+                    reply = monitorIface.call("Get", MONITOR_INTERFACE, "Y");
+                    if (reply.isValid()) {
+                        _rect.setY(reply.value().variant().value<uint>());
+                    }
+                    reply = monitorIface.call("Get", MONITOR_INTERFACE, "Width");
+                    if (reply.isValid()) {
+                        _rect.setWidth(reply.value().variant().value<uint>());
+                    }
+                    reply = monitorIface.call("Get", MONITOR_INTERFACE, "Height");
+                    if (reply.isValid()) {
+                        _rect.setHeight(reply.value().variant().value<uint>());
+                    }
+                    if (pointInRect(QPoint(x, y), _rect)) s_currentMonitorRect = _rect;
+                }
+            }
+            argument.endArray();
+        }
+    }
+
+    return s_currentMonitorRect;
+}
+
+QRect currentMonitorRect(int x, int y)
+{
+    QDesktopWidget *desktop = QApplication::desktop();
+    qDebug() << "currentMonitorRect" << desktop->screenGeometry(desktop->screenNumber(QPoint(x, y)));
+
+    return desktop->screenGeometry(desktop->screenNumber(QPoint(x, y)));
+}
 
 }

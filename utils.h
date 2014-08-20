@@ -6,31 +6,27 @@
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
 
+#define DISPLAY_SERVICE "com.deepin.daemon.Display"
+#define DISPLAY_PATH "/com/deepin/daemon/Display"
+#define PROPERTIES_INTERFACE "org.freedesktop.DBus.Properties"
+#define DISPLAY_INTERFACE "com.deepin.daemon.Display"
+#define MONITOR_INTERFACE "com.deepin.daemon.Display.Monitor"
+
 class QX11Info;
 class QString;
 class QPoint;
 class QRect;
 
-class Utils : public QObject
-{
-    Q_OBJECT
+namespace Utils {
 
-public:
-    static bool menuItemCheckableFromId(QString id) {
-        return id.split(':').count() == 3;
-    }
+bool menuItemCheckableFromId(QString id);
 
-    static QString toMenuItemText(QString text);
+void grabKeyboard(xcb_window_t);
+void grabPointer(xcb_window_t);
 
-    static void grabKeyboard(xcb_window_t);
-    static void grabPointer(xcb_window_t);
+bool pointInRect(QPoint, QRect);
+QRect currentMonitorRect(int, int);
 
-    static bool pointInRect(QPoint, QRect);
-
-private:
-    Utils();
-    Utils(const Utils &);
-    Utils& operator=(const Utils &);
-};
+}
 
 #endif // UTILS_H

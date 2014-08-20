@@ -11,7 +11,6 @@ class DDockMenu : public DMenuBase
 public:
     DDockMenu(DDockMenu *parent = 0);
 
-    virtual void setItemState(ItemState);
     virtual void setPosition(int, int);
 
 protected:
