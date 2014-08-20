@@ -26,9 +26,14 @@ public:
     int currentIndex();
     void setCurrentIndex(int);
 
+    void clearActions();
+    void doCurrentAction();
+
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
+    virtual void keyPressEvent(QKeyEvent *event);
 
 private:
     int _iconWidth;
@@ -36,7 +41,11 @@ private:
     int _subMenuIndicatorWidth;
 
     int _currentIndex;
-    QRect getRectOfActionAtIndex(int index);
+    QRect getRectOfActionAtIndex(int);
+    int getNextItemsHasShortcut(int, QString);
+    void doCheck(int);
+    void doUnCheck(int);
+    void sendItemClickedSignal(QString, bool);
 };
 
 #endif // DMENUCONTENT_H

@@ -16,9 +16,6 @@ MenuObject::MenuObject(ManagerObject *manager):
     QObject(manager)
 {
     this->menu = NULL;
-
-    connect(Utils::instance(), SIGNAL(itemClicked(QString,bool)), this, SIGNAL(ItemInvoked(QString,bool)));
-    connect(Utils::instance(), SIGNAL(menuDisappeared()), this->parent(), SLOT(UnregisterMenu()));
 }
 
 void MenuObject::SetItemActivity(const QString &itemId, bool isActive)
@@ -51,6 +48,9 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
         this->menu = new DDesktopMenu();
     }
 
+    connect(this->menu, SIGNAL(destroyed()), this, SLOT(menuDestroiedSlot()));
+    connect(this->menu, SIGNAL(itemClicked(QString,bool)), this, SIGNAL(ItemInvoked(QString,bool)));
+
     bytes.clear();
     bytes.append(jsonObj["menuJsonContent"].toString());
     QJsonDocument menuContent = QJsonDocument::fromJson(bytes);
@@ -59,13 +59,19 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
     this->menu->setContent(menuContentObj["items"].toArray());
     this->menu->setPosition(jsonObj["x"].toInt(), jsonObj["y"].toInt());
     this->menu->show();
-
-//    Utils::instance()->grabKeyboard(menu->winId());
+    this->menu->grabFocus();
 }
 
 void MenuObject::destroyMenu()
 {
-    if(this->menu) this->menu->destroyAll();
+    if(this->menu) {
+        this->menu->deleteLater();
+    }
 
     emit MenuUnregistered();
+}
+
+void MenuObject::menuDestroiedSlot()
+{
+    this->menu = NULL;
 }

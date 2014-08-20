@@ -4,18 +4,22 @@
 #include <QPen>
 #include <QBrush>
 #include <QHBoxLayout>
+#include <QJsonObject>
 #include <QDebug>
 
 #include "ddockmenu.h"
 #include "dmenubase.h"
 #include "dmenucontent.h"
 
-DDockMenu::DDockMenu():
-    DMenuBase()
+DDockMenu::DDockMenu(DDockMenu *parent):
+    DMenuBase(parent)
 {
     this->setShadowMargins(QMargins(10, 10, 10, 10));
-    this->setContentsMargins(this->shadowMargins());
-    this->setMenuContentMargins(QMargins(20, 5, 10, 5));
+    this->setContentsMargins(QMargins(this->shadowMargins().left(),
+                                      this->shadowMargins().top(),
+                                      this->shadowMargins().right(),
+                                      this->shadowMargins().bottom() + CORNER_HEIGHT));
+    this->setMenuContentMargins(QMargins(15, 5, 15, 5));
     this->setItemLeftSpacing(10);
     this->setItemCenterSpacing(10);
     this->setItemRightSpacing(10);
@@ -62,22 +66,22 @@ void DDockMenu::setItemState(ItemState state)
     switch (state) {
     case NormalState:
         this->setItemBackgroundColor(Qt::transparent);
-        this->setItemTextColor(Qt::black);
-        this->setItemShortcutColor(Qt::black);
+        this->setItemTextColor(Qt::white);
+        this->setItemShortcutColor(QColor("#646464"));
         this->setCheckmarkIcon(":/images/check_dark_normal.png");
         this->setSubMenuIndicatorIcon(":/images/arrow-dark.png");
         break;
     case HoverState:
-        this->setItemBackgroundColor(Qt::gray);
-        this->setItemTextColor(Qt::white);
-        this->setItemShortcutColor(Qt::white);
+        this->setItemBackgroundColor(Qt::transparent);
+        this->setItemTextColor(QColor("#00a4e2"));
+        this->setItemShortcutColor(QColor("#646464"));
         this->setCheckmarkIcon(":/images/check_dark_hover.png");
         this->setSubMenuIndicatorIcon(":/images/arrow-dark.png");
         break;
     case InactiveState:
         this->setItemBackgroundColor(Qt::transparent);
-        this->setItemTextColor(Qt::gray);
-        this->setItemShortcutColor(Qt::gray);
+        this->setItemTextColor(QColor("#646464"));
+        this->setItemShortcutColor(QColor("#646464"));
         this->setCheckmarkIcon(":/images/check_dark_inactive.png");
         this->setSubMenuIndicatorIcon(":/images/arrow-dark.png");
         break;
@@ -87,4 +91,8 @@ void DDockMenu::setItemState(ItemState state)
 void DDockMenu::setPosition(int x, int y)
 {
     this->move(x - this->width() / 2, y - this->height() + this->shadowMargins().bottom());
+}
+
+void DDockMenu::showSubMenu(int x, int y, QJsonObject obj)
+{
 }

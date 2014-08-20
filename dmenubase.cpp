@@ -4,15 +4,17 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QHBoxLayout>
-#include <QStringList>
 #include <QSharedPointer>
+#include <QRegExp>
 #include <QDebug>
 
 #include "dmenubase.h"
-#include <dmenucontent.h>
+#include "dmenucontent.h"
+#include "utils.h"
 
 DMenuBase::DMenuBase(QWidget *parent) :
-    QWidget(parent, Qt::Popup),
+    QWidget(parent, Qt::Tool | Qt::BypassWindowManagerHint),
+    _subMenu(NULL),
     _radius(4),
     _shadowMargins(QMargins(0, 0, 0, 0)),
     _checkmarkIcon(""),
@@ -197,24 +199,36 @@ void DMenuBase::setMenuContent(QSharedPointer<DMenuContent> content)
     this->setLayout(layout);
 }
 
+DMenuBase* DMenuBase::subMenu()
+{
+    return _subMenu;
+}
+
 void DMenuBase::setContent(QJsonArray items)
 {
     Q_ASSERT(this->menuContent());
-    this->menuContent()->actions().clear();
+    this->menuContent()->setCurrentIndex(-1);
+    this->menuContent()->clearActions();
 
     foreach (QJsonValue item, items) {
         QJsonObject itemObj = item.toObject();
 
         QAction *action = new QAction(this->menuContent().data());
-        action->setText(itemObj["itemText"].toString());
+        QRegExp regexp("_(.)");
+        regexp.indexIn(itemObj["itemText"].toString());
+        QString navKey = regexp.cap(1);
+        QString itemText = itemObj["itemText"].toString().replace(regexp, navKey);
+
+        action->setText(itemText);
         action->setEnabled(itemObj["isActive"].toBool());
-        action->setCheckable(menuItemCheckableFromId(itemObj["itemId"].toString()));
+        action->setCheckable(Utils::menuItemCheckableFromId(itemObj["itemId"].toString()));
         action->setChecked(itemObj["checked"].toBool());
         action->setProperty("itemId", itemObj["itemId"].toString());
         action->setProperty("itemIcon", itemObj["itemIcon"].toString());
         action->setProperty("itemIconHover", itemObj["itemIconHover"].toString());
         action->setProperty("itemIconInactive", itemObj["itemIconInactive"].toString());
-        action->setProperty("hasSubMenu", itemObj["itemSubMenu"].toObject()["items"].toArray().count() != 0);
+        action->setProperty("itemSubMenu", itemObj["itemSubMenu"].toObject());
+        action->setProperty("itemNavKey", navKey);
 
         _menuContent->addAction(action);
     }
@@ -229,7 +243,8 @@ void DMenuBase::setContent(QJsonArray items)
                  + _shadowMargins.top()
                  + _shadowMargins.bottom()
                  + _menuContentMargins.top()
-                 + _menuContentMargins.bottom());
+                 + _menuContentMargins.bottom()
+                 + this->contentsMargins().bottom() - _shadowMargins.bottom());
 }
 
 void DMenuBase::destroyAll()
@@ -243,8 +258,29 @@ void DMenuBase::destroyAll()
     }
 }
 
-bool DMenuBase::menuItemCheckableFromId(QString id)
+void DMenuBase::grabFocus()
 {
-    return id.split(':').count() == 3;
+//    Utils::grabPointer(this->winId());
+//    Utils::grabKeyboard(this->winId());
+    this->menuContent()->grabMouse();
+    this->menuContent()->grabKeyboard();
+}
 
+bool DMenuBase::pointInMenuArea(QPoint point)
+{
+    if(this->parent()) {
+        DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+        Q_ASSERT(parent);
+
+        return parent->pointInMenuArea(point);
+    } else {
+        DMenuBase *subMenu =this;
+        while (subMenu) {
+            if (Utils::pointInRect(point, subMenu->geometry())) {
+                return true;
+            }
+            subMenu = subMenu->subMenu();
+        }
+        return false;
+    }
 }

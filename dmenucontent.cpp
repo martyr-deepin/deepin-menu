@@ -4,10 +4,16 @@
 #include <QAction>
 #include <QtGlobal>
 #include <QMouseEvent>
+#include <QKeyEvent>
 #include <QIcon>
 #include <QColor>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QPoint>
+#include <QStaticText>
 #include <QDebug>
 
+#include "utils.h"
 #include "dmenubase.h"
 #include "dmenucontent.h"
 
@@ -26,6 +32,17 @@ int DMenuContent::currentIndex()
 void DMenuContent::setCurrentIndex(int index)
 {
     _currentIndex = index;
+    this->update();
+
+    if (index < 0 || index >= this->actions().count()) return;
+
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
+
+    QRect actionRect = this->getRectOfActionAtIndex(index);
+    QPoint point = this->mapToGlobal(QPoint(this->width(), actionRect.y()));
+    QJsonObject subMenuJsonObj = this->actions().at(index)->property("itemSubMenu").value<QJsonObject>();
+    parent->showSubMenu(point.x(), point.y(), subMenuJsonObj);
 }
 
 int DMenuContent::contentWidth()
@@ -47,7 +64,8 @@ int DMenuContent::contentWidth()
             _iconWidth = MENU_ICON_SIZE + parent->itemLeftSpacing();
         }
         if(!action->shortcut().isEmpty()) _shortcutWidth = qMax(_shortcutWidth, metrics.width(action->shortcut().toString()) + parent->itemCenterSpacing());
-        if(action->property("hasSubMenu").toBool()) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
+        bool hasSubMenu = action->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0;
+        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
 
         result = qMax(result, metrics.width(action->text()));
     }
@@ -68,6 +86,27 @@ int DMenuContent::contentHeight()
     }
 
     return result;
+}
+
+void DMenuContent::doCurrentAction()
+{
+    if (_currentIndex < 0 || _currentIndex >= this->actions().count()) return;
+
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
+
+    QAction *currentAction = this->actions().at(_currentIndex);
+    if (currentAction->isCheckable()) {
+        if (currentAction->isChecked()) {
+            this->doUnCheck(_currentIndex);
+        } else {
+            this->doCheck(_currentIndex);
+        }
+        this->sendItemClickedSignal(currentAction->property("itemId").toString(), currentAction->isChecked());
+    } else if (!currentAction->text().isEmpty() && currentAction->isEnabled()) {
+        this->sendItemClickedSignal(currentAction->property("itemId").toString(), false);
+        parent->destroyAll();
+    }
 }
 
 // override methods
@@ -122,12 +161,14 @@ void DMenuContent::paintEvent(QPaintEvent * event)
             }
 
             // draw text
-            painter.drawText(QRect(actionRectWidthMargins.x() + _iconWidth,
-                                   actionRectWidthMargins.y(),
-                                   actionRectWidthMargins.width(),
-                                   actionRectWidthMargins.height()),
-                             Qt::AlignVCenter,
-                             action->text());
+            QRect textRect = painter.boundingRect(QRect(actionRectWidthMargins.x() + _iconWidth,
+                                                        actionRectWidthMargins.y(),
+                                                        actionRectWidthMargins.width(),
+                                                        actionRectWidthMargins.height()),
+                                                  Qt::AlignVCenter,
+                                                  action->text());
+
+            painter.drawStaticText(textRect.topLeft(), QStaticText(action->text()));
 
             // draw shortcut text
             if(_shortcutWidth)
@@ -139,7 +180,7 @@ void DMenuContent::paintEvent(QPaintEvent * event)
                                  action->shortcut().toString());
 
             // draw sub menu indicator icon
-            if(action->property("hasSubMenu").toBool())
+            if(action->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0)
                 painter.drawImage(QRect(actionRectWidthMargins.x() + actionRectWidthMargins.width() - SUB_MENU_INDICATOR_SIZE,
                                         actionRectWidthMargins.y() + (MENU_ITEM_HEIGHT - MENU_ICON_SIZE) / 2,
                                         SUB_MENU_INDICATOR_SIZE, SUB_MENU_INDICATOR_SIZE),
@@ -150,20 +191,80 @@ void DMenuContent::paintEvent(QPaintEvent * event)
 
 void DMenuContent::mouseMoveEvent(QMouseEvent *event)
 {
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
     int previousHeight = this->rect().y();
 
     for (int i = 0; i < this->actions().count(); i++) {
         QAction *action = this->actions().at(i);
         int itemHeight = this->actions().at(i)->text().isEmpty() ? SEPARATOR_HEIGHT : MENU_ITEM_HEIGHT;
 
-        if (previousHeight <= event->y() && event->y() <+ previousHeight + itemHeight) {
-            _currentIndex = i; break;
+        if (previousHeight <= event->y() &&
+                event->y() <= previousHeight + itemHeight &&
+                this->rect().x() <= event->x() &&
+                event->x() <= this->rect().x() + this->rect().width()) {
+            this->setCurrentIndex(i);
+            break;
         } else {
             previousHeight += itemHeight;
         }
     }
+}
 
-    this->update();
+void DMenuContent::mousePressEvent(QMouseEvent *event)
+{
+    qDebug() << event->globalPos();
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
+
+    if (!parent->pointInMenuArea(event->globalPos())) {
+        parent->destroyAll();
+    } else if (Utils::pointInRect(event->globalPos(), parent->geometry())){
+        this->doCurrentAction();
+    }
+}
+
+void DMenuContent::keyPressEvent(QKeyEvent *event)
+{
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
+
+    switch (event->key()) {
+    case Qt::Key_Escape:
+        parent->destroyAll();
+        break;
+    case Qt::Key_Return:
+        this->doCurrentAction();
+        break;
+    case Qt::Key_Up:
+        this->setCurrentIndex(qMax(currentIndex() - 1, 0));
+        break;
+    case Qt::Key_Down:
+        this->setCurrentIndex(qMin(currentIndex() + 1, this->actions().count() - 1));
+        break;
+    case Qt::Key_Right:
+        if (parent->subMenu() && parent->subMenu()->isVisible())
+            parent->subMenu()->grabFocus();
+        break;
+    case Qt::Key_Left:
+        if (parent->parent()) {
+            DMenuBase *p_parent = qobject_cast<DMenuBase*>(parent->parent());
+            Q_ASSERT(p_parent);
+
+            p_parent->grabFocus();
+        }
+        break;
+    default:
+        qDebug() << event->text();
+        int _next_index_has_shortcut = getNextItemsHasShortcut(_currentIndex + 1, event->text());
+        if (_next_index_has_shortcut != -1) {
+            this->setCurrentIndex(_next_index_has_shortcut);
+            if (_next_index_has_shortcut == getNextItemsHasShortcut(_next_index_has_shortcut + 1, event->text())) {
+                this->doCurrentAction();
+            }
+        }
+
+    }
 }
 
 // private methods
@@ -182,4 +283,54 @@ QRect DMenuContent::getRectOfActionAtIndex(int index)
     }
 
     return QRect(0, previousHeight, this->width(), itemHeight);
+}
+
+void DMenuContent::clearActions()
+{
+    foreach (QAction *action, this->actions()) {
+        this->removeAction(action);
+    }
+}
+
+int DMenuContent::getNextItemsHasShortcut(int startPos, QString keyText) {
+    if (keyText.isEmpty()) return -1;
+
+    for (int i = qMax(startPos, 0); i < this->actions().count(); i++) {
+        // a trick here, using currentIndex as the cursor.
+        if (keyText == this->actions().at(i)->property("itemNavKey").toString().toLower()){
+            return i;
+        }
+    }
+
+    for (int i = 0; i < this->actions().count(); i++) {
+        // we do the check another time to support wrapping.
+        if (keyText == this->actions().at(i)->property("itemNavKey").toString().toLower()) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void DMenuContent::doCheck(int index) {
+
+}
+
+void DMenuContent::doUnCheck(int index)
+{
+
+}
+
+void DMenuContent::sendItemClickedSignal(QString id, bool checked)
+{
+    DMenuBase *root = qobject_cast<DMenuBase *>(this->parent());
+    Q_ASSERT(root);
+    while (root) {
+        if (!root->parent()) {
+            root->itemClicked(id, checked);
+            break;
+        } else {
+            root = qobject_cast<DMenuBase *>(root->parent());
+            Q_ASSERT(root);
+        }
+    }
 }
