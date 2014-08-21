@@ -57,13 +57,9 @@ void DDesktopMenu::paintEvent(QPaintEvent *)
 
 void DDesktopMenu::setPosition(int x, int y)
 {
-//    DMenuBase *rootMenu = this->getRootMenu();
-//    QPoint rootMenuPos = rootMenu->mapToGlobal(QPoint(1, 1));
-//    qDebug() << rootMenuPos;
     QPoint point(x - this->shadowMargins().left(),
                  y - this->shadowMargins().top());
-//    QRect currentMonitorRect = Utils::currentMonitorRect(rootMenuPos.x(), rootMenuPos.y());
-        QRect currentMonitorRect = Utils::currentMonitorRect(point.x(), point.y());
+    QRect currentMonitorRect = Utils::currentMonitorRect(point.x(), point.y());
 
     if (point.x()
             + this->width()

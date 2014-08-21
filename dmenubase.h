@@ -6,6 +6,7 @@
 #include <QGraphicsDropShadowEffect>
 
 class QColor;
+class QTimer;
 class QMargins;
 class QJsonArray;
 class QByteArray;
@@ -87,7 +88,10 @@ protected:
     ItemStyle _hoverStyle;
     ItemStyle _inactiveStyle;
 
-    bool nativeEvent(const QByteArray &, void *, long *);
+    virtual bool nativeEvent(const QByteArray &, void *, long *);
+
+private slots:
+    void grabFocusSlot();
 
 private:
     int _radius;
@@ -100,6 +104,9 @@ private:
 
     QSharedPointer<DMenuContent> _menuContent;
     QGraphicsDropShadowEffect *_dropShadow;
+    QTimer *_grabFocusTimer;
+
+    bool grabFocusInternal(int);
 };
 
 #endif // DMENUBASE_H

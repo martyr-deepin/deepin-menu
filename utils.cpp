@@ -135,7 +135,6 @@ QRect _currentMonitorRect(int x, int y)
 QRect currentMonitorRect(int x, int y)
 {
     QDesktopWidget *desktop = QApplication::desktop();
-    qDebug() << "currentMonitorRect" << desktop->screenGeometry(desktop->screenNumber(QPoint(x, y)));
 
     return desktop->screenGeometry(desktop->screenNumber(QPoint(x, y)));
 }

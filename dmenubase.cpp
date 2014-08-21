@@ -7,6 +7,9 @@
 #include <QSharedPointer>
 #include <QRegExp>
 #include <QPoint>
+#include <QWindow>
+#include <QThread>
+#include <QTimer>
 #include <QDebug>
 
 #include <xcb/xcb.h>
@@ -16,11 +19,14 @@
 #include "dmenucontent.h"
 #include "utils.h"
 
+#define GRAB_FOCUS_TRY_TIMES 100
+
 DMenuBase::DMenuBase(QWidget *parent) :
     QWidget(parent, Qt::Tool | Qt::BypassWindowManagerHint),
     _subMenu(NULL),
     _radius(4),
-    _shadowMargins(QMargins(0, 0, 0, 0))
+    _shadowMargins(QMargins(0, 0, 0, 0)),
+    _grabFocusTimer(new QTimer(this))
 {
     this->setAttribute(Qt::WA_TranslucentBackground);
 
@@ -196,8 +202,48 @@ void DMenuBase::destroyAll()
 
 void DMenuBase::grabFocus()
 {
-    this->menuContent()->grabKeyboard();
+    connect(_grabFocusTimer, SIGNAL(timeout()), this, SLOT(grabFocusSlot()));
+    _grabFocusTimer->start(50);
+}
+
+bool DMenuBase::grabFocusInternal(int tryTimes)
+{
+    QWindow *window = this->menuContent()->windowHandle();
+    if (!window)
+        if (const QWidget *nativeParent = this->menuContent()->nativeParentWidget())
+            window = nativeParent->windowHandle();
+    // grab pointer
+    int i = 0;
+    while(!window->setMouseGrabEnabled(true) && i < tryTimes) {
+        QThread::msleep(10);
+        i++;
+    }
+    if (i >= tryTimes) {
+        qWarning() << QString("GrabMouse Failed after tring %1 times").arg(i);
+    } else {
+        qDebug() << QString("GrabMouse tries %1").arg(i);
+    }
     this->menuContent()->grabMouse();
+
+    // grab keyboard
+    int j = 0;
+    while(!window->setKeyboardGrabEnabled(true) && j < tryTimes) {
+        QThread::msleep(10);
+        j++;
+    }
+    if (j >= tryTimes) {
+        qWarning() << QString("GrabKeyboard Failed after tring %1 times").arg(j);
+    } else {
+        qDebug() << QString("GrabKeyboard tries %1").arg(j);
+    }
+    this->menuContent()->grabKeyboard();
+
+    return (i < tryTimes) && (j < tryTimes);
+}
+
+void DMenuBase::grabFocusSlot()
+{
+    if (grabFocusInternal(1)) _grabFocusTimer->stop();
 }
 
 DMenuBase *DMenuBase::menuUnderPoint(QPoint point)
