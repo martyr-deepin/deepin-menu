@@ -3,13 +3,13 @@
 
 #include <QObject>
 
-class ManagerObject;
 class DMenuBase;
 class MenuObject : public QObject
 {
     Q_OBJECT
 public:
-    MenuObject(ManagerObject *manager);
+    MenuObject();
+    ~MenuObject();
 
 signals:
     void ItemInvoked(const QString &itemId, bool checked);
@@ -20,13 +20,11 @@ public slots:
     void SetItemText(const QString &itemId, const QString &text);
     void ShowMenu(const QString &menuJsonContent);
 
-    void destroyMenu();
-
 private slots:
-    void menuDestroiedSlot();
+    void menuDismissedSlot();
 
 private:
-    DMenuBase *menu;
+    DMenuBase *_menu;
 };
 
 #endif // MENU_OBJECT_H

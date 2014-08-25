@@ -25,6 +25,9 @@ private:
     MenuObject *menuObject;
     MenuAdaptor *menuAdaptor;
     QString menuObjectPath;
+
+private slots:
+    void menuObjectDestroiedSlot();
 };
 
 #endif // MANAGER_OBJECT_H

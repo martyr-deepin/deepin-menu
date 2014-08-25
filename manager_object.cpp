@@ -22,8 +22,10 @@ QDBusObjectPath ManagerObject::RegisterMenu()
     uuid = uuid.replace("-", "_");
     menuObjectPath = "/com/deepin/menu/" + uuid;
 
-    menuObject = new MenuObject(this);
+    menuObject = new MenuObject();
     menuAdaptor = new MenuAdaptor(menuObject);
+
+    connect(menuObject, SIGNAL(destroyed()), this, SLOT(menuObjectDestroiedSlot()));
 
     QDBusConnection connection = QDBusConnection::sessionBus();
     connection.registerObject(menuObjectPath, menuObject);
@@ -39,14 +41,18 @@ void ManagerObject::UnregisterMenu()
     }
 }
 
-void ManagerObject::UnregisterMenu(const QString &menuObjectPath)
+void ManagerObject::UnregisterMenu(const QString &)
 {
     if (menuObject) {
-        menuObject->destroyMenu();
         menuObject->deleteLater();
-        menuObject = NULL;
-
-        QDBusConnection connection = QDBusConnection::sessionBus();
-        connection.unregisterObject(menuObjectPath);
     }
+}
+
+// private slots
+void ManagerObject::menuObjectDestroiedSlot()
+{
+    menuObject = NULL;
+
+    QDBusConnection connection = QDBusConnection::sessionBus();
+    connection.unregisterObject(menuObjectPath);
 }

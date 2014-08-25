@@ -6,36 +6,43 @@
 #include <QtGlobal>
 #include <QDebug>
 
-#include "utils.h"
 #include "menu_object.h"
-#include "manager_object.h"
 #include "ddesktopmenu.h"
 #include "ddockmenu.h"
 
-MenuObject::MenuObject(ManagerObject *manager):
-    QObject(manager)
+MenuObject::MenuObject():
+    QObject()
 {
-    this->menu = NULL;
+    _menu = NULL;
+}
+
+MenuObject::~MenuObject()
+{
+    if(_menu) {
+        _menu->deleteLater();
+    }
+
+    emit MenuUnregistered();
 }
 
 void MenuObject::SetItemActivity(const QString &itemId, bool isActive)
 {
-    if (this->menu) this->menu->setItemActivity(itemId, isActive);
+    if (_menu) _menu->setItemActivity(itemId, isActive);
 }
 
 void MenuObject::SetItemChecked(const QString &itemId, bool checked)
 {
-    if (this->menu) this->menu->setItemChecked(itemId, checked);
+    if (_menu) _menu->setItemChecked(itemId, checked);
 }
 
 void MenuObject::SetItemText(const QString &itemId, const QString &text)
 {
-    if (this->menu) this->menu->setItemText(itemId, text);
+    if (_menu) _menu->setItemText(itemId, text);
 }
 
 void MenuObject::ShowMenu(const QString &menuJsonContent)
 {
-    Q_ASSERT(this->menu == NULL);
+    Q_ASSERT(_menu == NULL);
 
     QByteArray bytes;
     bytes.append(menuJsonContent);
@@ -43,35 +50,28 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
     QJsonObject jsonObj = menuDocument.object();
 
     if(jsonObj["isDockMenu"].toBool()) {
-        this->menu = new DDockMenu();
+        _menu = new DDockMenu();
     } else {
-        this->menu = new DDesktopMenu();
+        _menu = new DDesktopMenu();
     }
 
-    connect(this->menu, SIGNAL(destroyed()), this, SLOT(menuDestroiedSlot()));
-    connect(this->menu, SIGNAL(itemClicked(QString,bool)), this, SIGNAL(ItemInvoked(QString,bool)));
+    connect(_menu, SIGNAL(destroyed()), this, SLOT(menuDismissedSlot()));
+    connect(_menu, SIGNAL(itemClicked(QString,bool)), this, SIGNAL(ItemInvoked(QString,bool)));
 
     bytes.clear();
     bytes.append(jsonObj["menuJsonContent"].toString());
     QJsonDocument menuContent = QJsonDocument::fromJson(bytes);
     QJsonObject menuContentObj = menuContent.object();
 
-    this->menu->setContent(menuContentObj["items"].toArray());
-    this->menu->setPosition(jsonObj["x"].toInt(), jsonObj["y"].toInt());
-    this->menu->show();
-    this->menu->grabFocus();
+    _menu->setContent(menuContentObj["items"].toArray());
+    _menu->setPosition(jsonObj["x"].toInt(), jsonObj["y"].toInt());
+    _menu->show();
+    _menu->grabFocus();
 }
 
-void MenuObject::destroyMenu()
+void MenuObject::menuDismissedSlot()
 {
-    if(this->menu) {
-        this->menu->deleteLater();
-    }
+    _menu = NULL;
 
-    emit MenuUnregistered();
-}
-
-void MenuObject::menuDestroiedSlot()
-{
-    this->menu = NULL;
+    this->deleteLater();
 }
