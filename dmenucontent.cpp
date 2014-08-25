@@ -354,7 +354,6 @@ void DMenuContent::doCheck(int index) {
     DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
     Q_ASSERT(parent);
 
-    qDebug() << index;
     QAction *action = this->actions().at(index);
     QString itemId = action->property("itemId").toString();
     parent->getRootMenu()->setItemChecked(itemId, true);
@@ -389,8 +388,42 @@ void DMenuContent::doUnCheck(int index)
 
     QAction *action = this->actions().at(index);
     QString itemId = action->property("itemId").toString();
-    parent->getRootMenu()->setItemChecked(itemId, false);
-    this->sendItemClickedSignal(action->property("itemId").toString(), false);
+
+    if (Utils::menuItemCheckableFromId(itemId)) {
+        QStringList components = itemId.split(':');
+        QString group = components.at(0);
+        QString type = components.at(1);
+
+        if (type == "radio") {
+            bool hasNoCheck = true;
+
+            foreach (QAction *act, this->actions()) {
+                QString _itemId = act->property("itemId").toString();
+
+                if (Utils::menuItemCheckableFromId(_itemId) && _itemId != itemId) {
+                    QStringList components = _itemId.split(':');
+                    QString _group = components.at(0);
+                    QString _type = components.at(1);
+
+                    if (group == _group && _type == "radio") {
+                        QString prop("%1Checked");
+                        QVariant checkedCache = parent->getRootMenu()->property(prop.arg(_itemId).toLatin1());
+                        bool checked = checkedCache.isNull() ? act->isChecked() : checkedCache.toBool();
+
+                        hasNoCheck = hasNoCheck && !checked;
+                    }
+                }
+            }
+
+            if (!hasNoCheck) {
+                parent->getRootMenu()->setItemChecked(itemId, false);
+                this->sendItemClickedSignal(action->property("itemId").toString(), false);
+            }
+        }
+    } else {
+        parent->getRootMenu()->setItemChecked(itemId, false);
+        this->sendItemClickedSignal(action->property("itemId").toString(), false);
+    }
 
     this->update();
 }
