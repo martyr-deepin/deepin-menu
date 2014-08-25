@@ -116,19 +116,23 @@ void DMenuContent::doCurrentAction()
 
     QAction *currentAction = this->actions().at(_currentIndex);
     QString itemId = currentAction->property("itemId").toString();
-    QVariant checkedCache = parent->getRootMenu()->property(itemId.toLatin1());
+    QString prop("%1Checked");
+    QVariant checkedCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
     bool checked = checkedCache.isNull() ? currentAction->isChecked() : checkedCache.toBool();
     bool currentActionHasSubMenu = currentAction->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0;
+    prop = QString("%1Activity");
+    QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
+    bool active = activeCache.isNull() ? currentAction->isEnabled() : activeCache.toBool();
 
+    if (!active || currentAction->text().isEmpty() || currentActionHasSubMenu) return;
+ 
     if (currentAction->isCheckable()) {
         if (checked) {
             this->doUnCheck(_currentIndex);
         } else {
             this->doCheck(_currentIndex);
         }
-    } else if (!currentActionHasSubMenu &&
-               !currentAction->text().isEmpty() &&
-               currentAction->isEnabled()) {
+    } else {
         this->sendItemClickedSignal(currentAction->property("itemId").toString(), false);
         parent->destroyAll();
     }
@@ -149,7 +153,7 @@ void DMenuContent::paintEvent(QPaintEvent *)
         QRect actionRectWidthMargins = actionRect.marginsRemoved(QMargins(this->contentsMargins().left(), 0, this->contentsMargins().right(), 0));
         QString itemId = action->property("itemId").toString();
 
-        QString prop("%1Active");
+        QString prop("%1Activity");
         QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
         bool active = activeCache.isNull() ? action->isEnabled() : activeCache.toBool();
         DMenuBase::ItemStyle itemStyle = active ? i == _currentIndex ? parent->hoverStyle() : parent->normalStyle() : parent->inactiveStyle();
@@ -208,9 +212,9 @@ void DMenuContent::paintEvent(QPaintEvent *)
                                                         actionRectWidthMargins.width(),
                                                         actionRectWidthMargins.height()),
                                                   Qt::AlignVCenter,
-                                                  action->text());
+                                                  text);
 
-            painter.drawStaticText(textRect.topLeft(), QStaticText(action->text()));
+            painter.drawStaticText(textRect.topLeft(), QStaticText(text));
 
             // draw shortcut text
             if(_shortcutWidth)
@@ -350,24 +354,27 @@ void DMenuContent::doCheck(int index) {
     DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
     Q_ASSERT(parent);
 
+    qDebug() << index;
     QAction *action = this->actions().at(index);
     QString itemId = action->property("itemId").toString();
-    QString prop("%1Checked");
-    parent->getRootMenu()->setProperty(prop.arg(itemId).toLatin1(), true);
+    parent->getRootMenu()->setItemChecked(itemId, true);
     this->sendItemClickedSignal(itemId, true);
 
-    QStringList components = itemId.split(':');
-    QString group = components.at(0);
+    if (Utils::menuItemCheckableFromId(itemId)) {
+        QStringList components = itemId.split(':');
+        QString group = components.at(0);
 
-    foreach (QAction *act, this->actions()) {
-        if (act != action && act->isCheckable()) {
+        foreach (QAction *act, this->actions()) {
             QString _itemId = act->property("itemId").toString();
-            QStringList _components = _itemId.split(':');
-            QString _group = _components.at(0);
-            QString _type = _components.at(1);
 
-            if (_type == "radio" && _group == group) {
-                parent->getRootMenu()->setProperty(prop.arg(_itemId).toLatin1(), false);
+            if (act != action && Utils::menuItemCheckableFromId(_itemId)) {
+                QStringList _components = _itemId.split(':');
+                QString _group = _components.at(0);
+                QString _type = _components.at(1);
+
+                if (_type == "radio" && _group == group) {
+                    parent->getRootMenu()->setItemChecked(_itemId, false);
+                }
             }
         }
     }
@@ -381,7 +388,8 @@ void DMenuContent::doUnCheck(int index)
     Q_ASSERT(parent);
 
     QAction *action = this->actions().at(index);
-    parent->getRootMenu()->setProperty(action->property("itemId").toString().toLatin1(), false);
+    QString itemId = action->property("itemId").toString();
+    parent->getRootMenu()->setItemChecked(itemId, false);
     this->sendItemClickedSignal(action->property("itemId").toString(), false);
 
     this->update();

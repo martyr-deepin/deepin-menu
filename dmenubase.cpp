@@ -163,7 +163,7 @@ void DMenuBase::setContent(QJsonArray items)
 
         action->setText(itemText);
         action->setEnabled(itemObj["isActive"].toBool());
-        action->setCheckable(Utils::menuItemCheckableFromId(itemObj["itemId"].toString()));
+        action->setCheckable(itemObj["isCheckable"].toBool() || Utils::menuItemCheckableFromId(itemObj["itemId"].toString()));
         action->setChecked(itemObj["checked"].toBool());
         action->setProperty("itemId", itemObj["itemId"].toString());
         action->setProperty("itemIcon", itemObj["itemIcon"].toString());
@@ -269,18 +269,21 @@ void DMenuBase::setItemActivity(const QString &itemId, bool isActive)
 {
     QString prop("%1Activity");
     this->setProperty(prop.arg(itemId).toLatin1(), isActive);
+    this->updateAll();
 }
 
 void DMenuBase::setItemChecked(const QString &itemId, bool checked)
 {
     QString prop("%1Checked");
     this->setProperty(prop.arg(itemId).toLatin1(), checked);
+    this->updateAll();
 }
 
 void DMenuBase::setItemText(const QString &itemId, const QString &text)
 {
     QString prop("%1Text");
     this->setProperty(prop.arg(itemId).toLatin1(), text);
+    this->updateAll();
 }
 
 const DMenuBase::ItemStyle DMenuBase::normalStyle()
@@ -334,4 +337,15 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
         }
     }
     return false;
+}
+
+
+// private methods
+void DMenuBase::updateAll()
+{
+    DMenuBase *subMenu = this;
+    while (subMenu) {
+        subMenu->update();
+        subMenu = subMenu->subMenu();
+    }
 }

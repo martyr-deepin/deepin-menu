@@ -107,6 +107,7 @@ private:
     QTimer *_grabFocusTimer;
 
     bool grabFocusInternal(int);
+    void updateAll();
 };
 
 #endif // DMENUBASE_H
