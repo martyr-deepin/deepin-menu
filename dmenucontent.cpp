@@ -258,8 +258,6 @@ void DMenuContent::mouseMoveEvent(QMouseEvent *event)
                 previousHeight += itemHeight;
             }
         }
-    } else if (menuUnderCursor){
-        menuUnderCursor->grabFocus();
     }
 }
 

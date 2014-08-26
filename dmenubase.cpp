@@ -10,6 +10,7 @@
 #include <QWindow>
 #include <QThread>
 #include <QTimer>
+#include <QTime>
 #include <QDebug>
 
 #include <xcb/xcb.h>
@@ -25,8 +26,7 @@ DMenuBase::DMenuBase(QWidget *parent) :
     QWidget(parent, Qt::Tool | Qt::BypassWindowManagerHint),
     _subMenu(NULL),
     _radius(4),
-    _shadowMargins(QMargins(0, 0, 0, 0)),
-    _grabFocusTimer(new QTimer(this))
+    _shadowMargins(QMargins(0, 0, 0, 0))
 {
     this->setAttribute(Qt::WA_TranslucentBackground);
 
@@ -35,6 +35,9 @@ DMenuBase::DMenuBase(QWidget *parent) :
     _dropShadow->setColor(Qt::black);
     _dropShadow->setOffset(0.0);
     this->setGraphicsEffect(_dropShadow);
+
+    _grabFocusTimer = new QTimer(this);
+    _grabFocusTimer->setSingleShot(true);
 }
 
 // getters and setters
@@ -202,8 +205,8 @@ void DMenuBase::destroyAll()
 
 void DMenuBase::grabFocus()
 {
+    grabFocusSlot();
     connect(_grabFocusTimer, SIGNAL(timeout()), this, SLOT(grabFocusSlot()));
-    _grabFocusTimer->start(50);
 }
 
 bool DMenuBase::grabFocusInternal(int tryTimes)
@@ -243,7 +246,7 @@ bool DMenuBase::grabFocusInternal(int tryTimes)
 
 void DMenuBase::grabFocusSlot()
 {
-    if (grabFocusInternal(1)) _grabFocusTimer->stop();
+    if (!grabFocusInternal(1)) { _grabFocusTimer->start(); }
 }
 
 DMenuBase *DMenuBase::menuUnderPoint(QPoint point)
@@ -325,15 +328,38 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
         xcb_generic_event_t *event = static_cast<xcb_generic_event_t*>(message);
         const uint8_t responseType = event->response_type & ~0x80;
 
-        if (responseType == XCB_BUTTON_PRESS) {
+        switch (responseType) {
+        case XCB_BUTTON_PRESS: {
             xcb_button_press_event_t *ev = reinterpret_cast<xcb_button_press_event_t*>(event);
             qDebug() << "nativeEvent" <<  responseType <<
                         ev->detail << ev->child << ev->root_x << ev->root_y;
             if (!this->menuUnderPoint(QPoint(ev->root_x, ev->root_y))) {
                 this->destroyAll();
-            } else if (_menuContent){
+            }
+            break;
+        }
+        case XCB_BUTTON_RELEASE: {
+            xcb_button_release_event_t *ev = reinterpret_cast<xcb_button_release_event_t*>(event);
+            qDebug() << "nativeEvent" <<  responseType <<
+                        ev->detail << ev->child << ev->root_x << ev->root_y;
+
+            if (this->menuUnderPoint(QPoint(ev->root_x, ev->root_y)) && _menuContent){
                 _menuContent->doCurrentAction();
             }
+            break;
+        }
+        case XCB_MOTION_NOTIFY: {
+            xcb_motion_notify_event_t *ev = reinterpret_cast<xcb_motion_notify_event_t*>(event);
+            qDebug() << "nativeEvent" <<  responseType <<
+                        ev->detail << ev->child << ev->root_x << ev->root_y;
+            DMenuBase *menuUnderPoint = this->menuUnderPoint(QPoint(ev->root_x, ev->root_y));
+            if (menuUnderPoint &&
+                    (this->mouseGrabber() != menuUnderPoint
+                     || this->keyboardGrabber() != menuUnderPoint)) {
+                menuUnderPoint->grabFocus();
+            }
+            break;
+        }
         }
     }
     return false;
