@@ -419,6 +419,9 @@ void DMenuContent::doUnCheck(int index)
                 parent->getRootMenu()->setItemChecked(itemId, false);
                 this->sendItemClickedSignal(action->property("itemId").toString(), false);
             }
+        } else {
+            parent->getRootMenu()->setItemChecked(itemId, false);
+            this->sendItemClickedSignal(action->property("itemId").toString(), false);
         }
     } else {
         parent->getRootMenu()->setItemChecked(itemId, false);
