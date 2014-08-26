@@ -63,8 +63,11 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
     QJsonDocument menuContent = QJsonDocument::fromJson(bytes);
     QJsonObject menuContentObj = menuContent.object();
 
+    int x = jsonObj["x"].toDouble();
+    int y = jsonObj["y"].toDouble();
+
     _menu->setContent(menuContentObj["items"].toArray());
-    _menu->setPosition(jsonObj["x"].toInt(), jsonObj["y"].toInt());
+    _menu->setPosition(x, y);
     _menu->show();
     _menu->grabFocus();
 }
