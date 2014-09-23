@@ -68,7 +68,6 @@ void DDesktopMenu::setPosition(int x, int y)
 
     if (point.x()
             + this->width()
-            - this->shadowMargins().right()
             > currentMonitorRect.x()
             + currentMonitorRect.width()) {
         if (this->parent()) {
@@ -80,22 +79,20 @@ void DDesktopMenu::setPosition(int x, int y)
                        - this->width()
                        + this->shadowMargins().right());
         } else {
-            point.setX(currentMonitorRect.x()
-                       + currentMonitorRect.width()
+            point.setX(point.x()
                        - this->width()
+                       + this->shadowMargins().left()
                        + this->shadowMargins().right());
         }
     }
 
     if (point.y()
             + this->height()
-            - this->shadowMargins().bottom()
             > currentMonitorRect.y()
             + currentMonitorRect.height()) {
         point.setY(currentMonitorRect.y()
                    + currentMonitorRect.height()
-                   - this->height()
-                   + this->shadowMargins().bottom());
+                   - this->height());
 
     }
 
