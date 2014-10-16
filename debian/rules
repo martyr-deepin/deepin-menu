@@ -15,7 +15,7 @@
 override_dh_auto_build:
 	dh_auto_build
 	python setup.py build
-	qmake && make
+	qmake DEFINES+=QT_NO_DEBUG_OUTPUT && make
 
 override_dh_auto_install:
 	dh_auto_install --destdir=debian/deepin-menu
