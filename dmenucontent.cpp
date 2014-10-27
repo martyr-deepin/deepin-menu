@@ -125,7 +125,7 @@ void DMenuContent::doCurrentAction()
     bool active = activeCache.isNull() ? currentAction->isEnabled() : activeCache.toBool();
 
     if (!active || currentAction->text().isEmpty() || currentActionHasSubMenu) return;
- 
+
     if (currentAction->isCheckable()) {
         if (checked) {
             this->doUnCheck(_currentIndex);
@@ -134,8 +134,8 @@ void DMenuContent::doCurrentAction()
         }
     } else {
         this->sendItemClickedSignal(currentAction->property("itemId").toString(), false);
-        parent->destroyAll();
     }
+    parent->destroyAll();
 }
 
 // override methods
