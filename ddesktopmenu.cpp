@@ -101,6 +101,8 @@ void DDesktopMenu::setPosition(int x, int y)
 
 void DDesktopMenu::showSubMenu(int x, int y, QJsonObject subMenuJsonObject)
 {
+    qDebug() << "showSubMenu " << x << y << subMenuJsonObject;
+
     QJsonArray items = subMenuJsonObject["items"].toArray();
     if (items.count() != 0) {
         if (!_subMenu) {

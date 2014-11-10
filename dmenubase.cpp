@@ -257,14 +257,17 @@ DMenuBase *DMenuBase::menuUnderPoint(QPoint point)
 
         return parent->menuUnderPoint(point);
     } else {
+        DMenuBase *result = NULL;
         DMenuBase *subMenu =this;
         while (subMenu) {
             if (Utils::pointInRect(point, subMenu->geometry())) {
-                return subMenu;
+                // shouldn't return here, otherwise the old menus are able to steal focus from
+                // the younger ones even if they are at the bottom of the stack.
+                result = subMenu;
             }
             subMenu = subMenu->subMenu();
         }
-        return NULL;
+        return result;
     }
 }
 
