@@ -10,9 +10,11 @@
 #include "ddockmenu.h"
 #include "dmenubase.h"
 #include "dmenucontent.h"
+#include "utils.h"
 
 DDockMenu::DDockMenu(DDockMenu *parent):
-    DMenuBase(parent)
+    DMenuBase(parent),
+    m_cornerX(0)
 {
     this->setShadowMargins(QMargins(10, 10, 10, 10));
     this->setContentsMargins(QMargins(this->shadowMargins().left(),
@@ -52,11 +54,12 @@ void DDockMenu::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
+    int cornerX = m_cornerX ? m_cornerX : rect.x() + rect.width() / 2;
     QPoint topLeft(rect.x(), rect.y());
     QPoint topRight(rect.x() + rect.width(), rect.y());
     QPoint bottomRight(rect.x() + rect.width(), rect.y() + rect.height() - CORNER_HEIGHT);
     QPoint bottomLeft(rect.x(), rect.y() + rect.height() - CORNER_HEIGHT);
-    QPoint cornerPoint(rect.x() + rect.width() / 2, rect.y() + rect.height());
+    QPoint cornerPoint(cornerX, rect.y() + rect.height());
     int radius = this->radius();
 
     QPainterPath border;
@@ -79,9 +82,36 @@ void DDockMenu::paintEvent(QPaintEvent *)
 
 void DDockMenu::setPosition(int x, int y)
 {
-    this->move(x - this->width() / 2, y - this->height() + this->shadowMargins().bottom());
+    QPoint point(x - this->width() / 2,
+                 y - this->height() + this->shadowMargins().bottom() / 2);
+    QRect currentMonitorRect = Utils::currentMonitorRect(x, y);
+    int deltaToMonitorLSide = point.x() -
+            currentMonitorRect.x();
+
+    int deltaToMonitorRSide = currentMonitorRect.x()
+            + currentMonitorRect.width()
+            - x - this->width() / 2;
+
+    if (deltaToMonitorLSide < 0) {
+        point.setX(point.x() - deltaToMonitorLSide);
+        this->moveCornerX(deltaToMonitorLSide);
+        this->repaint();
+    }
+    if (deltaToMonitorRSide < 0) {
+        point.setX(point.x() + deltaToMonitorRSide);
+        this->moveCornerX(-deltaToMonitorRSide);
+        this->repaint();
+    }
+
+    this->move(point);
 }
 
 void DDockMenu::showSubMenu(int, int, QJsonObject)
 {
+}
+
+// move the corner point horizontally from the central deltaX pixels.
+void DDockMenu::moveCornerX(int deltaX)
+{
+    m_cornerX = this->width() / 2 + deltaX;
 }
