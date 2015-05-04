@@ -32,7 +32,7 @@ def parseMenuItem(menuItem):
         result.setIcons(menuItem[2])
     if len(menuItem) > 3:
         result.setSubMenu(parseMenu(Menu(is_root=False), menuItem[3]))
-    if len(menuItem) > 4:        
+    if len(menuItem) > 4:
         result.extra = menuItem[4]
     return result
 
@@ -52,7 +52,7 @@ def validateItemGroupInfo(item, groupId, groupType):
     item.id = "%s:%s:%s" % (groupId, groupType, info[-1])
 
 class MenuItem(QObject):
-    def __init__(self, id, text, icons=None, subMenu=None, 
+    def __init__(self, id, text, icons=None, subMenu=None,
                  isActive=True, isCheckable=False, checked=False, showCheckmark=True, extra=""):
         super(MenuItem, self).__init__()
         self.id = id
@@ -79,7 +79,7 @@ class MenuItem(QObject):
             iconHover = self.icons[1]
         if len(self.icons) > 2:
             iconInactive = self.icons[2]
-            
+
         return {"itemId": self.id,
                 "itemIcon": iconNormal,
                 "itemIconHover": iconHover,
@@ -97,7 +97,7 @@ class MenuItem(QObject):
 
     def setIcons(self, icons):
         self.icons = icons
-        
+
     @property
     def hasSubMenu(self):
         return len(self.subMenu.items) != 0
@@ -107,7 +107,7 @@ class MenuItem(QObject):
 
 class CheckableMenuItem(MenuItem):
     def __init__(self, id, text, checked=False, showCheckmark=True, extra=""):
-        super(CheckableMenuItem, self).__init__(id, text, isCheckable=True, 
+        super(CheckableMenuItem, self).__init__(id, text, isCheckable=True,
                                                 checked=checked, showCheckmark=showCheckmark, extra=extra)
 
 class MenuSeparator(MenuItem):
@@ -118,7 +118,7 @@ class Menu(QObject):
     itemClicked = pyqtSignal(str, bool)
     menuDismissed = pyqtSignal()
 
-    def __init__(self, items=None, is_root=True, checkableMenu=False, 
+    def __init__(self, items=None, is_root=True, checkableMenu=False,
         singleCheck=False):
         super(Menu, self).__init__()
         self.items = []
@@ -154,21 +154,21 @@ class Menu(QObject):
             if item.id == id:
                 return item
         return None
-    
+
     def setItemActivity(self, id, value):
         item = self.getItemById(id)
-        if item: 
+        if item:
             item.isActive = value
             if self.menuIface:
                 self.menuIface.setItemActivity(id, value)
-        
+
     def setItemText(self, id, value):
         item = self.getItemById(id)
-        if item: 
+        if item:
             item.text = value
             if self.menuIface:
                 self.menuIface.setItemText(id, value)
-        
+
     def showRectMenu(self, x, y):
         msg = self.managerIface.registerMenu()
         reply = QDBusReply(msg)
@@ -190,7 +190,7 @@ class Menu(QObject):
                                             "cornerDirection": cornerDirection,
                                             "menuJsonContent": str(self)}))
         self.menuIface.ItemInvoked.connect(self.itemInvokedSlot)
-        self.menuIface.MenuUnregistered.connect(self.menuUnregisteredSlot)        
+        self.menuIface.MenuUnregistered.connect(self.menuUnregisteredSlot)
 
     @pyqtSlot(str, bool)
     def itemInvokedSlot(self, itemId, checked):
@@ -206,7 +206,7 @@ class Menu(QObject):
 class CheckboxMenu(Menu):
     def __init__(self, groupId, items):
         self.groupId = groupId
-        super(CheckboxMenu, self).__init__(items, checkableMenu=True, 
+        super(CheckboxMenu, self).__init__(items, checkableMenu=True,
             singleCheck=False)
 
     def addMenuItem(self, item):
@@ -218,7 +218,7 @@ class CheckboxMenu(Menu):
 class RadioButtonMenu(Menu):
     def __init__(self, groupId, items):
         self.groupId = groupId
-        super(RadioButtonMenu, self).__init__(items, checkableMenu=True, 
+        super(RadioButtonMenu, self).__init__(items, checkableMenu=True,
             singleCheck=True)
 
     def addMenuItem(self, item):
@@ -238,7 +238,7 @@ if __name__ == "__main__":
         print "id: ", s, ", checked: ", c
         # menu.setItemText("id_nonactive", "hello")
         # menu.setItemActivity("id_nonactive", True)
-        
+
     @pyqtSlot()
     def dismissed():
         print "dismissed"

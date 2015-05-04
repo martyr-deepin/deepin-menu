@@ -3,20 +3,20 @@
 
 # Copyright (C) 2011 ~ 2013 Deepin, Inc.
 #               2011 ~ 2013 Wang YaoHua
-# 
+#
 # Author:     Wang YaoHua <mr.asianwang@gmail.com>
 # Maintainer: Wang YaoHua <mr.asianwang@gmail.com>
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -29,7 +29,7 @@ class MenuManagerInterface(QDBusAbstractInterface):
         super(MenuManagerInterface, self).__init__("com.deepin.menu",
                                                    "/com/deepin/menu",
                                                    "com.deepin.menu.Manager",
-                                                   QDBusConnection.sessionBus(), 
+                                                   QDBusConnection.sessionBus(),
                                                    None)
 
     def registerMenu(self):
@@ -50,20 +50,20 @@ class MenuObjectInterface(QDBusAbstractInterface):
         super(MenuObjectInterface, self).__init__("com.deepin.menu",
                                                   path,
                                                   "com.deepin.menu.Menu",
-                                                  QDBusConnection.sessionBus(), 
+                                                  QDBusConnection.sessionBus(),
                                                   None)
 
     def showMenu(self, jsonContent):
-        self.call('ShowMenu', jsonContent)
-        
+        self.asyncCall('ShowMenu', jsonContent)
+
     def setItemText(self, id, value):
-        self.call('SetItemText', id, value)
-        
+        self.asyncCall('SetItemText', id, value)
+
     def setItemActivity(self, id, value):
-        self.call('SetItemActivity', id, value)
-        
+        self.asyncCall('SetItemActivity', id, value)
+
     def setItemChecked(self, id, value):
-        self.call('SetItemChecked', id, value)
+        self.asyncCall('SetItemChecked', id, value)
 
 class XMouseAreaInterface(QDBusAbstractInterface):
 
@@ -75,7 +75,7 @@ class XMouseAreaInterface(QDBusAbstractInterface):
         super(XMouseAreaInterface, self).__init__("com.deepin.api.XMouseArea",
                                                   "/com/deepin/api/XMouseArea",
                                                   "com.deepin.api.XMouseArea",
-                                                  QDBusConnection.sessionBus(), 
+                                                  QDBusConnection.sessionBus(),
                                                   None)
 
     def registerArea(self, x1, x2, y1, y2, flag):
@@ -93,7 +93,7 @@ class DisplayPropertyInterface(QDBusAbstractInterface):
             "com.deepin.daemon.Display",
             "/com/deepin/daemon/Display",
             "org.freedesktop.DBus.Properties",
-            QDBusConnection.sessionBus(), 
+            QDBusConnection.sessionBus(),
             None)
 
     def getPrimaryRect(self):
