@@ -12,9 +12,9 @@
 #include <QTimer>
 #include <QTime>
 #include <QDebug>
+#include <QX11Info>
 
-#include <xcb/xcb.h>
-#include <xcb/xproto.h>
+#include <X11/Xlib.h>
 
 #include "dmenubase.h"
 #include "dmenucontent.h"
@@ -29,6 +29,8 @@ DMenuBase::DMenuBase(QWidget *parent) :
     _shadowMargins(QMargins(0, 0, 0, 0))
 {
     this->setAttribute(Qt::WA_TranslucentBackground);
+
+    queryXIExtension();
 
     _dropShadow = new QGraphicsDropShadowEffect(this);
     _dropShadow->setBlurRadius(0);
@@ -334,7 +336,7 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
         switch (responseType) {
         case XCB_BUTTON_PRESS: {
             xcb_button_press_event_t *ev = reinterpret_cast<xcb_button_press_event_t*>(event);
-            qDebug() << "nativeEvent" <<  responseType <<
+            qDebug() << "nativeEvent XCB_BUTTON_PRESS" <<  responseType <<
                         ev->detail << ev->child << ev->root_x << ev->root_y;
             if (!this->menuUnderPoint(QPoint(ev->root_x, ev->root_y))) {
                 this->destroyAll();
@@ -343,7 +345,7 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
         }
         case XCB_BUTTON_RELEASE: {
             xcb_button_release_event_t *ev = reinterpret_cast<xcb_button_release_event_t*>(event);
-            qDebug() << "nativeEvent" <<  responseType <<
+            qDebug() << "nativeEvent XCB_BUTTON_RELEASE" <<  responseType <<
                         ev->detail << ev->child << ev->root_x << ev->root_y;
 
             if (this->menuUnderPoint(QPoint(ev->root_x, ev->root_y)) && _menuContent){
@@ -353,7 +355,7 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
         }
         case XCB_MOTION_NOTIFY: {
             xcb_motion_notify_event_t *ev = reinterpret_cast<xcb_motion_notify_event_t*>(event);
-            qDebug() << "nativeEvent" <<  responseType <<
+            qDebug() << "nativeEvent XCB_MOTION_NOTIFY" <<  responseType <<
                         ev->detail << ev->child << ev->root_x << ev->root_y;
             DMenuBase *menuUnderPoint = this->menuUnderPoint(QPoint(ev->root_x, ev->root_y));
             if (menuUnderPoint &&
@@ -363,11 +365,66 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
             }
             break;
         }
+        default:
+            if (isXIType(event, xiOpCode, XI_ButtonPress)) {
+                xXIDeviceEvent *ev = reinterpret_cast<xXIDeviceEvent*>(event);
+                qDebug() << "nativeEvent XI_ButtonPress" << fixed1616ToReal(ev->root_x) <<
+                    fixed1616ToReal(ev->root_y);
+                if (!this->menuUnderPoint(QPoint(fixed1616ToReal(ev->root_x),
+                                                 fixed1616ToReal(ev->root_y)))) {
+                    this->destroyAll();
+                }
+            } else if (isXIType(event, xiOpCode, XI_ButtonRelease)) {
+                xXIDeviceEvent *ev = reinterpret_cast<xXIDeviceEvent*>(event);
+                qDebug() << "nativeEvent XI_ButtonRelease" << fixed1616ToReal(ev->root_x) <<
+                    fixed1616ToReal(ev->root_y);
+                if (this->menuUnderPoint(QPoint(fixed1616ToReal(ev->root_x),
+                                                fixed1616ToReal(ev->root_y))) && _menuContent){
+                    _menuContent->doCurrentAction();
+                }
+            } else if (isXIType(event, xiOpCode, XI_Motion)) {
+                xXIDeviceEvent *ev = reinterpret_cast<xXIDeviceEvent*>(event);
+                qDebug() << "nativeEvent XI_Motion" << fixed1616ToReal(ev->root_x) <<
+                    fixed1616ToReal(ev->root_y);
+                DMenuBase *menuUnderPoint = this->menuUnderPoint(
+                    QPoint(fixed1616ToReal(ev->root_x), fixed1616ToReal(ev->root_y)));
+                if (menuUnderPoint &&
+                    (this->mouseGrabber() != menuUnderPoint
+                     || this->keyboardGrabber() != menuUnderPoint)) {
+                    menuUnderPoint->grabFocus();
+                }
+            }
+            break;
         }
     }
     return false;
 }
 
+void DMenuBase::queryXIExtension()
+{
+    XQueryExtension((Display *)QX11Info::display(), "XInputExtension", &xiOpCode, &xiEventBase, &xiErrorBase);
+    qDebug() << "xiOpCode: " << xiOpCode;
+}
+
+bool DMenuBase::isXIEvent(xcb_generic_event_t *event, int opCode)
+{
+    qt_xcb_ge_event_t *e = (qt_xcb_ge_event_t *)event;
+    return e->extension == opCode;
+}
+
+bool DMenuBase::isXIType(xcb_generic_event_t *event, int opCode, uint16_t type)
+{
+    if (!isXIEvent(event, opCode))
+        return false;
+
+    xXIGenericDeviceEvent *xiEvent = reinterpret_cast<xXIGenericDeviceEvent *>(event);
+    return xiEvent->evtype == type;
+}
+
+qreal DMenuBase::fixed1616ToReal(FP1616 val)
+{
+    return (qreal(val >> 16)) + (val & 0xFFFF) / (qreal)0xFFFF;
+}
 
 // private methods
 void DMenuBase::updateAll()
