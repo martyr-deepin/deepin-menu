@@ -82,8 +82,8 @@ int DMenuContent::contentWidth()
         */
         _iconWidth = MENU_ICON_SIZE + parent->itemLeftSpacing();
         if(!action->shortcut().isEmpty()) _shortcutWidth = qMax(_shortcutWidth, metrics.width(action->shortcut().toString()) + parent->itemCenterSpacing());
-//        bool hasSubMenu = action->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0;
-//        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
+        //        bool hasSubMenu = action->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0;
+        //        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
         _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
 
         result = qMax(result, metrics.width(action->text()));
@@ -148,7 +148,7 @@ void DMenuContent::paintEvent(QPaintEvent *)
     painter.setFont(font);
 
     for(int i = 0; i < this->actions().count(); i++) {
-    	QAction *action = this->actions().at(i);
+        QAction *action = this->actions().at(i);
         QRect actionRect = this->getRectOfActionAtIndex(i);
         QRect actionRectWidthMargins = actionRect.marginsRemoved(QMargins(this->contentsMargins().left(), 0, this->contentsMargins().right(), 0));
         QString itemId = action->property("itemId").toString();
@@ -186,8 +186,8 @@ void DMenuContent::paintEvent(QPaintEvent *)
                 bool checked = checkedCache.isNull() ? action->isChecked() : checkedCache.toBool();
 
                 if (!action->property("itemIcon").toString().isEmpty() || \
-                    !action->property("itemIconHover").toString().isEmpty() || \
-                    !action->property("itemIconInactive").toString().isEmpty())
+                        !action->property("itemIconHover").toString().isEmpty() || \
+                        !action->property("itemIconInactive").toString().isEmpty())
                 {
                     qDebug() << "draw icon";
                     if (!active) {
@@ -332,16 +332,33 @@ void DMenuContent::clearActions()
 int DMenuContent::getNextItemsHasShortcut(int startPos, QString keyText) {
     if (keyText.isEmpty()) return -1;
 
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
+
     for (int i = qMax(startPos, 0); i < this->actions().count(); i++) {
+        QString itemId(this->actions().at(i)->property("itemId").toString());
+        QAction *action = this->actions().at(i);
+
+        QString prop("%1Active");
+        QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
+        bool active = activeCache.isNull() ? action->isEnabled() : activeCache.toBool();
+
         // a trick here, using currentIndex as the cursor.
-        if (keyText == this->actions().at(i)->property("itemNavKey").toString().toLower()){
+        if (active && keyText == this->actions().at(i)->property("itemNavKey").toString().toLower()){
             return i;
         }
     }
 
+    // we do the check another time to support wrapping.
     for (int i = 0; i < this->actions().count(); i++) {
-        // we do the check another time to support wrapping.
-        if (keyText == this->actions().at(i)->property("itemNavKey").toString().toLower()) {
+        QString itemId(this->actions().at(i)->property("itemId").toString());
+        QAction *action = this->actions().at(i);
+
+        QString prop("%1Active");
+        QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
+        bool active = activeCache.isNull() ? action->isEnabled() : activeCache.toBool();
+
+        if (active && keyText == this->actions().at(i)->property("itemNavKey").toString().toLower()) {
             return i;
         }
     }
