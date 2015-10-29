@@ -17,6 +17,7 @@
 #include "dmenubase.h"
 #include "dmenucontent.h"
 
+#define MENU_ITEM_MAX_WIDTH 300
 #define MENU_ITEM_HEIGHT 24
 #define MENU_ITEM_FONT_SIZE 13
 #define MENU_ICON_SIZE 14
@@ -89,7 +90,8 @@ int DMenuContent::contentWidth()
         result = qMax(result, metrics.width(action->text()));
     }
 
-    return result + _iconWidth + _shortcutWidth + _subMenuIndicatorWidth;
+    return qMin(MENU_ITEM_MAX_WIDTH,
+                result + _iconWidth + _shortcutWidth + _subMenuIndicatorWidth);
 }
 
 int DMenuContent::contentHeight()
@@ -207,14 +209,15 @@ void DMenuContent::paintEvent(QPaintEvent *)
             QString prop("%1Text");
             QVariant textCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
             QString text = textCache.isNull() ? action->text() : textCache.toString();
+            QString elidedText = elideText(text, actionRectWidthMargins.width() - _iconWidth - _shortcutWidth);
             QRect textRect = painter.boundingRect(QRect(actionRectWidthMargins.x() + _iconWidth,
                                                         actionRectWidthMargins.y(),
                                                         actionRectWidthMargins.width(),
                                                         actionRectWidthMargins.height()),
                                                   Qt::AlignVCenter,
-                                                  text);
+                                                  elidedText);
 
-            painter.drawStaticText(textRect.topLeft(), QStaticText(text));
+            painter.drawStaticText(textRect.topLeft(), QStaticText(elidedText));
 
             // draw shortcut text
             if(_shortcutWidth)
@@ -461,5 +464,27 @@ void DMenuContent::sendItemClickedSignal(QString id, bool checked)
             root = qobject_cast<DMenuBase *>(root->parent());
             Q_ASSERT(root);
         }
+    }
+}
+
+QString DMenuContent::elideText(QString source, int maxWidth) const
+{
+    QFont font;
+    font.setPixelSize(MENU_ITEM_FONT_SIZE);
+    QFontMetrics metrics(font);
+
+    if (metrics.width(source) < maxWidth) {
+        return source;
+    } else {
+        QString result;
+        foreach (QChar ch, source) {
+            if (metrics.width(result + ch + "...") >= maxWidth) {
+                return result + "...";
+            } else {
+                result.append(ch);
+            }
+        }
+
+        return result;
     }
 }

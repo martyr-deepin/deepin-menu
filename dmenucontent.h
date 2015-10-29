@@ -39,6 +39,7 @@ private:
     void doCheck(int);
     void doUnCheck(int);
     void sendItemClickedSignal(QString, bool);
+    QString elideText(QString source, int maxWidth) const;
 };
 
 #endif // DMENUCONTENT_H
