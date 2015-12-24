@@ -10,7 +10,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QPoint>
-#include <QStaticText>
+#include <QTextDocument>
 #include <QDebug>
 
 #include "utils.h"
@@ -89,7 +89,7 @@ int DMenuContent::contentWidth()
         //        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
         _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
 
-        result = qMax(result, metrics.width(action->text()));
+        result = qMax(result, metrics.width(trimTags(action->text())));
     }
 
     return qMin(MENU_ITEM_MAX_WIDTH,
@@ -211,15 +211,23 @@ void DMenuContent::paintEvent(QPaintEvent *)
             QString prop("%1Text");
             QVariant textCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
             QString text = textCache.isNull() ? action->text() : textCache.toString();
-            QString elidedText = elideText(text, actionRectWidthMargins.width() - _iconWidth - _shortcutWidth);
-            QRect textRect = painter.boundingRect(QRect(actionRectWidthMargins.x() + _iconWidth,
-                                                        actionRectWidthMargins.y(),
-                                                        actionRectWidthMargins.width(),
-                                                        actionRectWidthMargins.height()),
-                                                  Qt::AlignVCenter,
-                                                  elidedText);
+            QString elidedText = elideText(text, actionRectWidthMargins.width());
 
-            painter.drawStaticText(textRect.topLeft(), QStaticText(elidedText));
+            painter.save();
+            // move the start point to the right place.
+            // FIXME: don't know why we should do the -4 operation.
+            painter.translate(actionRectWidthMargins.x() + _iconWidth - 4,
+                              actionRectWidthMargins.y() - 4);
+            QTextDocument doc;
+            doc.setDefaultFont(font);
+            doc.setUseDesignMetrics(true);
+
+            QString itemRichText = QString("<font color='%1'>%2</font>") \
+                                            .arg(painter.pen().color().name()) \
+                                            .arg(elidedText);
+            doc.setHtml(itemRichText);
+            doc.drawContents(&painter);
+            painter.restore();
 
             // draw shortcut text
             if(_shortcutWidth)
@@ -238,6 +246,8 @@ void DMenuContent::paintEvent(QPaintEvent *)
                                   QImage(itemStyle.subMenuIndicatorIcon));
         }
     }
+
+    painter.end();
 }
 
 void DMenuContent::mouseMoveEvent(QMouseEvent *event)
@@ -531,4 +541,13 @@ QString DMenuContent::elideText(QString source, int maxWidth) const
 
         return result;
     }
+}
+
+QString DMenuContent::trimTags(QString source) const
+{
+    QString result(source);
+    result.replace("<u>", "");
+    result.replace("</u>", "");
+
+    return result;
 }

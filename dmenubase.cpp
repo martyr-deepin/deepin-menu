@@ -163,7 +163,7 @@ void DMenuBase::setContent(QJsonArray items)
         QAction *action = new QAction(this->menuContent().data());
         QRegExp regexp("_(.)");
         regexp.indexIn(itemObj["itemText"].toString());
-        QString navKey = regexp.cap(1);
+        QString navKey = QString("<u>%1</u>").arg(regexp.cap(1));
         QString itemText = itemObj["itemText"].toString().replace(regexp, navKey);
 
         action->setText(itemText);
