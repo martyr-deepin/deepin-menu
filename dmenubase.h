@@ -111,6 +111,9 @@ protected:
 
     virtual bool nativeEvent(const QByteArray &, void *, long *);
 
+private slots:
+    void grabFocusSlot();
+
 private:
     int xiErrorBase;
     int xiEventBase;
@@ -126,12 +129,14 @@ private:
 
     QSharedPointer<DMenuContent> _menuContent;
     QGraphicsDropShadowEffect *_dropShadow;
+    QTimer *_grabFocusTimer;
 
     void queryXIExtension();
     bool isXIEvent(xcb_generic_event_t *event, int opCode);
     bool isXIType(xcb_generic_event_t *event, int opCode, uint16_t type);
     qreal fixed1616ToReal(FP1616 val);
 
+    bool grabFocusInternal(int);
     void updateAll();
 };
 

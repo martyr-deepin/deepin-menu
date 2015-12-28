@@ -37,6 +37,9 @@ DMenuBase::DMenuBase(QWidget *parent) :
     _dropShadow->setColor(Qt::black);
     _dropShadow->setOffset(0.0);
     this->setGraphicsEffect(_dropShadow);
+
+    _grabFocusTimer = new QTimer(this);
+    _grabFocusTimer->setSingleShot(true);
 }
 
 // getters and setters
@@ -198,25 +201,54 @@ void DMenuBase::destroyAll()
         Q_ASSERT(parent);
         parent->destroyAll();
     } else {
-      this->deleteLater();
+        this->deleteLater();
     }
-
-    this->menuContent()->releaseMouse();
-    this->menuContent()->releaseKeyboard();
 }
 
 void DMenuBase::grabFocus()
 {
+    grabFocusSlot();
+    connect(_grabFocusTimer, SIGNAL(timeout()), this, SLOT(grabFocusSlot()));
+}
+
+bool DMenuBase::grabFocusInternal(int tryTimes)
+{
     QWindow *window = this->menuContent()->windowHandle();
     if (!window)
-      if (const QWidget *nativeParent = this->menuContent()->nativeParentWidget())
-        window = nativeParent->windowHandle();
+        if (const QWidget *nativeParent = this->menuContent()->nativeParentWidget())
+            window = nativeParent->windowHandle();
     // grab pointer
-    window->setMouseGrabEnabled(true);
+    int i = 0;
+    while(!window->setMouseGrabEnabled(true) && i < tryTimes) {
+        QThread::msleep(10);
+        i++;
+    }
+    if (i >= tryTimes) {
+        qWarning() << QString("GrabMouse Failed after tring %1 times").arg(i);
+    } else {
+        qDebug() << QString("GrabMouse tries %1").arg(i);
+    }
     this->menuContent()->grabMouse();
 
-    window->setKeyboardGrabEnabled(true);
+    // grab keyboard
+    int j = 0;
+    while(!window->setKeyboardGrabEnabled(true) && j < tryTimes) {
+        QThread::msleep(10);
+        j++;
+    }
+    if (j >= tryTimes) {
+        qWarning() << QString("GrabKeyboard Failed after tring %1 times").arg(j);
+    } else {
+        qDebug() << QString("GrabKeyboard tries %1").arg(j);
+    }
     this->menuContent()->grabKeyboard();
+
+    return (i < tryTimes) && (j < tryTimes);
+}
+
+void DMenuBase::grabFocusSlot()
+{
+    if (!grabFocusInternal(1)) { _grabFocusTimer->start(); }
 }
 
 DMenuBase *DMenuBase::menuUnderPoint(QPoint point)
