@@ -277,10 +277,10 @@ void DMenuContent::keyPressEvent(QKeyEvent *event)
         this->doCurrentAction();
         break;
     case Qt::Key_Up:
-        this->setCurrentIndex(qMax(currentIndex() - 1, 0));
+        this->selectPrevious();
         break;
     case Qt::Key_Down:
-        this->setCurrentIndex(qMin(currentIndex() + 1, this->actions().count() - 1));
+        this->selectNext();
         break;
     case Qt::Key_Right:
         if (parent->subMenu() && parent->subMenu()->isVisible())
@@ -366,6 +366,48 @@ int DMenuContent::getNextItemsHasShortcut(int startPos, QString keyText) {
         }
     }
     return -1;
+}
+
+void DMenuContent::selectPrevious()
+{
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
+
+    for (int i = currentIndex() - 1; i >= 0; i--) {
+        QAction * action = actions().at(i);
+
+        QString itemId(action->property("itemId").toString());
+
+        QString prop("%1Active");
+        QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
+        bool active = activeCache.isNull() ? action->isEnabled() : activeCache.toBool();
+
+        if (active && !action->text().isEmpty()) {
+            setCurrentIndex(i);
+            break;
+        }
+    }
+}
+
+void DMenuContent::selectNext()
+{
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
+
+    for (int i = currentIndex() + 1; i < actions().count(); i++) {
+        QAction * action = actions().at(i);
+
+        QString itemId(action->property("itemId").toString());
+
+        QString prop("%1Active");
+        QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
+        bool active = activeCache.isNull() ? action->isEnabled() : activeCache.toBool();
+
+        if (active && !action->text().isEmpty()) {
+            setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 void DMenuContent::doCheck(int index) {

@@ -36,6 +36,8 @@ private:
     int _currentIndex;
     QRect getRectOfActionAtIndex(int);
     int getNextItemsHasShortcut(int, QString);
+    void selectPrevious();
+    void selectNext();
     void doCheck(int);
     void doUnCheck(int);
     void sendItemClickedSignal(QString, bool);
