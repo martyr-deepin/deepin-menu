@@ -38,6 +38,8 @@ int DMenuContent::currentIndex()
 
 void DMenuContent::setCurrentIndex(int index)
 {
+    if (_currentIndex == index) return;
+
     _currentIndex = index;
     this->update();
 
