@@ -90,10 +90,16 @@ void DDesktopMenu::setPosition(int x, int y)
             + this->height()
             > currentMonitorRect.y()
             + currentMonitorRect.height()) {
-        point.setY(currentMonitorRect.y()
-                   + currentMonitorRect.height()
-                   - this->height());
-
+        if (this->parent()) {
+            point.setY(currentMonitorRect.y()
+                       + currentMonitorRect.height()
+                       - this->height());
+        } else {
+            point.setY(point.y()
+                       - this->height()
+                       + this->shadowMargins().top()
+                       + this->shadowMargins().bottom());
+        }
     }
 
     this->move(point);
