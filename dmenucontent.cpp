@@ -89,7 +89,8 @@ int DMenuContent::contentWidth()
         //        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
         _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
 
-        result = qMax(result, metrics.width(trimTags(action->text())));
+        //FIXME: the +2 is just a work-around.
+        result = qMax(result, metrics.width(trimTags(action->text())) + 2);
     }
 
     return qMin(MENU_ITEM_MAX_WIDTH,
