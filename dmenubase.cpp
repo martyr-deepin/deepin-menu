@@ -208,9 +208,9 @@ void DMenuBase::destroyAll()
 
 void DMenuBase::grabFocus()
 {
+    grabFocusSlot();
     if (m_focusGrabbed) return;
 
-    grabFocusSlot();
     connect(_grabFocusTimer, SIGNAL(timeout()), this, SLOT(grabFocusSlot()));
 }
 
