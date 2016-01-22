@@ -218,15 +218,24 @@ void DMenuContent::paintEvent(QPaintEvent *)
             // move the start point to the right place.
             // FIXME: don't know why we should do the -4 operation.
             painter.translate(actionRectWidthMargins.x() + _iconWidth - 4,
-                              actionRectWidthMargins.y() - 4);
-            QTextDocument doc;
-            doc.setDefaultFont(font);
-            doc.setUseDesignMetrics(true);
+                              actionRectWidthMargins.y());
+            if (font.defaultFamily() == "Source Han Sans SC") {
+                painter.translate(0, -4);
+            }
 
             QString itemRichText = QString("<font color='%1'>%2</font>") \
                                             .arg(painter.pen().color().name()) \
                                             .arg(elidedText);
+
+            // no help.
+//            QTextOption opt;
+//            opt.setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+
+            QTextDocument doc;
             doc.setHtml(itemRichText);
+            doc.setDefaultFont(font);
+//            doc.setDefaultTextOption(opt);
+
             doc.drawContents(&painter);
             painter.restore();
 
