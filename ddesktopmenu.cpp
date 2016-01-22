@@ -117,6 +117,8 @@ void DDesktopMenu::showSubMenu(int x, int y, QJsonObject subMenuJsonObject)
         _subMenu->setContent(items);
         _subMenu->setPosition(x, y);
         _subMenu->show();
+        _subMenu->grabFocus();
+        _subMenu->menuContent()->setCurrentIndex(0);
     } else if (_subMenu && _subMenu->isVisible()) {
         _subMenu->deleteLater();
         _subMenu = NULL;
