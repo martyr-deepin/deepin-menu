@@ -130,7 +130,6 @@ private:
     QSharedPointer<DMenuContent> _menuContent;
     QGraphicsDropShadowEffect *_dropShadow;
     QTimer *_grabFocusTimer;
-    bool m_focusGrabbed = false;
 
     void queryXIExtension();
     bool isXIEvent(xcb_generic_event_t *event, int opCode);

@@ -208,9 +208,15 @@ void DMenuBase::destroyAll()
 
 void DMenuBase::grabFocus()
 {
-    grabFocusSlot();
-    if (m_focusGrabbed) return;
+    if (mouseGrabber() == menuContent().data()
+        && keyboardGrabber() == menuContent().data())
+    {
+        // the menu already grabs the focus, no need
+        // to do it again.
+        return;
+    }
 
+    grabFocusSlot();
     connect(_grabFocusTimer, SIGNAL(timeout()), this, SLOT(grabFocusSlot()));
 }
 
@@ -251,8 +257,9 @@ bool DMenuBase::grabFocusInternal(int tryTimes)
 
 void DMenuBase::grabFocusSlot()
 {
-    m_focusGrabbed = grabFocusInternal(1);
-    if (!m_focusGrabbed) { _grabFocusTimer->start(); }
+    if (!grabFocusInternal(1)) {
+        _grabFocusTimer->start();
+    }
 }
 
 DMenuBase *DMenuBase::menuUnderPoint(QPoint point)
@@ -392,9 +399,7 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
 //                    fixed1616ToReal(ev->root_y);
                 DMenuBase *menuUnderPoint = this->menuUnderPoint(
                     QPoint(fixed1616ToReal(ev->root_x), fixed1616ToReal(ev->root_y)));
-                if (menuUnderPoint &&
-                    (this->mouseGrabber() != menuUnderPoint
-                     || this->keyboardGrabber() != menuUnderPoint)) {
+                if (menuUnderPoint) {
                     menuUnderPoint->grabFocus();
                 }
             }
