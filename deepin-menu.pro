@@ -37,7 +37,7 @@ HEADERS  += \
     ddockmenu.h \
     dmenuapplication.h
 
-LIBS += -lxcb
+LIBS += -lxcb -lX11
 
 RESOURCES += \
     images.qrc

@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2015 Deepin Technology Co., Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ **/
+
 #include <QPainter>
 #include <QPainterPath>
 #include <QBrush>
@@ -90,10 +99,16 @@ void DDesktopMenu::setPosition(int x, int y)
             + this->height()
             > currentMonitorRect.y()
             + currentMonitorRect.height()) {
-        point.setY(currentMonitorRect.y()
-                   + currentMonitorRect.height()
-                   - this->height());
-
+        if (this->parent()) {
+            point.setY(currentMonitorRect.y()
+                       + currentMonitorRect.height()
+                       - this->height());
+        } else {
+            point.setY(point.y()
+                       - this->height()
+                       + this->shadowMargins().top()
+                       + this->shadowMargins().bottom());
+        }
     }
 
     this->move(point);
@@ -111,6 +126,8 @@ void DDesktopMenu::showSubMenu(int x, int y, QJsonObject subMenuJsonObject)
         _subMenu->setContent(items);
         _subMenu->setPosition(x, y);
         _subMenu->show();
+        _subMenu->grabFocus();
+        _subMenu->menuContent()->setCurrentIndex(0);
     } else if (_subMenu && _subMenu->isVisible()) {
         _subMenu->deleteLater();
         _subMenu = NULL;

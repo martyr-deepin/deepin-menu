@@ -1,9 +1,39 @@
+/**
+ * Copyright (C) 2015 Deepin Technology Co., Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ **/
+
 #ifndef DMENUBASE_H
 #define DMENUBASE_H
+
+// this event type was added in libxcb 1.10,
+// but we support also older version
+#ifndef XCB_GE_GENERIC
+#define XCB_GE_GENERIC 35
+#endif
 
 #include <QWidget>
 #include <QSharedPointer>
 #include <QGraphicsDropShadowEffect>
+
+#include <xcb/xcb.h>
+#include <X11/extensions/XI2proto.h>
+
+// Starting from the xcb version 1.9.3 struct xcb_ge_event_t has changed:
+// - "pad0" became "extension"
+// - "pad1" and "pad" became "pad0"
+// New and old version of this struct share the following fields:
+typedef struct qt_xcb_ge_event_t {
+    uint8_t  response_type;
+    uint8_t  extension;
+    uint16_t sequence;
+    uint32_t length;
+    uint16_t event_type;
+} qt_xcb_ge_event_t;
 
 class QColor;
 class QTimer;
@@ -94,6 +124,10 @@ private slots:
     void grabFocusSlot();
 
 private:
+    int xiErrorBase;
+    int xiEventBase;
+    int xiOpCode;
+
     int _radius;
     QMargins _shadowMargins;
     QMargins _menuContentMargins;
@@ -105,6 +139,11 @@ private:
     QSharedPointer<DMenuContent> _menuContent;
     QGraphicsDropShadowEffect *_dropShadow;
     QTimer *_grabFocusTimer;
+
+    void queryXIExtension();
+    bool isXIEvent(xcb_generic_event_t *event, int opCode);
+    bool isXIType(xcb_generic_event_t *event, int opCode, uint16_t type);
+    qreal fixed1616ToReal(FP1616 val);
 
     bool grabFocusInternal(int);
     void updateAll();

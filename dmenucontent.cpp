@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2015 Deepin Technology Co., Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ **/
+
 #include <QRect>
 #include <QPainter>
 #include <QBrush>
@@ -10,13 +19,14 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QPoint>
-#include <QStaticText>
+#include <QTextDocument>
 #include <QDebug>
 
 #include "utils.h"
 #include "dmenubase.h"
 #include "dmenucontent.h"
 
+#define MENU_ITEM_MAX_WIDTH 300
 #define MENU_ITEM_HEIGHT 24
 #define MENU_ITEM_FONT_SIZE 13
 #define MENU_ICON_SIZE 14
@@ -37,6 +47,8 @@ int DMenuContent::currentIndex()
 
 void DMenuContent::setCurrentIndex(int index)
 {
+    if (_currentIndex == index) return;
+
     _currentIndex = index;
     this->update();
 
@@ -82,14 +94,16 @@ int DMenuContent::contentWidth()
         */
         _iconWidth = MENU_ICON_SIZE + parent->itemLeftSpacing();
         if(!action->shortcut().isEmpty()) _shortcutWidth = qMax(_shortcutWidth, metrics.width(action->shortcut().toString()) + parent->itemCenterSpacing());
-//        bool hasSubMenu = action->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0;
-//        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
+        //        bool hasSubMenu = action->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0;
+        //        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
         _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
 
-        result = qMax(result, metrics.width(action->text()));
+        //FIXME: the +2 is just a work-around.
+        result = qMax(result, metrics.width(trimTags(action->text())) + 2);
     }
 
-    return result + _iconWidth + _shortcutWidth + _subMenuIndicatorWidth;
+    return qMin(MENU_ITEM_MAX_WIDTH,
+                result + _iconWidth + _shortcutWidth + _subMenuIndicatorWidth);
 }
 
 int DMenuContent::contentHeight()
@@ -148,7 +162,7 @@ void DMenuContent::paintEvent(QPaintEvent *)
     painter.setFont(font);
 
     for(int i = 0; i < this->actions().count(); i++) {
-    	QAction *action = this->actions().at(i);
+        QAction *action = this->actions().at(i);
         QRect actionRect = this->getRectOfActionAtIndex(i);
         QRect actionRectWidthMargins = actionRect.marginsRemoved(QMargins(this->contentsMargins().left(), 0, this->contentsMargins().right(), 0));
         QString itemId = action->property("itemId").toString();
@@ -186,8 +200,8 @@ void DMenuContent::paintEvent(QPaintEvent *)
                 bool checked = checkedCache.isNull() ? action->isChecked() : checkedCache.toBool();
 
                 if (!action->property("itemIcon").toString().isEmpty() || \
-                    !action->property("itemIconHover").toString().isEmpty() || \
-                    !action->property("itemIconInactive").toString().isEmpty())
+                        !action->property("itemIconHover").toString().isEmpty() || \
+                        !action->property("itemIconInactive").toString().isEmpty())
                 {
                     qDebug() << "draw icon";
                     if (!active) {
@@ -207,14 +221,32 @@ void DMenuContent::paintEvent(QPaintEvent *)
             QString prop("%1Text");
             QVariant textCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
             QString text = textCache.isNull() ? action->text() : textCache.toString();
-            QRect textRect = painter.boundingRect(QRect(actionRectWidthMargins.x() + _iconWidth,
-                                                        actionRectWidthMargins.y(),
-                                                        actionRectWidthMargins.width(),
-                                                        actionRectWidthMargins.height()),
-                                                  Qt::AlignVCenter,
-                                                  text);
+            QString elidedText = elideText(text, actionRectWidthMargins.width());
 
-            painter.drawStaticText(textRect.topLeft(), QStaticText(text));
+            painter.save();
+            // move the start point to the right place.
+            // FIXME: don't know why we should do the -4 operation.
+            painter.translate(actionRectWidthMargins.x() + _iconWidth - 4,
+                              actionRectWidthMargins.y());
+            if (font.defaultFamily() == "Source Han Sans SC") {
+                painter.translate(0, -4);
+            }
+
+            QString itemRichText = QString("<font color='%1'>%2</font>") \
+                                            .arg(painter.pen().color().name()) \
+                                            .arg(elidedText);
+
+            // no help.
+//            QTextOption opt;
+//            opt.setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+
+            QTextDocument doc;
+            doc.setHtml(itemRichText);
+            doc.setDefaultFont(font);
+//            doc.setDefaultTextOption(opt);
+
+            doc.drawContents(&painter);
+            painter.restore();
 
             // draw shortcut text
             if(_shortcutWidth)
@@ -233,6 +265,8 @@ void DMenuContent::paintEvent(QPaintEvent *)
                                   QImage(itemStyle.subMenuIndicatorIcon));
         }
     }
+
+    painter.end();
 }
 
 void DMenuContent::mouseMoveEvent(QMouseEvent *event)
@@ -274,10 +308,10 @@ void DMenuContent::keyPressEvent(QKeyEvent *event)
         this->doCurrentAction();
         break;
     case Qt::Key_Up:
-        this->setCurrentIndex(qMax(currentIndex() - 1, 0));
+        this->selectPrevious();
         break;
     case Qt::Key_Down:
-        this->setCurrentIndex(qMin(currentIndex() + 1, this->actions().count() - 1));
+        this->selectNext();
         break;
     case Qt::Key_Right:
         if (parent->subMenu() && parent->subMenu()->isVisible())
@@ -332,20 +366,79 @@ void DMenuContent::clearActions()
 int DMenuContent::getNextItemsHasShortcut(int startPos, QString keyText) {
     if (keyText.isEmpty()) return -1;
 
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
+
     for (int i = qMax(startPos, 0); i < this->actions().count(); i++) {
+        QString itemId(this->actions().at(i)->property("itemId").toString());
+        QAction *action = this->actions().at(i);
+
+        QString prop("%1Active");
+        QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
+        bool active = activeCache.isNull() ? action->isEnabled() : activeCache.toBool();
+
         // a trick here, using currentIndex as the cursor.
-        if (keyText == this->actions().at(i)->property("itemNavKey").toString().toLower()){
+        if (active && keyText == this->actions().at(i)->property("itemNavKey").toString().toLower()){
             return i;
         }
     }
 
+    // we do the check another time to support wrapping.
     for (int i = 0; i < this->actions().count(); i++) {
-        // we do the check another time to support wrapping.
-        if (keyText == this->actions().at(i)->property("itemNavKey").toString().toLower()) {
+        QString itemId(this->actions().at(i)->property("itemId").toString());
+        QAction *action = this->actions().at(i);
+
+        QString prop("%1Active");
+        QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
+        bool active = activeCache.isNull() ? action->isEnabled() : activeCache.toBool();
+
+        if (active && keyText == this->actions().at(i)->property("itemNavKey").toString().toLower()) {
             return i;
         }
     }
     return -1;
+}
+
+void DMenuContent::selectPrevious()
+{
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
+
+    for (int i = currentIndex() - 1; i >= 0; i--) {
+        QAction * action = actions().at(i);
+
+        QString itemId(action->property("itemId").toString());
+
+        QString prop("%1Active");
+        QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
+        bool active = activeCache.isNull() ? action->isEnabled() : activeCache.toBool();
+
+        if (active && !action->text().isEmpty()) {
+            setCurrentIndex(i);
+            break;
+        }
+    }
+}
+
+void DMenuContent::selectNext()
+{
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
+
+    for (int i = currentIndex() + 1; i < actions().count(); i++) {
+        QAction * action = actions().at(i);
+
+        QString itemId(action->property("itemId").toString());
+
+        QString prop("%1Active");
+        QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
+        bool active = activeCache.isNull() ? action->isEnabled() : activeCache.toBool();
+
+        if (active && !action->text().isEmpty()) {
+            setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 void DMenuContent::doCheck(int index) {
@@ -445,4 +538,35 @@ void DMenuContent::sendItemClickedSignal(QString id, bool checked)
             Q_ASSERT(root);
         }
     }
+}
+
+QString DMenuContent::elideText(QString source, int maxWidth) const
+{
+    QFont font;
+    font.setPixelSize(MENU_ITEM_FONT_SIZE);
+    QFontMetrics metrics(font);
+
+    if (metrics.width(source) < maxWidth) {
+        return source;
+    } else {
+        QString result;
+        foreach (QChar ch, source) {
+            if (metrics.width(result + ch + "...") >= maxWidth) {
+                return result + "...";
+            } else {
+                result.append(ch);
+            }
+        }
+
+        return result;
+    }
+}
+
+QString DMenuContent::trimTags(QString source) const
+{
+    QString result(source);
+    result.replace("<u>", "");
+    result.replace("</u>", "");
+
+    return result;
 }
