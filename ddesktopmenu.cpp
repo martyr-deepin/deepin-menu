@@ -35,7 +35,7 @@ DDesktopMenu::DDesktopMenu(DDesktopMenu *parent):
                            QColor("#636363"),
                            ":/images/check_light_normal.png",
                            ":/images/arrow-light.png" };
-    this->_hoverStyle = { QColor("#535353"),
+    this->_hoverStyle = { QColor("#2ca7f8"),
                           Qt::white,
                           QColor("#636363"),
                           ":/images/check_light_hover.png",
