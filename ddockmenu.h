@@ -17,19 +17,30 @@
 
 class DDockMenu : public DMenuBase
 {
+    Q_OBJECT
 public:
+    enum Direction {
+        Top, Bottom, Right, Left
+    };
+
     DDockMenu(DDockMenu *parent = 0);
 
     virtual void setPosition(int, int);
+
+    Direction direction() const;
+    void setDirection(const Direction &direction);
 
 protected:
     virtual void paintEvent(QPaintEvent *);
 
 private:
     int m_cornerX;
+    int m_cornerY;
+    Direction m_direction;
     virtual void showSubMenu(int, int, QJsonObject);
 
     void moveCornerX(int);
+    void moveCornerY(int);
 };
 
 #endif // DDOCKMENU_H

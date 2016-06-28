@@ -15,6 +15,7 @@
 class QJsonObject;
 class DDesktopMenu : public DMenuBase
 {
+    Q_OBJECT
 public:
     DDesktopMenu(DDesktopMenu *parent=0);
 

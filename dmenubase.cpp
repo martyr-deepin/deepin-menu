@@ -195,12 +195,15 @@ void DMenuBase::setContent(QJsonArray items)
                  + _shadowMargins.left()
                  + _shadowMargins.right()
                  + _menuContentMargins.left()
-                 + _menuContentMargins.right(),
+                 + _menuContentMargins.right()
+                 + this->contentsMargins().left() - _shadowMargins.left()
+                 + this->contentsMargins().right() - _shadowMargins.right(),
                  _menuContent->contentHeight()
                  + _shadowMargins.top()
                  + _shadowMargins.bottom()
                  + _menuContentMargins.top()
                  + _menuContentMargins.bottom()
+                 + this->contentsMargins().top() - _shadowMargins.top()
                  + this->contentsMargins().bottom() - _shadowMargins.bottom());
 }
 

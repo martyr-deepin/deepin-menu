@@ -8,4 +8,4 @@ core
 *.o
 moc_*
 qrc_*.cpp
-deepin-menu.pro.user
+deepin-menu.pro.user*

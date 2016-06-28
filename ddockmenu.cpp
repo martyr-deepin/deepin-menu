@@ -23,17 +23,16 @@
 
 DDockMenu::DDockMenu(DDockMenu *parent):
     DMenuBase(parent),
-    m_cornerX(0)
+    m_cornerX(0),
+    m_cornerY(0)
 {
     this->setShadowMargins(QMargins(10, 10, 10, 10));
-    this->setContentsMargins(QMargins(this->shadowMargins().left(),
-                                      this->shadowMargins().top(),
-                                      this->shadowMargins().right(),
-                                      this->shadowMargins().bottom() + CORNER_HEIGHT));
     this->setMenuContentMargins(QMargins(5, 5, 5, 5));
     this->setItemLeftSpacing(10);
     this->setItemCenterSpacing(10);
     this->setItemRightSpacing(10);
+
+    this->setDirection(Bottom);
 
     this->_normalStyle = ItemStyle{Qt::transparent,
             Qt::white,
@@ -63,56 +62,210 @@ void DDockMenu::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    int cornerX = m_cornerX ? m_cornerX : rect.x() + rect.width() / 2;
-    QPoint topLeft(rect.x(), rect.y());
-    QPoint topRight(rect.x() + rect.width(), rect.y());
-    QPoint bottomRight(rect.x() + rect.width(), rect.y() + rect.height() - CORNER_HEIGHT);
-    QPoint bottomLeft(rect.x(), rect.y() + rect.height() - CORNER_HEIGHT);
-    QPoint cornerPoint(cornerX, rect.y() + rect.height());
-    int radius = this->radius();
+    if (m_direction == Bottom) {
+        int cornerX = m_cornerX ? m_cornerX : rect.x() + rect.width() / 2;
+        QPoint topLeft(rect.x(), rect.y());
+        QPoint topRight(rect.x() + rect.width(), rect.y());
+        QPoint bottomRight(rect.x() + rect.width(), rect.y() + rect.height() - CORNER_HEIGHT);
+        QPoint bottomLeft(rect.x(), rect.y() + rect.height() - CORNER_HEIGHT);
+        QPoint cornerPoint(cornerX, rect.y() + rect.height());
+        int radius = this->radius();
 
-    QPainterPath border;
-    border.moveTo(topLeft.x() + radius, topLeft.y());
-    border.lineTo(topRight.x() - radius, topRight.y());
-    border.arcTo(topRight.x() - 2 * radius, topRight.y(), 2 * radius, 2 * radius, 90, -90);
-    border.lineTo(bottomRight.x(), bottomRight.y() - radius);
-    border.arcTo(bottomRight.x() - 2 * radius, bottomRight.y() - 2 * radius, 2 * radius, 2 * radius, 0, -90);
-    border.lineTo(cornerPoint.x() + CORNER_WIDTH / 2, cornerPoint.y() - CORNER_HEIGHT);
-    border.lineTo(cornerPoint);
-    border.lineTo(cornerPoint.x() - CORNER_WIDTH / 2, cornerPoint.y() - CORNER_HEIGHT);
-    border.lineTo(bottomLeft.x() + radius, bottomLeft.y());
-    border.arcTo(bottomLeft.x(), bottomLeft.y() - 2 * radius, 2 * radius, 2 * radius, -90, -90);
-    border.lineTo(topLeft.x(), topLeft.y() + radius);
-    border.arcTo(topLeft.x(), topLeft.y(), 2 * radius, 2 * radius, 180, -90);
+        QPainterPath border;
+        border.moveTo(topLeft.x() + radius, topLeft.y());
+        border.lineTo(topRight.x() - radius, topRight.y());
+        border.arcTo(topRight.x() - 2 * radius, topRight.y(), 2 * radius, 2 * radius, 90, -90);
+        border.lineTo(bottomRight.x(), bottomRight.y() - radius);
+        border.arcTo(bottomRight.x() - 2 * radius, bottomRight.y() - 2 * radius, 2 * radius, 2 * radius, 0, -90);
+        border.lineTo(cornerPoint.x() + CORNER_WIDTH / 2, cornerPoint.y() - CORNER_HEIGHT);
+        border.lineTo(cornerPoint);
+        border.lineTo(cornerPoint.x() - CORNER_WIDTH / 2, cornerPoint.y() - CORNER_HEIGHT);
+        border.lineTo(bottomLeft.x() + radius, bottomLeft.y());
+        border.arcTo(bottomLeft.x(), bottomLeft.y() - 2 * radius, 2 * radius, 2 * radius, -90, -90);
+        border.lineTo(topLeft.x(), topLeft.y() + radius);
+        border.arcTo(topLeft.x(), topLeft.y(), 2 * radius, 2 * radius, 180, -90);
 
-    painter.strokePath(border, QPen(Qt::white));
-    painter.fillPath(border, QBrush(Qt::black));
+        painter.strokePath(border, QPen(Qt::white));
+        painter.fillPath(border, QBrush(Qt::black));
+
+    } else if(m_direction == Top) {
+        int cornerX = m_cornerX ? m_cornerX : rect.x() + rect.width() / 2;
+        QPoint topLeft(rect.x(), rect.y() + CORNER_HEIGHT);
+        QPoint topRight(rect.x() + rect.width(), rect.y() + CORNER_HEIGHT);
+        QPoint bottomRight(rect.x() + rect.width(), rect.y() + rect.height());
+        QPoint bottomLeft(rect.x(), rect.y() + rect.height());
+        QPoint cornerPoint(cornerX, rect.y());
+        int radius = this->radius();
+
+        QPainterPath border;
+        border.moveTo(topLeft.x() + radius, topLeft.y());
+        border.lineTo(cornerPoint.x() - CORNER_WIDTH / 2, cornerPoint.y() + CORNER_HEIGHT);
+        border.lineTo(cornerPoint);
+        border.lineTo(cornerPoint.x() + CORNER_WIDTH / 2, cornerPoint.y() + CORNER_HEIGHT);
+        border.lineTo(topRight.x() - radius, topRight.y());
+        border.arcTo(topRight.x() - 2 * radius, topRight.y(), 2 * radius, 2 * radius, 90, -90);
+        border.lineTo(bottomRight.x(), bottomRight.y() - radius);
+        border.arcTo(bottomRight.x() - 2 * radius, bottomRight.y() - 2 * radius, 2 * radius, 2 * radius, 0, -90);
+        border.lineTo(bottomLeft.x() + radius, bottomLeft.y());
+        border.arcTo(bottomLeft.x(), bottomLeft.y() - 2 * radius, 2 * radius, 2 * radius, -90, -90);
+        border.lineTo(topLeft.x(), topLeft.y() + radius);
+        border.arcTo(topLeft.x(), topLeft.y(), 2 * radius, 2 * radius, 180, -90);
+
+        painter.strokePath(border, QPen(Qt::white));
+        painter.fillPath(border, QBrush(Qt::black));
+    } else if(m_direction == Left) {
+        int cornerY = m_cornerY ? m_cornerY : rect.y() + rect.height() / 2;
+        QPoint topLeft(rect.x() + CORNER_HEIGHT, rect.y());
+        QPoint topRight(rect.x() + rect.width(), rect.y());
+        QPoint bottomRight(rect.x() + rect.width(), rect.y() + rect.height());
+        QPoint bottomLeft(rect.x() + CORNER_HEIGHT, rect.y() + rect.height());
+        QPoint cornerPoint(rect.x(), cornerY);
+        int radius = this->radius();
+
+        QPainterPath border;
+        border.moveTo(topLeft.x() + radius, topLeft.y());     
+        border.lineTo(topRight.x() - radius, topRight.y());
+        border.arcTo(topRight.x() - 2 * radius, topRight.y(), 2 * radius, 2 * radius, 90, -90);
+        border.lineTo(bottomRight.x(), bottomRight.y() - radius);
+        border.arcTo(bottomRight.x() - 2 * radius, bottomRight.y() - 2 * radius, 2 * radius, 2 * radius, 0, -90);
+        border.lineTo(bottomLeft.x() + radius, bottomLeft.y());
+        border.arcTo(bottomLeft.x(), bottomLeft.y() - 2 * radius, 2 * radius, 2 * radius, -90, -90);
+        border.lineTo(cornerPoint.x() + CORNER_HEIGHT, cornerPoint.y() + CORNER_WIDTH / 2);
+        border.lineTo(cornerPoint);
+        border.lineTo(cornerPoint.x() + CORNER_HEIGHT, cornerPoint.y() - CORNER_WIDTH / 2);
+        border.lineTo(topLeft.x(), topLeft.y() + radius);
+        border.arcTo(topLeft.x(), topLeft.y(), 2 * radius, 2 * radius, 180, -90);
+
+        painter.strokePath(border, QPen(Qt::white));
+        painter.fillPath(border, QBrush(Qt::black));
+    } else {
+        int cornerY = m_cornerY ? m_cornerY : rect.y() + rect.height() / 2;
+        QPoint topLeft(rect.x(), rect.y());
+        QPoint topRight(rect.x() + rect.width() - CORNER_HEIGHT, rect.y());
+        QPoint bottomRight(rect.x() + rect.width() - CORNER_HEIGHT, rect.y() + rect.height());
+        QPoint bottomLeft(rect.x(), rect.y() + rect.height());
+        QPoint cornerPoint(rect.x() + rect.width(), cornerY);
+        int radius = this->radius();
+
+        QPainterPath border;
+        border.moveTo(topLeft.x() + radius, topLeft.y());
+        border.lineTo(topRight.x() - radius, topRight.y());
+        border.arcTo(topRight.x() - 2 * radius, topRight.y(), 2 * radius, 2 * radius, 90, -90);
+        border.lineTo(cornerPoint.x() - CORNER_HEIGHT, cornerPoint.y() - CORNER_WIDTH / 2);
+        border.lineTo(cornerPoint);
+        border.lineTo(cornerPoint.x() - CORNER_HEIGHT, cornerPoint.y() + CORNER_WIDTH / 2);
+        border.lineTo(bottomRight.x(), bottomRight.y() - radius);
+        border.arcTo(bottomRight.x() - 2 * radius, bottomRight.y() - 2 * radius, 2 * radius, 2 * radius, 0, -90);
+        border.lineTo(bottomLeft.x() + radius, bottomLeft.y());
+        border.arcTo(bottomLeft.x(), bottomLeft.y() - 2 * radius, 2 * radius, 2 * radius, -90, -90);
+        border.lineTo(topLeft.x(), topLeft.y() + radius);
+        border.arcTo(topLeft.x(), topLeft.y(), 2 * radius, 2 * radius, 180, -90);
+
+        painter.strokePath(border, QPen(Qt::white));
+        painter.fillPath(border, QBrush(Qt::black));
+    }
+}
+
+DDockMenu::Direction DDockMenu::direction() const
+{
+    return m_direction;
+}
+
+void DDockMenu::setDirection(const Direction &direction)
+{
+    if (m_direction != direction) {
+        m_direction = direction;
+        setContentsMargins(QMargins(shadowMargins().left() + (m_direction == Left ? CORNER_HEIGHT : 0),
+                                    shadowMargins().top() + (m_direction == Top ? CORNER_HEIGHT : 0),
+                                    shadowMargins().right() + (m_direction == Right ? CORNER_HEIGHT : 0),
+                                    shadowMargins().bottom()  + (m_direction == Bottom ? CORNER_HEIGHT : 0)));
+    }
 }
 
 void DDockMenu::setPosition(int x, int y)
 {
-    QPoint point(x - this->width() / 2,
-                 y - this->height() + this->shadowMargins().bottom() / 2);
-    QRect currentMonitorRect = Utils::currentMonitorRect(x, y);
-    int deltaToMonitorLSide = point.x() -
-            currentMonitorRect.x();
+    if (m_direction == Top) {
+        QPoint point(x - this->width() / 2, y);
+        QRect currentMonitorRect = Utils::currentMonitorRect(x, y);
+        int deltaToMonitorLSide = point.x() -
+                currentMonitorRect.x();
 
-    int deltaToMonitorRSide = currentMonitorRect.x()
-            + currentMonitorRect.width()
-            - x - this->width() / 2;
+        int deltaToMonitorRSide = currentMonitorRect.x()
+                + currentMonitorRect.width()
+                - point.x();
 
-    if (deltaToMonitorLSide < 0) {
-        point.setX(point.x() - deltaToMonitorLSide);
-        this->moveCornerX(deltaToMonitorLSide);
-        this->repaint();
+        if (deltaToMonitorLSide < 0) {
+            point.setX(point.x() - deltaToMonitorLSide);
+            this->moveCornerX(deltaToMonitorLSide);
+        }
+        if (deltaToMonitorRSide < 0) {
+            point.setX(point.x() + deltaToMonitorRSide);
+            this->moveCornerX(-deltaToMonitorRSide);
+        }
+
+        this->move(point);
+    } else if (m_direction == Bottom) {
+        QPoint point(x - this->width() / 2,
+                     y - this->height() + this->shadowMargins().bottom() / 2);
+        QRect currentMonitorRect = Utils::currentMonitorRect(x, y);
+        int deltaToMonitorLSide = point.x() -
+                currentMonitorRect.x();
+
+        int deltaToMonitorRSide = currentMonitorRect.x()
+                + currentMonitorRect.width()
+                - point.x();
+
+        if (deltaToMonitorLSide < 0) {
+            point.setX(point.x() - deltaToMonitorLSide);
+            this->moveCornerX(deltaToMonitorLSide);
+        }
+        if (deltaToMonitorRSide < 0) {
+            point.setX(point.x() + deltaToMonitorRSide);
+            this->moveCornerX(-deltaToMonitorRSide);
+        }
+
+        this->move(point);
+    } else if (m_direction == Left) {
+        QPoint point(x, y - this->height() / 2);
+        QRect currentMonitorRect = Utils::currentMonitorRect(x, y);
+        int deltaToMonitorTSide = point.y() -
+                currentMonitorRect.y();
+
+        int deltaToMonitorBSide = currentMonitorRect.y()
+                + currentMonitorRect.height()
+                - point.y();
+
+        if (deltaToMonitorTSide < 0) {
+            point.setY(point.y() - deltaToMonitorTSide);
+            this->moveCornerY(deltaToMonitorTSide);
+        }
+        if (deltaToMonitorBSide < 0) {
+            point.setY(point.y() + deltaToMonitorBSide);
+            this->moveCornerY(deltaToMonitorBSide);
+        }
+
+        this->move(point);
+    } else {
+        QPoint point(x - this->width(), y - this->height() / 2);
+        QRect currentMonitorRect = Utils::currentMonitorRect(x, y);
+        int deltaToMonitorTSide = point.y() -
+                currentMonitorRect.y();
+
+        int deltaToMonitorBSide = currentMonitorRect.y()
+                + currentMonitorRect.height()
+                - point.y();
+
+        if (deltaToMonitorTSide < 0) {
+            point.setY(point.y() - deltaToMonitorTSide);
+            this->moveCornerY(deltaToMonitorTSide);
+        }
+        if (deltaToMonitorBSide < 0) {
+            point.setY(point.y() + deltaToMonitorBSide);
+            this->moveCornerY(deltaToMonitorBSide);
+        }
+
+        this->move(point);
     }
-    if (deltaToMonitorRSide < 0) {
-        point.setX(point.x() + deltaToMonitorRSide);
-        this->moveCornerX(-deltaToMonitorRSide);
-        this->repaint();
-    }
-
-    this->move(point);
 }
 
 void DDockMenu::showSubMenu(int, int, QJsonObject)
@@ -123,4 +276,9 @@ void DDockMenu::showSubMenu(int, int, QJsonObject)
 void DDockMenu::moveCornerX(int deltaX)
 {
     m_cornerX = this->width() / 2 + deltaX;
+}
+
+void DDockMenu::moveCornerY(int deltaY)
+{
+    m_cornerY = this->height() / 2 + deltaY;
 }

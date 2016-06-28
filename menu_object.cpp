@@ -19,6 +19,18 @@
 #include "ddesktopmenu.h"
 #include "ddockmenu.h"
 
+static DDockMenu::Direction DirectionFromString(QString direction) {
+    if (direction == "top") {
+        return DDockMenu::Top;
+    } else if (direction == "left") {
+        return DDockMenu::Left;
+    } else if (direction == "right") {
+        return DDockMenu::Right;
+    }
+
+    return DDockMenu::Bottom;
+}
+
 MenuObject::MenuObject():
     QObject()
 {
@@ -74,6 +86,12 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
 
     int x = jsonObj["x"].toDouble();
     int y = jsonObj["y"].toDouble();
+    QString direction = jsonObj["direction"].toString();
+
+    DDockMenu * dm = qobject_cast<DDockMenu*>(_menu);
+    if (dm) {
+        dm->setDirection(DirectionFromString(direction));
+    }
 
     _menu->setContent(menuContentObj["items"].toArray());
     _menu->setPosition(x, y);
