@@ -389,7 +389,7 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
             break;
         }
         default:
-            if (isXIType(event, xiOpCode, XI_ButtonPress)) {
+            if (isXIType(event, xiOpCode, XI_ButtonPress) || isXIType(event, xiOpCode, XI_TouchBegin)) {
                 xXIDeviceEvent *ev = reinterpret_cast<xXIDeviceEvent*>(event);
 //                qDebug() << "nativeEvent XI_ButtonPress" << fixed1616ToReal(ev->root_x) <<
 //                    fixed1616ToReal(ev->root_y);
@@ -397,7 +397,7 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
                                                  fixed1616ToReal(ev->root_y)))) {
                     this->destroyAll();
                 }
-            } else if (isXIType(event, xiOpCode, XI_ButtonRelease)) {
+            } else if (isXIType(event, xiOpCode, XI_ButtonRelease) || isXIType(event, xiOpCode, XI_TouchEnd)) {
                 xXIDeviceEvent *ev = reinterpret_cast<xXIDeviceEvent*>(event);
 //                qDebug() << "nativeEvent XI_ButtonRelease" << fixed1616ToReal(ev->root_x) <<
 //                    fixed1616ToReal(ev->root_y);
