@@ -269,30 +269,19 @@ void DMenuContent::paintEvent(QPaintEvent *)
     painter.end();
 }
 
+// This method is implemented just for touch screen users.
+// Because there's no movement events as mouse movement events.
+void DMenuContent::mousePressEvent(QMouseEvent *event)
+{
+    int index = itemIndexUnderEvent(event);
+    setCurrentIndex(index);
+    doCurrentAction();
+}
+
 void DMenuContent::mouseMoveEvent(QMouseEvent *event)
 {
-    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
-    Q_ASSERT(parent);
-
-    DMenuBase *menuUnderCursor = parent->menuUnderPoint(event->globalPos());
-    if (menuUnderCursor == parent) {
-        int previousHeight = this->rect().y();
-
-        for (int i = 0; i < this->actions().count(); i++) {
-            QAction *action = this->actions().at(i);
-            int itemHeight = action->text().isEmpty() ? SEPARATOR_HEIGHT : MENU_ITEM_HEIGHT;
-
-            if (previousHeight <= event->y() &&
-                    event->y() <= previousHeight + itemHeight &&
-                    this->rect().x() <= event->x() &&
-                    event->x() <= this->rect().x() + this->rect().width()) {
-                this->setCurrentIndex(i);
-                break;
-            } else {
-                previousHeight += itemHeight;
-            }
-        }
-    }
+    int index = itemIndexUnderEvent(event);
+    setCurrentIndex(index);
 }
 
 void DMenuContent::keyPressEvent(QKeyEvent *event)
@@ -538,6 +527,33 @@ void DMenuContent::sendItemClickedSignal(QString id, bool checked)
             Q_ASSERT(root);
         }
     }
+}
+
+int DMenuContent::itemIndexUnderEvent(QMouseEvent *event) const
+{
+    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    Q_ASSERT(parent);
+
+    DMenuBase *menuUnderCursor = parent->menuUnderPoint(event->globalPos());
+    if (menuUnderCursor == parent) {
+        int previousHeight = this->rect().y();
+
+        for (int i = 0; i < this->actions().count(); i++) {
+            QAction *action = this->actions().at(i);
+            int itemHeight = action->text().isEmpty() ? SEPARATOR_HEIGHT : MENU_ITEM_HEIGHT;
+
+            if (previousHeight <= event->y() &&
+                    event->y() <= previousHeight + itemHeight &&
+                    this->rect().x() <= event->x() &&
+                    event->x() <= this->rect().x() + this->rect().width()) {
+                return i;
+            } else {
+                previousHeight += itemHeight;
+            }
+        }
+    }
+
+    return 0;
 }
 
 QString DMenuContent::elideText(QString source, int maxWidth) const

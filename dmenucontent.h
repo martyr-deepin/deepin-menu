@@ -34,6 +34,7 @@ public:
 
 protected:
     virtual void paintEvent(QPaintEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void keyPressEvent(QKeyEvent *event);
 
@@ -50,6 +51,7 @@ private:
     void doCheck(int);
     void doUnCheck(int);
     void sendItemClickedSignal(QString, bool);
+    int itemIndexUnderEvent(QMouseEvent *event) const;
     QString elideText(QString source, int maxWidth) const;
     QString trimTags(QString source) const;
 };
