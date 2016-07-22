@@ -47,7 +47,7 @@ int DMenuContent::currentIndex()
 
 void DMenuContent::setCurrentIndex(int index)
 {
-    if (_currentIndex == index) return;
+    if (index < 0 || _currentIndex == index) return;
 
     _currentIndex = index;
     this->update();
@@ -553,7 +553,7 @@ int DMenuContent::itemIndexUnderEvent(QMouseEvent *event) const
         }
     }
 
-    return 0;
+    return -1;
 }
 
 QString DMenuContent::elideText(QString source, int maxWidth) const
