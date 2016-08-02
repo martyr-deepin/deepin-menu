@@ -41,10 +41,10 @@ DMenuBase::DMenuBase(QWidget *parent) :
 
     queryXIExtension();
 
-    _dropShadow = new QGraphicsDropShadowEffect(this);
-    _dropShadow->setBlurRadius(0);
-    _dropShadow->setColor(Qt::black);
-    _dropShadow->setOffset(0.0);
+    _dropShadow = new QGraphicsDropShadowEffect;
+    _dropShadow->setColor(QColor::fromRgbF(0, 0, 0, 0.2));
+    _dropShadow->setXOffset(0);
+    _dropShadow->setYOffset(6);
     this->setGraphicsEffect(_dropShadow);
 
     _grabFocusTimer = new QTimer(this);

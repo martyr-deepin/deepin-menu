@@ -26,7 +26,7 @@ DDockMenu::DDockMenu(DDockMenu *parent):
     m_cornerX(0),
     m_cornerY(0)
 {
-    this->setShadowMargins(QMargins(10, 10, 10, 10));
+    this->setShadowMargins(QMargins(20, 20, 20, 20));
     this->setMenuContentMargins(QMargins(5, 5, 5, 5));
     this->setItemLeftSpacing(10);
     this->setItemCenterSpacing(10);
@@ -39,8 +39,8 @@ DDockMenu::DDockMenu(DDockMenu *parent):
             QColor("#646464"),
             ":/images/check_dark_normal.png",
             ":/images/arrow-dark.png"};
-    this->_hoverStyle = ItemStyle{Qt::transparent,
-            QColor("#00a4e2"),
+    this->_hoverStyle = ItemStyle{QColor("#2ca7f8"),
+            Qt::white,
             QColor("#646464"),
             ":/images/check_dark_hover.png",
             ":/images/arrow-dark.png"};
@@ -57,6 +57,8 @@ DDockMenu::DDockMenu(DDockMenu *parent):
 // override methods
 void DDockMenu::paintEvent(QPaintEvent *)
 {
+    QColor bdcolor = QColor::fromRgb(255, 255, 255, 255 * 0.1);
+    QColor bgcolor = QColor::fromRgb(18, 18, 18, 255 * 0.9);
     QRect rect = this->rect().marginsRemoved(shadowMargins());
 
     QPainter painter(this);
@@ -85,8 +87,8 @@ void DDockMenu::paintEvent(QPaintEvent *)
         border.lineTo(topLeft.x(), topLeft.y() + radius);
         border.arcTo(topLeft.x(), topLeft.y(), 2 * radius, 2 * radius, 180, -90);
 
-        painter.strokePath(border, QPen(Qt::white));
-        painter.fillPath(border, QBrush(Qt::black));
+        painter.strokePath(border, bdcolor);
+        painter.fillPath(border, bgcolor);
 
     } else if(m_direction == Top) {
         int cornerX = m_cornerX ? m_cornerX : rect.x() + rect.width() / 2;
@@ -111,8 +113,8 @@ void DDockMenu::paintEvent(QPaintEvent *)
         border.lineTo(topLeft.x(), topLeft.y() + radius);
         border.arcTo(topLeft.x(), topLeft.y(), 2 * radius, 2 * radius, 180, -90);
 
-        painter.strokePath(border, QPen(Qt::white));
-        painter.fillPath(border, QBrush(Qt::black));
+        painter.strokePath(border, bdcolor);
+        painter.fillPath(border, bgcolor);
     } else if(m_direction == Left) {
         int cornerY = m_cornerY ? m_cornerY : rect.y() + rect.height() / 2;
         QPoint topLeft(rect.x() + CORNER_HEIGHT, rect.y());
@@ -136,8 +138,8 @@ void DDockMenu::paintEvent(QPaintEvent *)
         border.lineTo(topLeft.x(), topLeft.y() + radius);
         border.arcTo(topLeft.x(), topLeft.y(), 2 * radius, 2 * radius, 180, -90);
 
-        painter.strokePath(border, QPen(Qt::white));
-        painter.fillPath(border, QBrush(Qt::black));
+        painter.strokePath(border, bdcolor);
+        painter.fillPath(border, bgcolor);
     } else {
         int cornerY = m_cornerY ? m_cornerY : rect.y() + rect.height() / 2;
         QPoint topLeft(rect.x(), rect.y());
@@ -161,8 +163,8 @@ void DDockMenu::paintEvent(QPaintEvent *)
         border.lineTo(topLeft.x(), topLeft.y() + radius);
         border.arcTo(topLeft.x(), topLeft.y(), 2 * radius, 2 * radius, 180, -90);
 
-        painter.strokePath(border, QPen(Qt::white));
-        painter.fillPath(border, QBrush(Qt::black));
+        painter.strokePath(border, bdcolor);
+        painter.fillPath(border, bgcolor);
     }
 }
 

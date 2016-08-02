@@ -23,7 +23,7 @@
 DDesktopMenu::DDesktopMenu(DDesktopMenu *parent):
     DMenuBase(parent)
 {
-    this->setShadowMargins(QMargins(10, 10, 10, 10));
+    this->setShadowMargins(QMargins(20, 20, 20, 20));
     this->setContentsMargins(this->shadowMargins());
     this->setMenuContentMargins(QMargins(5, 5, 5, 5));
     this->setItemLeftSpacing(10);
@@ -31,7 +31,7 @@ DDesktopMenu::DDesktopMenu(DDesktopMenu *parent):
     this->setItemRightSpacing(20);
 
     this->_normalStyle = { Qt::transparent,
-                           Qt::black,
+                           QColor("#303030"),
                            QColor("#636363"),
                            ":/images/check_light_normal.png",
                            ":/images/arrow-light.png" };
@@ -58,10 +58,15 @@ void DDesktopMenu::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    QPainterPath border;
-    border.addRoundedRect(rect, radius(), radius());
+    QPainterPath path;
+    path.addRoundedRect(rect, radius(), radius());
 
-    painter.fillPath(border, QBrush(Qt::white));
+    QPen pen = painter.pen();
+    pen.setColor(QColor::fromRgbF(0, 0, 0, 0.15));
+    pen.setWidth(1);
+    painter.strokePath(path, pen);
+
+    painter.fillPath(path, Qt::white);
 }
 
 void DDesktopMenu::setPosition(int x, int y)

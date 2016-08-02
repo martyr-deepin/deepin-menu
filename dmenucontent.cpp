@@ -29,8 +29,10 @@
 #define MENU_ITEM_MAX_WIDTH 300
 #define MENU_ITEM_HEIGHT 24
 #define MENU_ITEM_FONT_SIZE 13
-#define MENU_ICON_SIZE 14
-#define SUB_MENU_INDICATOR_SIZE 14
+#define MENU_ICON_WIDTH 10
+#define MENU_ICON_HEIGHT 9
+#define SUB_MENU_INDICATOR_WIDTH 6
+#define SUB_MENU_INDICATOR_HEIGHT 10
 #define SEPARATOR_HEIGHT 6
 
 DMenuContent::DMenuContent(DMenuBase *parent) :
@@ -92,11 +94,11 @@ int DMenuContent::contentWidth()
             _iconWidth = MENU_ICON_SIZE + parent->itemLeftSpacing();
         }
         */
-        _iconWidth = MENU_ICON_SIZE + parent->itemLeftSpacing();
+        _iconWidth = MENU_ICON_WIDTH + parent->itemLeftSpacing();
         if(!action->shortcut().isEmpty()) _shortcutWidth = qMax(_shortcutWidth, metrics.width(action->shortcut().toString()) + parent->itemCenterSpacing());
         //        bool hasSubMenu = action->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0;
         //        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
-        _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
+        _subMenuIndicatorWidth = SUB_MENU_INDICATOR_WIDTH + parent->itemRightSpacing();
 
         //FIXME: the +2 is just a work-around.
         result = qMax(result, metrics.width(trimTags(action->text())) + 2);
@@ -174,15 +176,15 @@ void DMenuContent::paintEvent(QPaintEvent *)
 
         // indicates that this item is a separator
         if (action->text().isEmpty()) {
-            int topLineX1 = actionRect.x();
+            int topLineX1 = actionRect.x() + 4;
             int topLineY1 = actionRect.y() + (actionRect.height() - 2) / 2;
-            int topLineX2 = actionRect.x() + actionRect.width();
+            int topLineX2 = actionRect.x() + actionRect.width() - 4;
             int topLineY2 = actionRect.y() + (actionRect.height() - 2) / 2;
             int bottomLineX1 = topLineX1;
             int bottomLineY1 = topLineY1 + 1;
             int bottomLineX2 = topLineX2;
             int bottomLineY2 = topLineY1 + 1;
-            painter.setPen(QPen(QColor::fromRgbF(0, 0, 0, 0.2)));
+            painter.setPen(QPen(QColor::fromRgbF(0, 0, 0, 0.1)));
             painter.drawLine(topLineX1, topLineY1, topLineX2, topLineY2);
             painter.setPen(QPen(QColor::fromRgbF(1, 1, 1, 0.1)));
             painter.drawLine(bottomLineX1, bottomLineY1, bottomLineX2, bottomLineY2);
@@ -192,9 +194,9 @@ void DMenuContent::paintEvent(QPaintEvent *)
 
             // draw icon
             if(_iconWidth) {
-                QRect iconRect = QRect(actionRectWidthMargins.x(),
-                                       actionRectWidthMargins.y() + (MENU_ITEM_HEIGHT - MENU_ICON_SIZE) / 2,
-                                       MENU_ICON_SIZE, MENU_ICON_SIZE);
+                QRect iconRect = QRect(actionRectWidthMargins.x() + 4,
+                                       actionRectWidthMargins.y() + (MENU_ITEM_HEIGHT - MENU_ICON_HEIGHT) / 2,
+                                       MENU_ICON_WIDTH, MENU_ICON_HEIGHT);
                 QString prop("%1Checked");
                 QVariant checkedCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
                 bool checked = checkedCache.isNull() ? action->isChecked() : checkedCache.toBool();
@@ -203,7 +205,7 @@ void DMenuContent::paintEvent(QPaintEvent *)
                         !action->property("itemIconHover").toString().isEmpty() || \
                         !action->property("itemIconInactive").toString().isEmpty())
                 {
-                    qDebug() << "draw icon";
+                    qDebug() << "draw icon" << iconRect;
                     if (!active) {
                         painter.drawImage(iconRect, QImage(action->property("itemIconInactive").toString()));
                     } else if (_currentIndex == i) {
@@ -259,9 +261,9 @@ void DMenuContent::paintEvent(QPaintEvent *)
 
             // draw sub menu indicator icon
             if(action->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0)
-                painter.drawImage(QRect(actionRectWidthMargins.x() + actionRectWidthMargins.width() - SUB_MENU_INDICATOR_SIZE,
-                                        actionRectWidthMargins.y() + (MENU_ITEM_HEIGHT - MENU_ICON_SIZE) / 2,
-                                        SUB_MENU_INDICATOR_SIZE, SUB_MENU_INDICATOR_SIZE),
+                painter.drawImage(QRect(actionRectWidthMargins.x() + actionRectWidthMargins.width() - SUB_MENU_INDICATOR_WIDTH,
+                                        actionRectWidthMargins.y() + (MENU_ITEM_HEIGHT - SUB_MENU_INDICATOR_HEIGHT) / 2,
+                                        SUB_MENU_INDICATOR_WIDTH, SUB_MENU_INDICATOR_HEIGHT),
                                   QImage(itemStyle.subMenuIndicatorIcon));
         }
     }
