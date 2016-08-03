@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file>images/arrow-light.png</file>
         <file>images/arrow-light-hover.png</file>
+        <file>images/arrow-light-inactive.png</file>
         <file>images/check_dark_hover.png</file>
         <file>images/check_dark_inactive.png</file>
         <file>images/check_dark_normal.png</file>

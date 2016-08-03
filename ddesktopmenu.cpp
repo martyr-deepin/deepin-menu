@@ -44,7 +44,7 @@ DDesktopMenu::DDesktopMenu(DDesktopMenu *parent):
                              QColor("#b4b4b4"),
                              QColor("#636363"),
                              ":/images/check_light_inactive.png",
-                             ":/images/arrow-light.png" };
+                             ":/images/arrow-light-inactive.png" };
 
     QSharedPointer<DMenuContent> ptr(new DMenuContent(this));
     this->setMenuContent(ptr);
