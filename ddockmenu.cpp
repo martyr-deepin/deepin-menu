@@ -26,6 +26,8 @@ DDockMenu::DDockMenu(DDockMenu *parent):
     m_cornerX(0),
     m_cornerY(0)
 {
+	this->setAccessibleName("DockMenu");
+
     this->setShadowMargins(QMargins(20, 20, 20, 20));
     this->setMenuContentMargins(QMargins(5, 5, 5, 5));
     this->setItemLeftSpacing(10);

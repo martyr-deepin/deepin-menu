@@ -23,6 +23,8 @@
 DDesktopMenu::DDesktopMenu(DDesktopMenu *parent):
     DMenuBase(parent)
 {
+	this->setAccessibleName("DesktopMenu");
+
     this->setShadowMargins(QMargins(20, 20, 20, 20));
     this->setContentsMargins(this->shadowMargins());
     this->setMenuContentMargins(QMargins(5, 5, 5, 5));
