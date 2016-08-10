@@ -189,7 +189,7 @@ void DDockMenu::setDirection(const Direction &direction)
 void DDockMenu::setPosition(int x, int y)
 {
     if (m_direction == Top) {
-        QPoint point(x - this->width() / 2, y);
+        QPoint point(x - this->width() / 2, y - shadowMargins().top());
         QRect currentMonitorRect = Utils::currentMonitorRect(x, y);
         int deltaToMonitorLSide = point.x() -
                 currentMonitorRect.x();
@@ -210,7 +210,7 @@ void DDockMenu::setPosition(int x, int y)
         this->move(point);
     } else if (m_direction == Bottom) {
         QPoint point(x - this->width() / 2,
-                     y - this->height() + this->shadowMargins().bottom() / 2);
+                     y - this->height() + this->shadowMargins().bottom());
         QRect currentMonitorRect = Utils::currentMonitorRect(x, y);
         int deltaToMonitorLSide = point.x() -
                 currentMonitorRect.x();
@@ -230,7 +230,7 @@ void DDockMenu::setPosition(int x, int y)
 
         this->move(point);
     } else if (m_direction == Left) {
-        QPoint point(x, y - this->height() / 2);
+        QPoint point(x - shadowMargins().left(), y - this->height() / 2);
         QRect currentMonitorRect = Utils::currentMonitorRect(x, y);
         int deltaToMonitorTSide = point.y() -
                 currentMonitorRect.y();
@@ -250,7 +250,7 @@ void DDockMenu::setPosition(int x, int y)
 
         this->move(point);
     } else {
-        QPoint point(x - this->width(), y - this->height() / 2);
+        QPoint point(x - this->width() + shadowMargins().right(), y - this->height() / 2);
         QRect currentMonitorRect = Utils::currentMonitorRect(x, y);
         int deltaToMonitorTSide = point.y() -
                 currentMonitorRect.y();
