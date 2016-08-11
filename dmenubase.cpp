@@ -205,6 +205,12 @@ void DMenuBase::setContent(QJsonArray items)
                  + _menuContentMargins.bottom()
                  + this->contentsMargins().top() - _shadowMargins.top()
                  + this->contentsMargins().bottom() - _shadowMargins.bottom());
+
+    /*
+    Force background update, to fix the bug that
+    sometimes background doesn't cover menu content.
+    */
+    update();
 }
 
 void DMenuBase::destroyAll()
