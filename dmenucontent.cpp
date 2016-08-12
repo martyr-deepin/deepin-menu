@@ -100,8 +100,7 @@ int DMenuContent::contentWidth()
         //        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
         _subMenuIndicatorWidth = SUB_MENU_INDICATOR_WIDTH + parent->itemRightSpacing();
 
-        //FIXME: the +2 is just a work-around.
-        result = qMax(result, metrics.width(trimTags(action->text())) + 2);
+        result = qMax(result, metrics.width(trimTags(action->text())) + parent->itemCenterSpacing());
     }
 
     return qMin(MENU_ITEM_MAX_WIDTH,
@@ -223,7 +222,9 @@ void DMenuContent::paintEvent(QPaintEvent *)
             QString prop("%1Text");
             QVariant textCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
             QString text = textCache.isNull() ? action->text() : textCache.toString();
-            QString elidedText = elideText(text, actionRectWidthMargins.width());
+            // FIXME(hualet): don't trust the magic +4 operation, I don't know why
+            // we should +4. All these crap started when I introduced QTextDocument...
+            QString elidedText = elideText(text, actionRectWidthMargins.width() + 4);
 
             painter.save();
             // move the start point to the right place.
@@ -567,16 +568,7 @@ QString DMenuContent::elideText(QString source, int maxWidth) const
     if (metrics.width(source) < maxWidth) {
         return source;
     } else {
-        QString result;
-        foreach (QChar ch, source) {
-            if (metrics.width(result + ch + "...") >= maxWidth) {
-                return result + "...";
-            } else {
-                result.append(ch);
-            }
-        }
-
-        return result;
+        return metrics.elidedText(source, Qt::ElideRight, maxWidth);
     }
 }
 
