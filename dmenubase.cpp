@@ -285,7 +285,8 @@ DMenuBase *DMenuBase::menuUnderPoint(QPoint point)
         DMenuBase *result = NULL;
         DMenuBase *subMenu =this;
         while (subMenu) {
-            if (Utils::pointInRect(point, subMenu->geometry())) {
+            // remove the shadow margin, so clicks on the shadow won't be eaten by us.
+            if (Utils::pointInRect(point, subMenu->geometry().marginsRemoved(subMenu->shadowMargins()))) {
                 // shouldn't return here, otherwise the old menus are able to steal focus from
                 // the younger ones even if they are at the bottom of the stack.
                 result = subMenu;
