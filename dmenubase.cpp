@@ -396,8 +396,15 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
             break;
         }
         default:
+            xXIDeviceEvent *ev = reinterpret_cast<xXIDeviceEvent*>(event);
+//            qDebug() << ev->detail << Button1Mask << Button3Mask << Button2Mask;
+            if (ev->detail !=0 && ev->detail != 1 && ev->detail != 2) {
+                // drop all mouse events with button other than left button
+                // or right button;
+                break;
+            }
+
             if (isXIType(event, xiOpCode, XI_ButtonPress) || isXIType(event, xiOpCode, XI_TouchBegin)) {
-                xXIDeviceEvent *ev = reinterpret_cast<xXIDeviceEvent*>(event);
 //                qDebug() << "nativeEvent XI_ButtonPress" << fixed1616ToReal(ev->root_x) <<
 //                    fixed1616ToReal(ev->root_y);
                 if (!this->menuUnderPoint(QPoint(fixed1616ToReal(ev->root_x),
@@ -405,7 +412,6 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
                     this->destroyAll();
                 }
             } else if (isXIType(event, xiOpCode, XI_ButtonRelease)) {
-                xXIDeviceEvent *ev = reinterpret_cast<xXIDeviceEvent*>(event);
 //                qDebug() << "nativeEvent XI_ButtonRelease" << fixed1616ToReal(ev->root_x) <<
 //                    fixed1616ToReal(ev->root_y);
                 if (this->menuUnderPoint(QPoint(fixed1616ToReal(ev->root_x),
@@ -413,7 +419,6 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
                     _menuContent->doCurrentAction();
                 }
             } else if (isXIType(event, xiOpCode, XI_Motion)) {
-                xXIDeviceEvent *ev = reinterpret_cast<xXIDeviceEvent*>(event);
 //                qDebug() << "nativeEvent XI_Motion" << fixed1616ToReal(ev->root_x) <<
 //                    fixed1616ToReal(ev->root_y);
                 DMenuBase *menuUnderPoint = this->menuUnderPoint(
