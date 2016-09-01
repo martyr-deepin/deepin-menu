@@ -398,7 +398,7 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
         default:
             xXIDeviceEvent *ev = reinterpret_cast<xXIDeviceEvent*>(event);
 //            qDebug() << ev->detail << Button1Mask << Button3Mask << Button2Mask;
-            if (ev->detail !=0 && ev->detail != 1 && ev->detail != 2) {
+            if (ev->detail !=0 && ev->detail != 1 && ev->detail != 2 && ev->detail != 3) {
                 // drop all mouse events with button other than left button
                 // or right button;
                 break;
