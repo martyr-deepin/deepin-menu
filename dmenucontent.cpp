@@ -148,6 +148,7 @@ void DMenuContent::doCurrentAction()
             this->doCheck(_currentIndex);
         }
     } else {
+        parent->releaseFocus();
         this->sendItemClickedSignal(currentAction->property("itemId").toString(), false);
     }
     parent->destroyAll();
@@ -270,15 +271,6 @@ void DMenuContent::paintEvent(QPaintEvent *)
     }
 
     painter.end();
-}
-
-// This method is implemented just for touch screen users.
-// Because there's no movement events as mouse movement events.
-void DMenuContent::mousePressEvent(QMouseEvent *event)
-{
-    int index = itemIndexUnderEvent(event);
-    setCurrentIndex(index);
-    doCurrentAction();
 }
 
 void DMenuContent::mouseMoveEvent(QMouseEvent *event)

@@ -215,6 +215,8 @@ void DMenuBase::setContent(QJsonArray items)
 
 void DMenuBase::destroyAll()
 {
+    releaseFocus();
+
     if(this->parent()) {
         DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
         Q_ASSERT(parent);
@@ -236,6 +238,14 @@ void DMenuBase::grabFocus()
 
     grabFocusSlot();
     connect(_grabFocusTimer, SIGNAL(timeout()), this, SLOT(grabFocusSlot()));
+}
+
+void DMenuBase::releaseFocus()
+{
+    if (mouseGrabber())
+        mouseGrabber()->releaseMouse();
+    if (keyboardGrabber())
+        keyboardGrabber()->releaseKeyboard();
 }
 
 bool DMenuBase::grabFocusInternal(int tryTimes)
@@ -363,73 +373,39 @@ bool DMenuBase::nativeEvent(const QByteArray &eventType, void *message, long *)
         xcb_generic_event_t *event = static_cast<xcb_generic_event_t*>(message);
         const uint8_t responseType = event->response_type & ~0x80;
 
-        switch (responseType) {
-        case XCB_BUTTON_PRESS: {
-            xcb_button_press_event_t *ev = reinterpret_cast<xcb_button_press_event_t*>(event);
-//            qDebug() << "nativeEvent XCB_BUTTON_PRESS" <<  responseType <<
-//                        ev->detail << ev->child << ev->root_x << ev->root_y;
-            if (!this->menuUnderPoint(QPoint(ev->root_x, ev->root_y))) {
+        xXIDeviceEvent *ev = reinterpret_cast<xXIDeviceEvent*>(event);
+        //            qDebug() << ev->detail << Button1Mask << Button3Mask << Button2Mask;
+        if (ev->detail !=0 && ev->detail != 1 && ev->detail != 2 && ev->detail != 3) {
+            // drop all mouse events with button other than left button
+            // or right button;
+            return false;
+        }
+
+        if (isXIType(event, xiOpCode, XI_ButtonPress) || isXIType(event, xiOpCode, XI_TouchBegin)) {
+            //                qDebug() << "nativeEvent XI_ButtonPress" << fixed1616ToReal(ev->root_x) <<
+            //                    fixed1616ToReal(ev->root_y);
+            if (!this->menuUnderPoint(QPoint(fixed1616ToReal(ev->root_x),
+                                             fixed1616ToReal(ev->root_y)))) {
                 this->destroyAll();
             }
-            break;
-        }
-        case XCB_BUTTON_RELEASE: {
-            xcb_button_release_event_t *ev = reinterpret_cast<xcb_button_release_event_t*>(event);
-//            qDebug() << "nativeEvent XCB_BUTTON_RELEASE" <<  responseType <<
-//                        ev->detail << ev->child << ev->root_x << ev->root_y;
-
-            if (this->menuUnderPoint(QPoint(ev->root_x, ev->root_y)) && _menuContent){
+        } else if (isXIType(event, xiOpCode, XI_ButtonRelease)) {
+            //                qDebug() << "nativeEvent XI_ButtonRelease" << fixed1616ToReal(ev->root_x) <<
+            //                    fixed1616ToReal(ev->root_y);
+            if (this->menuUnderPoint(QPoint(fixed1616ToReal(ev->root_x),
+                                            fixed1616ToReal(ev->root_y))) && _menuContent){
                 _menuContent->doCurrentAction();
             }
-            break;
-        }
-        case XCB_MOTION_NOTIFY: {
-            xcb_motion_notify_event_t *ev = reinterpret_cast<xcb_motion_notify_event_t*>(event);
-//            qDebug() << "nativeEvent XCB_MOTION_NOTIFY" <<  responseType <<
-//                        ev->detail << ev->child << ev->root_x << ev->root_y;
-            DMenuBase *menuUnderPoint = this->menuUnderPoint(QPoint(ev->root_x, ev->root_y));
-            if (menuUnderPoint &&
-                    (this->mouseGrabber() != menuUnderPoint
-                     || this->keyboardGrabber() != menuUnderPoint)) {
+        } else if (isXIType(event, xiOpCode, XI_Motion)) {
+            //                qDebug() << "nativeEvent XI_Motion" << fixed1616ToReal(ev->root_x) <<
+            //                    fixed1616ToReal(ev->root_y);
+            DMenuBase *menuUnderPoint = this->menuUnderPoint(
+                        QPoint(fixed1616ToReal(ev->root_x), fixed1616ToReal(ev->root_y)));
+            if (menuUnderPoint) {
                 menuUnderPoint->grabFocus();
             }
-            break;
-        }
-        default:
-            xXIDeviceEvent *ev = reinterpret_cast<xXIDeviceEvent*>(event);
-//            qDebug() << ev->detail << Button1Mask << Button3Mask << Button2Mask;
-            if (ev->detail !=0 && ev->detail != 1 && ev->detail != 2 && ev->detail != 3) {
-                // drop all mouse events with button other than left button
-                // or right button;
-                break;
-            }
-
-            if (isXIType(event, xiOpCode, XI_ButtonPress) || isXIType(event, xiOpCode, XI_TouchBegin)) {
-//                qDebug() << "nativeEvent XI_ButtonPress" << fixed1616ToReal(ev->root_x) <<
-//                    fixed1616ToReal(ev->root_y);
-                if (!this->menuUnderPoint(QPoint(fixed1616ToReal(ev->root_x),
-                                                 fixed1616ToReal(ev->root_y)))) {
-                    this->destroyAll();
-                }
-            } else if (isXIType(event, xiOpCode, XI_ButtonRelease)) {
-//                qDebug() << "nativeEvent XI_ButtonRelease" << fixed1616ToReal(ev->root_x) <<
-//                    fixed1616ToReal(ev->root_y);
-                if (this->menuUnderPoint(QPoint(fixed1616ToReal(ev->root_x),
-                                                fixed1616ToReal(ev->root_y))) && _menuContent){
-                    _menuContent->doCurrentAction();
-                }
-            } else if (isXIType(event, xiOpCode, XI_Motion)) {
-//                qDebug() << "nativeEvent XI_Motion" << fixed1616ToReal(ev->root_x) <<
-//                    fixed1616ToReal(ev->root_y);
-                DMenuBase *menuUnderPoint = this->menuUnderPoint(
-                    QPoint(fixed1616ToReal(ev->root_x), fixed1616ToReal(ev->root_y)));
-                if (menuUnderPoint) {
-                    menuUnderPoint->grabFocus();
-                }
-            }
-            break;
         }
     }
+
     return false;
 }
 

@@ -85,6 +85,7 @@ public:
     void setContent(QJsonArray items);
     void destroyAll();
     void grabFocus();
+    void releaseFocus();
     DMenuBase *menuUnderPoint(QPoint);
     DMenuBase *getRootMenu();
 
