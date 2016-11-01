@@ -170,11 +170,8 @@ void DMenuBase::setContent(QJsonArray items)
         QJsonObject itemObj = item.toObject();
 
         QAction *action = new QAction(this->menuContent().data());
-        QRegExp regexp("_(.)");
-        regexp.indexIn(itemObj["itemText"].toString());
-        QString navKey = regexp.cap(1);
-        QString navKeyWrapper = QString("<u>%1</u>").arg(navKey);
-        QString itemText = itemObj["itemText"].toString().replace(regexp, navKeyWrapper);
+        QString itemText = itemObj["itemText"].toString().replace("_", QString()).replace(QRegExp("\\([^)]+\\)"), QString());/*.replace(regexp, navKeyWrapper)*/;
+
 
         action->setText(itemText);
         action->setEnabled(itemObj["isActive"].toBool());
@@ -185,7 +182,7 @@ void DMenuBase::setContent(QJsonArray items)
         action->setProperty("itemIconHover", itemObj["itemIconHover"].toString());
         action->setProperty("itemIconInactive", itemObj["itemIconInactive"].toString());
         action->setProperty("itemSubMenu", itemObj["itemSubMenu"].toObject());
-        action->setProperty("itemNavKey", navKey);
+//        action->setProperty("itemNavKey", navKey);
 
         _menuContent->addAction(action);
     }
@@ -229,7 +226,7 @@ void DMenuBase::destroyAll()
 void DMenuBase::grabFocus()
 {
     if (mouseGrabber() == menuContent().data()
-        && keyboardGrabber() == menuContent().data())
+            && keyboardGrabber() == menuContent().data())
     {
         // the menu already grabs the focus, no need
         // to do it again.

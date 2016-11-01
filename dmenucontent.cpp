@@ -309,16 +309,6 @@ void DMenuContent::keyPressEvent(QKeyEvent *event)
             p_parent->grabFocus();
         }
         break;
-    default:
-        qDebug() << event->text();
-        int _next_index_has_shortcut = getNextItemsHasShortcut(_currentIndex + 1, event->text());
-        if (_next_index_has_shortcut != -1) {
-            this->setCurrentIndex(_next_index_has_shortcut);
-            if (_next_index_has_shortcut == getNextItemsHasShortcut(_next_index_has_shortcut + 1, event->text())) {
-                this->doCurrentAction();
-            }
-        }
-
     }
 }
 
