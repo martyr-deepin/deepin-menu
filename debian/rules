@@ -1,0 +1,29 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+%:
+	dh $@ --with python2
+
+override_dh_auto_build:
+	dh_auto_build
+	python setup.py build
+	qmake DEFINES+=QT_NO_DEBUG_OUTPUT && make
+
+override_dh_auto_install:
+	dh_auto_install --destdir=debian/deepin-menu
+	python setup.py install --root=debian/deepin-menu --install-layout=deb
+	make INSTALL_ROOT=debian/deepin-menu install
+	mkdir -p debian/deepin-menu/usr/share/pyshared
+	mv debian/deepin-menu/usr/deepin_menu debian/deepin-menu/usr/share/pyshared
+
+override_dh_fixperms:
+	dh_fixperms
+	chmod +x debian/deepin-menu/usr/share/pyshared/deepin_menu/menu.py

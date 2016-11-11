@@ -1,0 +1,59 @@
+deepin-menu (3.0.4-1) stable; urgency=low
+
+  * Autobuild Tag 3.0.4 
+
+ -- TagBuilder <tagbuilder@deepin.com>  Fri, 12 Aug 2016 18:59:32 +0000
+
+deepin-menu (3.0.3-1) stable; urgency=low
+
+  * Autobuild Tag 3.0.3 
+
+ -- TagBuilder <tagbuilder@deepin.com>  Wed, 20 Jul 2016 07:20:30 +0000
+
+deepin-menu (3.0.2-1) stable; urgency=low
+
+  * Autobuild Tag 3.0.2 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Fri, 22 Jan 2016 19:37:39 +0000
+
+deepin-menu (3.0.1-1) stable; urgency=low
+
+  * Autobuild Tag 3.0.1 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Tue, 12 Jan 2016 19:51:31 +0000
+
+deepin-menu (3.0.0-1) stable; urgency=low
+
+  * Autobuild Tag 3.0.0 
+
+ -- TagBuilder <tagbuilder@linuxdeepin.com>  Mon, 28 Dec 2015 21:06:03 +0000
+
+deepin-menu (2.90.2-1) stable; urgency=low
+
+  * Autobuild Tag 2.90.2 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Wed, 09 Dec 2015 22:06:30 +0000
+
+deepin-menu (2.90.1-2) stable; urgency=low
+
+  * Rebuild Version 2.90.1 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Fri, 20 Nov 2015 09:50:48 +0000
+
+deepin-menu (2.90.1-1) stable; urgency=low
+
+  * Autobuild Tag 2.90.1 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Fri, 20 Nov 2015 09:50:26 +0000
+
+deepin-menu (2.3.0-1) stable; urgency=low
+
+  * Autobuild Tag 2.3.0-1 
+
+ -- TagBuilder <tabbuilder@linuxdeepin.com>  Wed, 01 Jul 2015 09:32:07 +0000
+
+deepin-menu (0.0.0) unstable; urgency=medium
+
+  * Unstable release.
+
+ -- 宋文武 <songwenwu@linuxdeepin.com>  Thu, 13 Nov 2014 16:05:26 +0800
