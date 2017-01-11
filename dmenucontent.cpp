@@ -19,7 +19,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QPoint>
-#include <QTextDocument>
+#include <QStaticText>
 #include <QDebug>
 
 #include "utils.h"
@@ -100,7 +100,7 @@ int DMenuContent::contentWidth()
         //        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
         _subMenuIndicatorWidth = SUB_MENU_INDICATOR_WIDTH + parent->itemRightSpacing();
 
-        result = qMax(result, metrics.width(trimTags(action->text())) + parent->itemCenterSpacing());
+        result = qMax(result, metrics.width(action->text()) + parent->itemCenterSpacing());
     }
 
     return qMin(MENU_ITEM_MAX_WIDTH,
@@ -223,34 +223,15 @@ void DMenuContent::paintEvent(QPaintEvent *)
             QString prop("%1Text");
             QVariant textCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
             QString text = textCache.isNull() ? action->text() : textCache.toString();
-            // FIXME(hualet): don't trust the magic +4 operation, I don't know why
-            // we should +4. All these crap started when I introduced QTextDocument...
-            QString elidedText = elideText(text, actionRectWidthMargins.width() + 4);
 
-            painter.save();
-            // move the start point to the right place.
-            // FIXME: don't know why we should do the -4 operation.
-            painter.translate(actionRectWidthMargins.x() + _iconWidth - 4,
-                              actionRectWidthMargins.y());
-            if (font.defaultFamily() == "Source Han Sans SC") {
-                painter.translate(0, -4);
-            }
-
-            QString itemRichText = QString("<font color='%1'>%2</font>") \
-                                            .arg(painter.pen().color().name()) \
-                                            .arg(elidedText);
-
-            // no help.
-//            QTextOption opt;
-//            opt.setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
-
-            QTextDocument doc;
-            doc.setHtml(itemRichText);
-            doc.setDefaultFont(font);
-//            doc.setDefaultTextOption(opt);
-
-            doc.drawContents(&painter);
-            painter.restore();
+            QString elidedText = elideText(text, actionRectWidthMargins.width() - _iconWidth - _shortcutWidth);
+            QRect textRect = painter.boundingRect(QRect(actionRectWidthMargins.x() + _iconWidth,
+                                                        actionRectWidthMargins.y(),
+                                                        actionRectWidthMargins.width(),
+                                                        actionRectWidthMargins.height()),
+                                                  Qt::AlignVCenter,
+                                                  elidedText);
+            painter.drawStaticText(textRect.topLeft(), QStaticText(elidedText));
 
             // draw shortcut text
             if(_shortcutWidth)
@@ -552,13 +533,4 @@ QString DMenuContent::elideText(QString source, int maxWidth) const
     } else {
         return metrics.elidedText(source, Qt::ElideRight, maxWidth);
     }
-}
-
-QString DMenuContent::trimTags(QString source) const
-{
-    QString result(source);
-    result.replace("<u>", "");
-    result.replace("</u>", "");
-
-    return result;
 }

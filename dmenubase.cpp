@@ -172,7 +172,6 @@ void DMenuBase::setContent(QJsonArray items)
         QAction *action = new QAction(this->menuContent().data());
         QString itemText = itemObj["itemText"].toString().replace("_", QString()).replace(QRegExp("\\([^)]+\\)"), QString());/*.replace(regexp, navKeyWrapper)*/;
 
-
         action->setText(itemText);
         action->setEnabled(itemObj["isActive"].toBool());
         action->setCheckable(itemObj["isCheckable"].toBool() || Utils::menuItemCheckableFromId(itemObj["itemId"].toString()));

@@ -52,7 +52,6 @@ private:
     void sendItemClickedSignal(QString, bool);
     int itemIndexUnderEvent(QMouseEvent *event) const;
     QString elideText(QString source, int maxWidth) const;
-    QString trimTags(QString source) const;
 };
 
 #endif // DMENUCONTENT_H
