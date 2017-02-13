@@ -14,8 +14,8 @@
 #include <QString>
 #include <QDBusObjectPath>
 
-#include <dbus_menu_adaptor.h>
-#include <menu_object.h>
+#include <src/dbus_menu_adaptor.h>
+#include <src/menu_object.h>
 
 class ManagerObject : public QObject
 {

@@ -13,29 +13,29 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-SOURCES += main.cpp \
-    dmenubase.cpp \
-    ddesktopmenu.cpp \
-    utils.cpp \
-    dmenucontent.cpp \
-    dbus_manager_adaptor.cpp \
-    dbus_menu_adaptor.cpp \
-    manager_object.cpp \
-    menu_object.cpp \
-    ddockmenu.cpp \
-    dmenuapplication.cpp
+SOURCES += src/main.cpp \
+    src/dmenubase.cpp \
+    src/ddesktopmenu.cpp \
+    src/utils.cpp \
+    src/dmenucontent.cpp \
+    src/dbus_manager_adaptor.cpp \
+    src/dbus_menu_adaptor.cpp \
+    src/manager_object.cpp \
+    src/menu_object.cpp \
+    src/ddockmenu.cpp \
+    src/dmenuapplication.cpp
 
 HEADERS  += \
-    dmenubase.h \
-    ddesktopmenu.h \
-    utils.h \
-    dmenucontent.h \
-    dbus_manager_adaptor.h \
-    dbus_menu_adaptor.h \
-    manager_object.h \
-    menu_object.h \
-    ddockmenu.h \
-    dmenuapplication.h
+    src/dmenubase.h \
+    src/ddesktopmenu.h \
+    src/utils.h \
+    src/dmenucontent.h \
+    src/dbus_manager_adaptor.h \
+    src/dbus_menu_adaptor.h \
+    src/manager_object.h \
+    src/menu_object.h \
+    src/ddockmenu.h \
+    src/dmenuapplication.h
 
 LIBS += -lxcb -lX11
 

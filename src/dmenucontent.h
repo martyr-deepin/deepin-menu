@@ -13,7 +13,7 @@
 #include <QWidget>
 #include <QAction>
 
-#include <dmenubase.h>
+#include "src/dmenubase.h"
 
 class QRect;
 class DMenuBase;

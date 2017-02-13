@@ -10,7 +10,7 @@
 #ifndef DDESKTOPMENU_H
 #define DDESKTOPMENU_H
 
-#include <dmenubase.h>
+#include "src/dmenubase.h"
 
 class QJsonObject;
 class DDesktopMenu : public DMenuBase
