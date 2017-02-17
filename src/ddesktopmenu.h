@@ -12,6 +12,12 @@
 
 #include "src/dmenubase.h"
 
+namespace Dtk {
+namespace Widget {
+class DBlurEffectWidget;
+}
+}
+
 class QJsonObject;
 class DDesktopMenu : public DMenuBase
 {
@@ -22,10 +28,15 @@ public:
     virtual void setPosition(int, int);
 
 protected:
-    virtual void paintEvent(QPaintEvent * event);
+    void paintEvent(QPaintEvent * event) Q_DECL_OVERRIDE;
+    void showEvent(QShowEvent *event) Q_DECL_OVERRIDE;
 
 private:
+    Dtk::Widget::DBlurEffectWidget *m_blurEffect;
+
     virtual void showSubMenu(int, int, QJsonObject);
+
+    void setupBlurEffect();
 };
 
 #endif // DDESKTOPMENU_H

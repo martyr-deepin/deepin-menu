@@ -11,7 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = deepin-menu
 TEMPLATE = app
 
-CONFIG += c++11
+CONFIG += c++11 link_pkgconfig
+PKGCONFIG += dtkbase dtkwidget
 
 SOURCES += src/main.cpp \
     src/dmenubase.cpp \

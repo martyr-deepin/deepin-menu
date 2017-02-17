@@ -20,6 +20,10 @@
 #include "ddesktopmenu.h"
 #include "dmenucontent.h"
 
+#include <DBlurEffectWidget>
+
+DWIDGET_USE_NAMESPACE
+
 DDesktopMenu::DDesktopMenu(DDesktopMenu *parent):
     DMenuBase(parent)
 {
@@ -50,6 +54,8 @@ DDesktopMenu::DDesktopMenu(DDesktopMenu *parent):
 
     QSharedPointer<DMenuContent> ptr(new DMenuContent(this));
     this->setMenuContent(ptr);
+
+    setupBlurEffect();
 }
 
 // override methods
@@ -68,7 +74,18 @@ void DDesktopMenu::paintEvent(QPaintEvent *)
     pen.setWidth(1);
     painter.strokePath(path, pen);
 
-    painter.fillPath(path, Qt::white);
+    painter.fillPath(path, Qt::transparent);
+}
+
+void DDesktopMenu::showEvent(QShowEvent *event)
+{
+    DMenuBase::showEvent(event);
+
+    QRect rect = this->rect().marginsRemoved(shadowMargins());
+
+    m_blurEffect->setFixedSize(rect.size());
+    m_blurEffect->move(rect.topLeft());
+    m_blurEffect->lower();
 }
 
 void DDesktopMenu::setPosition(int x, int y)
@@ -139,4 +156,13 @@ void DDesktopMenu::showSubMenu(int x, int y, QJsonObject subMenuJsonObject)
         _subMenu->deleteLater();
         _subMenu = NULL;
     }
+}
+
+void DDesktopMenu::setupBlurEffect()
+{
+    m_blurEffect = new DBlurEffectWidget(this);
+    m_blurEffect->setBlendMode(DBlurEffectWidget::BehindWindowBlend);
+    m_blurEffect->setBlurRectXRadius(radius());
+    m_blurEffect->setBlurRectYRadius(radius());
+    m_blurEffect->setMaskColor(Qt::white);
 }
