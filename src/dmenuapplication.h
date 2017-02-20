@@ -10,9 +10,11 @@
 #ifndef DMENUAPPLICATION_H
 #define DMENUAPPLICATION_H
 
-#include <QApplication>
+#include <DApplication>
 
-class DMenuApplication : public QApplication
+DWIDGET_USE_NAMESPACE
+
+class DMenuApplication : public DApplication
 {
     Q_OBJECT
 public:
