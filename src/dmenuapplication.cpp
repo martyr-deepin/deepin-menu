@@ -12,6 +12,7 @@
 DMenuApplication::DMenuApplication(int &argc, char *argv[]) :
     DApplication(argc, argv)
 {
+    setTheme("light");
 }
 
 void DMenuApplication::quitApplication(const QString &)

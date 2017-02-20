@@ -32,15 +32,21 @@ static DDockMenu::Direction DirectionFromString(QString direction) {
 }
 
 MenuObject::MenuObject():
-    QObject()
+    QObject(),
+    m_dockMenu(nullptr),
+    m_desktopMenu(nullptr)
 {
-    _menu = NULL;
+
 }
 
 MenuObject::~MenuObject()
 {
-    if(_menu) {
-        _menu->deleteLater();
+    if (m_dockMenu) {
+        m_dockMenu->deleteLater();
+        m_dockMenu = nullptr;
+    } else if (m_desktopMenu) {
+        m_desktopMenu->deleteLater();
+        m_desktopMenu = nullptr;
     }
 
     emit MenuUnregistered();
@@ -48,60 +54,62 @@ MenuObject::~MenuObject()
 
 void MenuObject::SetItemActivity(const QString &itemId, bool isActive)
 {
-    if (_menu) _menu->setItemActivity(itemId, isActive);
+    if (m_dockMenu) m_dockMenu->setItemActivity(itemId, isActive);
+    if (m_desktopMenu) m_desktopMenu->setItemActivity(itemId, isActive);
 }
 
 void MenuObject::SetItemChecked(const QString &itemId, bool checked)
 {
-    if (_menu) _menu->setItemChecked(itemId, checked);
+    if (m_dockMenu) m_dockMenu->setItemChecked(itemId, checked);
+    if (m_desktopMenu) m_desktopMenu->setItemChecked(itemId, checked);
 }
 
 void MenuObject::SetItemText(const QString &itemId, const QString &text)
 {
-    if (_menu) _menu->setItemText(itemId, text);
+    if (m_dockMenu) m_dockMenu->setItemText(itemId, text);
+    if (m_desktopMenu) m_desktopMenu->setItemText(itemId, text);
 }
 
 void MenuObject::ShowMenu(const QString &menuJsonContent)
 {
-    Q_ASSERT(_menu == NULL);
-
     QByteArray bytes;
     bytes.append(menuJsonContent);
     QJsonDocument menuDocument = QJsonDocument::fromJson(bytes);
     QJsonObject jsonObj = menuDocument.object();
 
-    if(jsonObj["isDockMenu"].toBool()) {
-        _menu = new DDockMenu();
-    } else {
-        _menu = new DDesktopMenu();
-    }
+    int x = jsonObj["x"].toDouble();
+    int y = jsonObj["y"].toDouble();
+    QString direction = jsonObj["direction"].toString();
 
-    connect(_menu, SIGNAL(destroyed()), this, SLOT(menuDismissedSlot()));
-    connect(_menu, SIGNAL(itemClicked(QString,bool)), this, SIGNAL(ItemInvoked(QString,bool)));
+    if(jsonObj["isDockMenu"].toBool()) {
+        m_dockMenu = new DDockMenu;
+        connect(m_dockMenu, &DDockMenu::destroyed, this, &MenuObject::menuDismissedSlot);
+        connect(m_dockMenu, &DDockMenu::itemClicked, this, &MenuObject::ItemInvoked);
+    } else {
+        m_desktopMenu = new DDesktopMenu;
+        connect(m_desktopMenu, &DDesktopMenu::aboutToHide, this, &MenuObject::menuDismissedSlot);
+        connect(m_desktopMenu, &DDesktopMenu::itemClicked, this, &MenuObject::ItemInvoked);
+    }
 
     bytes.clear();
     bytes.append(jsonObj["menuJsonContent"].toString());
     QJsonDocument menuContent = QJsonDocument::fromJson(bytes);
     QJsonObject menuContentObj = menuContent.object();
 
-    int x = jsonObj["x"].toDouble();
-    int y = jsonObj["y"].toDouble();
-    QString direction = jsonObj["direction"].toString();
-
-    DDockMenu * dm = qobject_cast<DDockMenu*>(_menu);
-    if (dm) {
-        dm->setDirection(DirectionFromString(direction));
+    if (m_dockMenu) {
+        m_dockMenu->setDirection(DirectionFromString(direction));
+        m_dockMenu->setContent(menuContentObj["items"].toArray());
+        m_dockMenu->setPosition(x, y);
+        m_dockMenu->show();
+        m_dockMenu->grabFocus();
+    } else if (m_desktopMenu) {
+        m_desktopMenu->setContent(menuContentObj["items"].toArray());
+        m_desktopMenu->popup(QPoint(x, y));
+        m_desktopMenu->grabFocus();
     }
-
-    _menu->setContent(menuContentObj["items"].toArray());
-    _menu->setPosition(x, y);
-    _menu->show();
-    _menu->grabFocus();
 }
 
 void MenuObject::menuDismissedSlot()
 {
-    _menu = NULL;
-
     this->deleteLater();
 }

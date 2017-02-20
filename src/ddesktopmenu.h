@@ -10,33 +10,38 @@
 #ifndef DDESKTOPMENU_H
 #define DDESKTOPMENU_H
 
-#include "src/dmenubase.h"
+#include <QMenu>
 
-namespace Dtk {
-namespace Widget {
-class DBlurEffectWidget;
-}
-}
+#include <com_deepin_api_xmousearea.h>
 
-class QJsonObject;
-class DDesktopMenu : public DMenuBase
+using namespace com::deepin::api;
+
+class DDesktopMenu : public QMenu
 {
     Q_OBJECT
 public:
-    DDesktopMenu(DDesktopMenu *parent=0);
+    explicit DDesktopMenu();
+    ~DDesktopMenu();
 
-    virtual void setPosition(int, int);
+    void setContent(QJsonArray items);
+    void grabFocus();
+
+    void setItemActivity(const QString &itemId, bool isActive);
+    void setItemChecked(const QString &itemId, bool checked);
+    void setItemText(const QString &itemId, const QString &text);
+
+signals:
+    void itemClicked(const QString &id, bool checked);
 
 protected:
-    void paintEvent(QPaintEvent * event) Q_DECL_OVERRIDE;
-    void showEvent(QShowEvent *event) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
 private:
-    Dtk::Widget::DBlurEffectWidget *m_blurEffect;
+    QAction *action(const QString &id);
+    void addActionFromJson(QMenu *menu, const QJsonArray &items);
 
-    virtual void showSubMenu(int, int, QJsonObject);
-
-    void setupBlurEffect();
+    QString m_key;
+    XMouseArea *m_mouseArea;
 };
 
 #endif // DDESKTOPMENU_H
