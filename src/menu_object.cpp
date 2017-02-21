@@ -41,14 +41,6 @@ MenuObject::MenuObject():
 
 MenuObject::~MenuObject()
 {
-    if (m_dockMenu) {
-        m_dockMenu->deleteLater();
-        m_dockMenu = nullptr;
-    } else if (m_desktopMenu) {
-        m_desktopMenu->deleteLater();
-        m_desktopMenu = nullptr;
-    }
-
     emit MenuUnregistered();
 }
 
@@ -111,5 +103,13 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
 
 void MenuObject::menuDismissedSlot()
 {
+    if (m_dockMenu) {
+        m_dockMenu->deleteLater();
+        m_dockMenu = nullptr;
+    } else if (m_desktopMenu) {
+        m_desktopMenu->deleteLater();
+        m_desktopMenu = nullptr;
+    }
+
     this->deleteLater();
 }
