@@ -41,7 +41,7 @@ DMenuBase::DMenuBase(QWidget *parent) :
 
     queryXIExtension();
 
-    _dropShadow = new QGraphicsDropShadowEffect;
+    _dropShadow = new QGraphicsDropShadowEffect(this);
     _dropShadow->setColor(QColor::fromRgbF(0, 0, 0, 0.2));
     _dropShadow->setXOffset(0);
     _dropShadow->setYOffset(6);
@@ -201,12 +201,6 @@ void DMenuBase::setContent(QJsonArray items)
                  + _menuContentMargins.bottom()
                  + this->contentsMargins().top() - _shadowMargins.top()
                  + this->contentsMargins().bottom() - _shadowMargins.bottom());
-
-    /*
-    Force background update, to fix the bug that
-    sometimes background doesn't cover menu content.
-    */
-    update();
 }
 
 void DMenuBase::destroyAll()

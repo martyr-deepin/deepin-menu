@@ -10,37 +10,50 @@
 #ifndef DDOCKMENU_H
 #define DDOCKMENU_H
 
-#include "dmenubase.h"
+#include <darrowrectangle.h>
 
-#define CORNER_WIDTH 18
-#define CORNER_HEIGHT 10
+DWIDGET_USE_NAMESPACE
 
-class DDockMenu : public DMenuBase
+struct ItemStyle {
+    QColor itemBackgroundColor;
+    QColor itemTextColor;
+    QColor itemShortcutColor;
+    QString checkmarkIcon;
+    QString subMenuIndicatorIcon;
+};
+
+class DMenuContent;
+class DDockMenu : public DArrowRectangle
 {
     Q_OBJECT
 public:
-    enum Direction {
-        Top, Bottom, Right, Left
-    };
+    explicit DDockMenu(DDockMenu *parent = 0);
 
-    DDockMenu(DDockMenu *parent = 0);
+    void setItemActivity(const QString &itemId, bool isActive);
+    void setItemChecked(const QString &itemId, bool checked);
+    void setItemText(const QString &itemId, const QString &text);
 
-    virtual void setPosition(int, int);
+    void setItems(QJsonArray items);
 
-    Direction direction() const;
-    void setDirection(const Direction &direction);
+    DDockMenu *getRootMenu();
+    void showSubMenu(int x, int y, const QJsonObject &obj );
 
-protected:
-    virtual void paintEvent(QPaintEvent *);
+    DDockMenu *menuUnderPoint(const QPoint point);
+
+    void grabFocus();
+    void releaseFocus();
+
+    void destroyAll();
+
+    ItemStyle normalStyle;
+    ItemStyle hoverStyle;
+    ItemStyle inactiveStyle;
+
+signals:
+    void itemClicked(const QString &itemId, bool checked);
 
 private:
-    int m_cornerX;
-    int m_cornerY;
-    Direction m_direction;
-    virtual void showSubMenu(int, int, QJsonObject);
-
-    void moveCornerX(int);
-    void moveCornerY(int);
+    DMenuContent *m_menuContent;
 };
 
 #endif // DDOCKMENU_H

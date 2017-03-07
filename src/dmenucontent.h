@@ -13,15 +13,13 @@
 #include <QWidget>
 #include <QAction>
 
-#include "src/dmenubase.h"
-
 class QRect;
-class DMenuBase;
+class DDockMenu;
 class DMenuContent : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DMenuContent(DMenuBase *parent = 0);
+    explicit DMenuContent(DDockMenu *parent = 0);
 
     int contentWidth();
     int contentHeight();
@@ -32,10 +30,13 @@ public:
     void clearActions();
     void doCurrentAction();
 
+    void grabFocus();
+
 protected:
-    virtual void paintEvent(QPaintEvent *event);
-    virtual void mouseMoveEvent(QMouseEvent *event);
-    virtual void keyPressEvent(QKeyEvent *event);
+    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+    void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
 private:
     int _iconWidth;

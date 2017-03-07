@@ -19,16 +19,16 @@
 #include "ddesktopmenu.h"
 #include "ddockmenu.h"
 
-static DDockMenu::Direction DirectionFromString(QString direction) {
+static DArrowRectangle::ArrowDirection DirectionFromString(QString direction) {
     if (direction == "top") {
-        return DDockMenu::Top;
+        return DArrowRectangle::ArrowTop;
     } else if (direction == "left") {
-        return DDockMenu::Left;
+        return DArrowRectangle::ArrowLeft;
     } else if (direction == "right") {
-        return DDockMenu::Right;
+        return DArrowRectangle::ArrowRight;
     }
 
-    return DDockMenu::Bottom;
+    return DArrowRectangle::ArrowBottom;
 }
 
 MenuObject::MenuObject():
@@ -89,10 +89,9 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
     QJsonObject menuContentObj = menuContent.object();
 
     if (m_dockMenu) {
-        m_dockMenu->setDirection(DirectionFromString(direction));
-        m_dockMenu->setContent(menuContentObj["items"].toArray());
-        m_dockMenu->setPosition(x, y);
-        m_dockMenu->show();
+        m_dockMenu->setArrowDirection(DirectionFromString(direction));
+        m_dockMenu->setItems(menuContentObj["items"].toArray());
+        m_dockMenu->show(x, y);
         m_dockMenu->grabFocus();
     } else if (m_desktopMenu) {
         m_desktopMenu->setContent(menuContentObj["items"].toArray());

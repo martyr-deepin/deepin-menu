@@ -15,7 +15,6 @@ CONFIG += c++11 link_pkgconfig
 PKGCONFIG += dtkbase dtkwidget dframeworkdbus
 
 SOURCES += src/main.cpp \
-    src/dmenubase.cpp \
     src/ddesktopmenu.cpp \
     src/utils.cpp \
     src/dmenucontent.cpp \
@@ -27,7 +26,6 @@ SOURCES += src/main.cpp \
     src/dmenuapplication.cpp
 
 HEADERS  += \
-    src/dmenubase.h \
     src/ddesktopmenu.h \
     src/utils.h \
     src/dmenucontent.h \

@@ -23,8 +23,8 @@
 #include <QDebug>
 
 #include "utils.h"
-#include "dmenubase.h"
 #include "dmenucontent.h"
+#include "ddockmenu.h"
 
 #define MENU_ITEM_MAX_WIDTH 300
 #define MENU_ITEM_HEIGHT 24
@@ -35,7 +35,7 @@
 #define SUB_MENU_INDICATOR_HEIGHT 10
 #define SEPARATOR_HEIGHT 6
 
-DMenuContent::DMenuContent(DMenuBase *parent) :
+DMenuContent::DMenuContent(DDockMenu *parent) :
     QWidget(parent),
     _currentIndex(-1)
 {
@@ -56,7 +56,7 @@ void DMenuContent::setCurrentIndex(int index)
 
     if (index < 0 || index >= this->actions().count()) return;
 
-    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
     QAction *action = this->actions().at(index);
@@ -80,7 +80,6 @@ int DMenuContent::contentWidth()
     _iconWidth = 0;
     _shortcutWidth = 0;
     _subMenuIndicatorWidth = 0;
-    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
 
     QFont font;
     font.setPixelSize(MENU_ITEM_FONT_SIZE);
@@ -94,13 +93,13 @@ int DMenuContent::contentWidth()
             _iconWidth = MENU_ICON_SIZE + parent->itemLeftSpacing();
         }
         */
-        _iconWidth = MENU_ICON_WIDTH + parent->itemLeftSpacing();
-        if(!action->shortcut().isEmpty()) _shortcutWidth = qMax(_shortcutWidth, metrics.width(action->shortcut().toString()) + parent->itemCenterSpacing());
+        _iconWidth = MENU_ICON_WIDTH;
+        if(!action->shortcut().isEmpty()) _shortcutWidth = qMax(_shortcutWidth, metrics.width(action->shortcut().toString()));
         //        bool hasSubMenu = action->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0;
         //        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
-        _subMenuIndicatorWidth = SUB_MENU_INDICATOR_WIDTH + parent->itemRightSpacing();
+        _subMenuIndicatorWidth = SUB_MENU_INDICATOR_WIDTH;
 
-        result = qMax(result, metrics.width(action->text()) + parent->itemCenterSpacing());
+        result = qMax(result, metrics.width(action->text()));
     }
 
     return qMin(MENU_ITEM_MAX_WIDTH,
@@ -126,7 +125,7 @@ void DMenuContent::doCurrentAction()
 {
     if (_currentIndex < 0 || _currentIndex >= this->actions().count()) return;
 
-    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
     QAction *currentAction = this->actions().at(_currentIndex);
@@ -154,10 +153,18 @@ void DMenuContent::doCurrentAction()
     parent->destroyAll();
 }
 
+void DMenuContent::grabFocus()
+{
+    QTimer::singleShot(500, this, [this] {
+        grabKeyboard();
+        grabMouse();
+    });
+}
+
 // override methods
 void DMenuContent::paintEvent(QPaintEvent *)
 {
-    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     QFont font;
     font.setPixelSize(MENU_ITEM_FONT_SIZE);
     QPainter painter(this);
@@ -172,7 +179,7 @@ void DMenuContent::paintEvent(QPaintEvent *)
         QString prop("%1Activity");
         QVariant activeCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
         bool active = activeCache.isNull() ? action->isEnabled() : activeCache.toBool();
-        DMenuBase::ItemStyle itemStyle = active ? i == _currentIndex ? parent->hoverStyle() : parent->normalStyle() : parent->inactiveStyle();
+        ItemStyle itemStyle = active ? i == _currentIndex ? parent->hoverStyle : parent->normalStyle : parent->inactiveStyle;
 
         // indicates that this item is a separator
         if (action->text().isEmpty()) {
@@ -260,9 +267,22 @@ void DMenuContent::mouseMoveEvent(QMouseEvent *event)
     setCurrentIndex(index);
 }
 
+void DMenuContent::mouseReleaseEvent(QMouseEvent *event)
+{
+    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
+    if (parent) {
+        DDockMenu *menu = parent->menuUnderPoint(event->globalPos());
+        if (menu) {
+            doCurrentAction();
+        } else {
+            parent->destroyAll();
+        }
+    }
+}
+
 void DMenuContent::keyPressEvent(QKeyEvent *event)
 {
-    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
     switch (event->key()) {
@@ -279,12 +299,10 @@ void DMenuContent::keyPressEvent(QKeyEvent *event)
         this->selectNext();
         break;
     case Qt::Key_Right:
-        if (parent->subMenu() && parent->subMenu()->isVisible())
-            parent->subMenu()->grabFocus();
         break;
     case Qt::Key_Left:
         if (parent->parent()) {
-            DMenuBase *p_parent = qobject_cast<DMenuBase*>(parent->parent());
+            DDockMenu *p_parent = qobject_cast<DDockMenu*>(parent->parent());
             Q_ASSERT(p_parent);
 
             p_parent->grabFocus();
@@ -321,7 +339,7 @@ void DMenuContent::clearActions()
 int DMenuContent::getNextItemsHasShortcut(int startPos, QString keyText) {
     if (keyText.isEmpty()) return -1;
 
-    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
     for (int i = qMax(startPos, 0); i < this->actions().count(); i++) {
@@ -356,7 +374,7 @@ int DMenuContent::getNextItemsHasShortcut(int startPos, QString keyText) {
 
 void DMenuContent::selectPrevious()
 {
-    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
     for (int i = currentIndex() - 1; i >= 0; i--) {
@@ -377,7 +395,7 @@ void DMenuContent::selectPrevious()
 
 void DMenuContent::selectNext()
 {
-    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
     for (int i = currentIndex() + 1; i < actions().count(); i++) {
@@ -397,7 +415,7 @@ void DMenuContent::selectNext()
 }
 
 void DMenuContent::doCheck(int index) {
-    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
     QAction *action = this->actions().at(index);
@@ -429,7 +447,7 @@ void DMenuContent::doCheck(int index) {
 
 void DMenuContent::doUnCheck(int index)
 {
-    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
     QAction *action = this->actions().at(index);
@@ -482,14 +500,14 @@ void DMenuContent::doUnCheck(int index)
 
 void DMenuContent::sendItemClickedSignal(QString id, bool checked)
 {
-    DMenuBase *root = qobject_cast<DMenuBase *>(this->parent());
+    DDockMenu *root = qobject_cast<DDockMenu *>(this->parent());
     Q_ASSERT(root);
     while (root) {
         if (!root->parent()) {
             root->itemClicked(id, checked);
             break;
         } else {
-            root = qobject_cast<DMenuBase *>(root->parent());
+            root = qobject_cast<DDockMenu *>(root->parent());
             Q_ASSERT(root);
         }
     }
@@ -497,10 +515,10 @@ void DMenuContent::sendItemClickedSignal(QString id, bool checked)
 
 int DMenuContent::itemIndexUnderEvent(QMouseEvent *event) const
 {
-    DMenuBase *parent = qobject_cast<DMenuBase*>(this->parent());
+    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
-    DMenuBase *menuUnderCursor = parent->menuUnderPoint(event->globalPos());
+    DDockMenu *menuUnderCursor = parent->menuUnderPoint(event->globalPos());
     if (menuUnderCursor == parent) {
         int previousHeight = this->rect().y();
 
