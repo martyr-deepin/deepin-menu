@@ -41,6 +41,9 @@ MenuObject::MenuObject():
 
 MenuObject::~MenuObject()
 {
+    if (m_dockMenu) m_dockMenu->destroyAll();
+    if (m_desktopMenu) m_desktopMenu->deleteLater();
+
     emit MenuUnregistered();
 }
 
