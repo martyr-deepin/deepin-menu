@@ -29,11 +29,10 @@
 #define MENU_ITEM_MAX_WIDTH 300
 #define MENU_ITEM_HEIGHT 24
 #define MENU_ITEM_FONT_SIZE 13
-#define MENU_ICON_WIDTH 10
-#define MENU_ICON_HEIGHT 9
-#define SUB_MENU_INDICATOR_WIDTH 6
-#define SUB_MENU_INDICATOR_HEIGHT 10
 #define SEPARATOR_HEIGHT 6
+
+static const int LeftRightPadding = 20;
+static const int TopBottomPadding = 4;
 
 DMenuContent::DMenuContent(DDockMenu *parent) :
     QWidget(parent),
@@ -77,33 +76,16 @@ void DMenuContent::setCurrentIndex(int index)
 int DMenuContent::contentWidth()
 {
     int result = 0;
-    _iconWidth = 0;
-    _shortcutWidth = 0;
-    _subMenuIndicatorWidth = 0;
 
     QFont font;
     font.setPixelSize(MENU_ITEM_FONT_SIZE);
     QFontMetrics metrics(font);
-    foreach (QAction *action, this->actions()) {
-        /*
-        if(!action->property("itemIcon").toString().isEmpty() || \
-           !action->property("itemIconHover").toString().isEmpty() || \
-           !action->property("itemIconInactive").toString().isEmpty() || \
-           action->isCheckable()) {
-            _iconWidth = MENU_ICON_SIZE + parent->itemLeftSpacing();
-        }
-        */
-        _iconWidth = MENU_ICON_WIDTH;
-        if(!action->shortcut().isEmpty()) _shortcutWidth = qMax(_shortcutWidth, metrics.width(action->shortcut().toString()));
-        //        bool hasSubMenu = action->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0;
-        //        if(hasSubMenu) _subMenuIndicatorWidth = SUB_MENU_INDICATOR_SIZE + parent->itemRightSpacing();
-        _subMenuIndicatorWidth = SUB_MENU_INDICATOR_WIDTH;
 
+    foreach (QAction *action, this->actions()) {
         result = qMax(result, metrics.width(action->text()));
     }
 
-    return qMin(MENU_ITEM_MAX_WIDTH,
-                result + _iconWidth + _shortcutWidth + _subMenuIndicatorWidth);
+    return qMin(MENU_ITEM_MAX_WIDTH, result + 10 + LeftRightPadding*2);
 }
 
 int DMenuContent::contentHeight()
@@ -118,7 +100,7 @@ int DMenuContent::contentHeight()
         }
     }
 
-    return result;
+    return result + TopBottomPadding * 2;
 }
 
 void DMenuContent::doCurrentAction()
@@ -173,7 +155,6 @@ void DMenuContent::paintEvent(QPaintEvent *)
     for(int i = 0; i < this->actions().count(); i++) {
         QAction *action = this->actions().at(i);
         QRect actionRect = this->getRectOfActionAtIndex(i);
-        QRect actionRectWidthMargins = actionRect.marginsRemoved(QMargins(this->contentsMargins().left(), 0, this->contentsMargins().right(), 0));
         QString itemId = action->property("itemId").toString();
 
         QString prop("%1Activity");
@@ -199,62 +180,18 @@ void DMenuContent::paintEvent(QPaintEvent *)
             painter.fillRect(actionRect, QBrush(itemStyle.itemBackgroundColor));
             painter.setPen(QPen(itemStyle.itemTextColor));
 
-            // draw icon
-            if(_iconWidth) {
-                QRect iconRect = QRect(actionRectWidthMargins.x() + 4,
-                                       actionRectWidthMargins.y() + (MENU_ITEM_HEIGHT - MENU_ICON_HEIGHT) / 2,
-                                       MENU_ICON_WIDTH, MENU_ICON_HEIGHT);
-                QString prop("%1Checked");
-                QVariant checkedCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
-                bool checked = checkedCache.isNull() ? action->isChecked() : checkedCache.toBool();
-
-                if (!action->property("itemIcon").toString().isEmpty() || \
-                        !action->property("itemIconHover").toString().isEmpty() || \
-                        !action->property("itemIconInactive").toString().isEmpty())
-                {
-                    qDebug() << "draw icon" << iconRect;
-                    if (!active) {
-                        painter.drawImage(iconRect, QImage(action->property("itemIconInactive").toString()));
-                    } else if (_currentIndex == i) {
-                        painter.drawImage(iconRect, QImage(action->property("itemIconHover").toString()));
-                    } else {
-                        painter.drawImage(iconRect, QImage(action->property("itemIcon").toString()));
-                    }
-                } else if (action->isCheckable() && checked) {
-                    qDebug() << "draw checkmark";
-                    painter.drawImage(iconRect, QImage(itemStyle.checkmarkIcon));
-                }
-            }
-
             // draw text
             QString prop("%1Text");
             QVariant textCache = parent->getRootMenu()->property(prop.arg(itemId).toLatin1());
             QString text = textCache.isNull() ? action->text() : textCache.toString();
+            QString elidedText = elideText(text, actionRect.width() - LeftRightPadding * 2);
 
-            QString elidedText = elideText(text, actionRectWidthMargins.width() - _iconWidth - _shortcutWidth);
-            QRect textRect = painter.boundingRect(QRect(actionRectWidthMargins.x() + _iconWidth,
-                                                        actionRectWidthMargins.y(),
-                                                        actionRectWidthMargins.width(),
-                                                        actionRectWidthMargins.height()),
-                                                  Qt::AlignVCenter,
-                                                  elidedText);
-            painter.drawStaticText(textRect.topLeft(), QStaticText(elidedText));
+            QTextOption option;
+            option.setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
 
-            // draw shortcut text
-            if(_shortcutWidth)
-                painter.drawText(QRect(actionRectWidthMargins.x(),
-                                       actionRectWidthMargins.y(),
-                                       actionRectWidthMargins.width() - _subMenuIndicatorWidth,
-                                       actionRectWidthMargins.height()),
-                                 Qt::AlignVCenter | Qt::AlignRight,
-                                 action->shortcut().toString());
-
-            // draw sub menu indicator icon
-            if(action->property("itemSubMenu").value<QJsonObject>()["items"].toArray().count() != 0)
-                painter.drawImage(QRect(actionRectWidthMargins.x() + actionRectWidthMargins.width() - SUB_MENU_INDICATOR_WIDTH,
-                                        actionRectWidthMargins.y() + (MENU_ITEM_HEIGHT - SUB_MENU_INDICATOR_HEIGHT) / 2,
-                                        SUB_MENU_INDICATOR_WIDTH, SUB_MENU_INDICATOR_HEIGHT),
-                                  QImage(itemStyle.subMenuIndicatorIcon));
+            QRect textRect(actionRect);
+            textRect.adjust(LeftRightPadding, 0, -LeftRightPadding, 0);
+            painter.drawText(textRect, elidedText, option);
         }
     }
 
@@ -314,7 +251,7 @@ void DMenuContent::keyPressEvent(QKeyEvent *event)
 // private methods
 QRect DMenuContent::getRectOfActionAtIndex(int index)
 {
-    int previousHeight = 0;
+    int previousHeight = TopBottomPadding;
     int itemHeight = this->actions().at(index)->text().isEmpty() ? SEPARATOR_HEIGHT : MENU_ITEM_HEIGHT;
 
     for (int i = 0; i < index; i++) {

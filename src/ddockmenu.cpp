@@ -28,6 +28,7 @@ DDockMenu::DDockMenu(DDockMenu *parent):
     setAccessibleName("DockMenu");
     setBackgroundColor(QColor::fromRgb(18, 18, 18, 255 * 0.9));
     setBorderColor(QColor::fromRgb(255, 255, 255, 255 * 0.1));
+    setMargin(0);
 
     normalStyle = ItemStyle{Qt::transparent,
             Qt::white,
