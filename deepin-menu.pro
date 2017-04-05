@@ -23,7 +23,8 @@ SOURCES += src/main.cpp \
     src/manager_object.cpp \
     src/menu_object.cpp \
     src/ddockmenu.cpp \
-    src/dmenuapplication.cpp
+    src/dmenuapplication.cpp \
+    src/dabstractmenu.cpp
 
 HEADERS  += \
     src/ddesktopmenu.h \
@@ -34,7 +35,8 @@ HEADERS  += \
     src/manager_object.h \
     src/menu_object.h \
     src/ddockmenu.h \
-    src/dmenuapplication.h
+    src/dmenuapplication.h \
+    src/dabstractmenu.h
 
 LIBS += -lxcb -lX11
 

@@ -11,6 +11,7 @@
 #define DDOCKMENU_H
 
 #include <darrowrectangle.h>
+#include "dabstractmenu.h"
 
 #include <com_deepin_api_xmousearea.h>
 
@@ -25,42 +26,39 @@ struct ItemStyle {
 };
 
 class DMenuContent;
-class DDockMenu : public DArrowRectangle
+class DDockMenu : public DArrowRectangle, public DAbstractMenu
 {
     Q_OBJECT
 public:
     explicit DDockMenu(DDockMenu *parent = 0);
     ~DDockMenu();
 
-    void setItemActivity(const QString &itemId, bool isActive);
-    void setItemChecked(const QString &itemId, bool checked);
-    void setItemText(const QString &itemId, const QString &text);
+    void setItems(QJsonArray items) Q_DECL_OVERRIDE;
 
-    void setItems(QJsonArray items);
-
-    DDockMenu *getRootMenu();
-    void showSubMenu(int x, int y, const QJsonObject &obj );
-
-    DDockMenu *menuUnderPoint(const QPoint point);
-
-    void grabFocus();
-    void releaseFocus();
+    void grabFocus() Q_DECL_OVERRIDE;
+    void releaseFocus() Q_DECL_OVERRIDE;
 
     void destroyAll();
 
-    ItemStyle normalStyle;
-    ItemStyle hoverStyle;
-    ItemStyle inactiveStyle;
-
 signals:
-    void itemClicked(const QString &itemId, bool checked);
+    void itemClicked(const QString &id, bool checked);
 
 private slots:
     void onButtonPress(int in0, int in1, int in2, const QString &in3);
     void onCursorMove(int in0, int in1, const QString &in2);
 
 private:
+    DDockMenu *getRootMenu();
+    DDockMenu *menuUnderPoint(const QPoint point);
+    void showSubMenu(int x, int y, const QJsonObject &obj );
+
+private:
+    friend class DMenuContent;
     DMenuContent *m_menuContent;
+
+    ItemStyle normalStyle;
+    ItemStyle hoverStyle;
+    ItemStyle inactiveStyle;
 
     QString m_mouseAreaKey;
     com::deepin::api::XMouseArea *m_mouseAreaInter;

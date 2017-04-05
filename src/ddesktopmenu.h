@@ -11,24 +11,24 @@
 #define DDESKTOPMENU_H
 
 #include <QMenu>
+#include "dabstractmenu.h"
 
 #include <com_deepin_api_xmousearea.h>
 
 using namespace com::deepin::api;
 
-class DDesktopMenu : public QMenu
+class DDesktopMenu : public QMenu, public DAbstractMenu
 {
     Q_OBJECT
 public:
     explicit DDesktopMenu();
     ~DDesktopMenu();
 
-    void setContent(QJsonArray items);
-    void grabFocus();
+    void setItems(QJsonArray items) Q_DECL_OVERRIDE;
 
-    void setItemActivity(const QString &itemId, bool isActive);
-    void setItemChecked(const QString &itemId, bool checked);
-    void setItemText(const QString &itemId, const QString &text);
+    void setItemActivity(const QString &itemId, bool isActive) Q_DECL_OVERRIDE;
+    void setItemChecked(const QString &itemId, bool checked) Q_DECL_OVERRIDE;
+    void setItemText(const QString &itemId, const QString &text) Q_DECL_OVERRIDE;
 
 signals:
     void itemClicked(const QString &id, bool checked);

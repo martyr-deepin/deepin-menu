@@ -45,7 +45,7 @@ DDesktopMenu::~DDesktopMenu()
     m_mouseArea->UnregisterArea(m_key);
 }
 
-void DDesktopMenu::setContent(QJsonArray items)
+void DDesktopMenu::setItems(QJsonArray items)
 {
     addActionFromJson(this, items);
 }
@@ -133,8 +133,4 @@ void DDesktopMenu::addActionFromJson(QMenu *menu, const QJsonArray &items)
             hide();
         });
     }
-}
-
-void DDesktopMenu::grabFocus()
-{
 }

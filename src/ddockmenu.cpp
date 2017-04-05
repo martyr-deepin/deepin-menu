@@ -58,21 +58,6 @@ DDockMenu::~DDockMenu()
     releaseFocus();
 }
 
-void DDockMenu::setItemActivity(const QString &, bool)
-{
-
-}
-
-void DDockMenu::setItemChecked(const QString &, bool)
-{
-
-}
-
-void DDockMenu::setItemText(const QString &, const QString &)
-{
-
-}
-
 void DDockMenu::setItems(QJsonArray items)
 {
     m_menuContent->setCurrentIndex(-1);
