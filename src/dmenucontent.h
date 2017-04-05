@@ -32,12 +32,12 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
-    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
 private:
     friend class DDockMenu;
     void processCursorMove(int x, int y);
     void processButtonClick(int x, int y);
+    void processKeyPress(const QString &key);
 
 private:
     int _iconWidth;

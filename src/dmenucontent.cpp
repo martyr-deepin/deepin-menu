@@ -190,37 +190,6 @@ void DMenuContent::paintEvent(QPaintEvent *)
     painter.end();
 }
 
-void DMenuContent::keyPressEvent(QKeyEvent *event)
-{
-    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
-    Q_ASSERT(parent);
-
-    switch (event->key()) {
-    case Qt::Key_Escape:
-        parent->destroyAll();
-        break;
-    case Qt::Key_Return:
-        this->doCurrentAction();
-        break;
-    case Qt::Key_Up:
-        this->selectPrevious();
-        break;
-    case Qt::Key_Down:
-        this->selectNext();
-        break;
-    case Qt::Key_Right:
-        break;
-    case Qt::Key_Left:
-        if (parent->parent()) {
-            DDockMenu *p_parent = qobject_cast<DDockMenu*>(parent->parent());
-            Q_ASSERT(p_parent);
-
-            p_parent->grabFocus();
-        }
-        break;
-    }
-}
-
 void DMenuContent::processCursorMove(int x, int y)
 {
     int index = itemIndexUnderEvent(QPoint(x, y));
@@ -237,6 +206,22 @@ void DMenuContent::processButtonClick(int x, int y)
         } else {
             parent->destroyAll();
         }
+    }
+}
+
+void DMenuContent::processKeyPress(const QString &key)
+{
+    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
+    Q_ASSERT(parent);
+
+    if (key == "escape") {
+        parent->destroyAll();
+    } else if (key == "return") {
+        this->doCurrentAction();
+    } else if (key == "up") {
+        this->selectPrevious();
+    } else if (key == "down") {
+        this->selectNext();
     }
 }
 

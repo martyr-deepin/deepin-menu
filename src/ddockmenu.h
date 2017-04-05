@@ -46,6 +46,7 @@ signals:
 private slots:
     void onButtonPress(int in0, int in1, int in2, const QString &in3);
     void onCursorMove(int in0, int in1, const QString &in2);
+    void onKeyPress(const QString &in0, int in1, int in2, const QString &in3);
 
 private:
     DDockMenu *getRootMenu();

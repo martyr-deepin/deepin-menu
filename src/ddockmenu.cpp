@@ -51,6 +51,7 @@ DDockMenu::DDockMenu(DDockMenu *parent):
 
     connect(m_mouseAreaInter, &__XMouseArea::ButtonPress, this, &DDockMenu::onButtonPress);
     connect(m_mouseAreaInter, &__XMouseArea::CursorMove, this, &DDockMenu::onCursorMove);
+    connect(m_mouseAreaInter, &__XMouseArea::KeyPress, this, &DDockMenu::onKeyPress);
 }
 
 DDockMenu::~DDockMenu()
@@ -111,13 +112,20 @@ DDockMenu *DDockMenu::menuUnderPoint(const QPoint point)
 
 void DDockMenu::grabFocus()
 {
-    m_menuContent->grabKeyboard();
+    // Try to make us the focus grabber window, so that tooltips
+    // on Dock will disappear.
+    QTimer::singleShot(500, this, [this] {
+        grabMouse();
+        grabKeyboard();
+    });
+
     m_mouseAreaKey = m_mouseAreaInter->RegisterFullScreen();
 }
 
 void DDockMenu::releaseFocus()
 {
-    m_menuContent->releaseKeyboard();
+    releaseMouse();
+    releaseKeyboard();
     m_mouseAreaInter->UnregisterArea(m_mouseAreaKey);
 }
 
@@ -126,7 +134,7 @@ void DDockMenu::destroyAll()
     deleteLater();
 }
 
-void DDockMenu::onButtonPress(int in0, int in1, int in2, const QString &in3)
+void DDockMenu::onButtonPress(int, int in1, int in2, const QString &in3)
 {
     if (in3 == m_mouseAreaKey) {
         m_menuContent->processButtonClick(in1, in2);
@@ -137,5 +145,12 @@ void DDockMenu::onCursorMove(int in0, int in1, const QString &in2)
 {
     if (in2 == m_mouseAreaKey) {
         m_menuContent->processCursorMove(in0, in1);
+    }
+}
+
+void DDockMenu::onKeyPress(const QString &in0, int, int, const QString &in3)
+{
+    if (in3 == m_mouseAreaKey) {
+        m_menuContent->processKeyPress(in0);
     }
 }
