@@ -137,8 +137,4 @@ void DDesktopMenu::addActionFromJson(QMenu *menu, const QJsonArray &items)
 
 void DDesktopMenu::grabFocus()
 {
-    QTimer::singleShot(500, this, [this] {
-        grabKeyboard();
-        grabMouse();
-    });
 }

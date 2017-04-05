@@ -30,13 +30,14 @@ public:
     void clearActions();
     void doCurrentAction();
 
-    void grabFocus();
-
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
-    void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+
+private:
+    friend class DDockMenu;
+    void processCursorMove(int x, int y);
+    void processButtonClick(int x, int y);
 
 private:
     int _iconWidth;
@@ -51,7 +52,7 @@ private:
     void doCheck(int);
     void doUnCheck(int);
     void sendItemClickedSignal(QString, bool);
-    int itemIndexUnderEvent(QMouseEvent *event) const;
+    int itemIndexUnderEvent(QPoint point) const;
     QString elideText(QString source, int maxWidth) const;
 };
 

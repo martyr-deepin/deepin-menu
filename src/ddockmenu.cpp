@@ -23,7 +23,10 @@
 
 DDockMenu::DDockMenu(DDockMenu *parent):
     DArrowRectangle(DArrowRectangle::ArrowBottom, parent),
-    m_menuContent(new DMenuContent(this))
+    m_menuContent(new DMenuContent(this)),
+    m_mouseAreaInter(new com::deepin::api::XMouseArea("com.deepin.api.XMouseArea",
+                                                      "/com/deepin/api/XMouseArea",
+                                                      QDBusConnection::sessionBus(), this))
 {
     setAccessibleName("DockMenu");
     setBackgroundColor(QColor::fromRgb(18, 18, 18, 255 * 0.9));
@@ -45,6 +48,14 @@ DDockMenu::DDockMenu(DDockMenu *parent):
             QColor("#646464"),
             ":/images/check_dark_inactive.png",
             ":/images/arrow-dark.png"};
+
+    connect(m_mouseAreaInter, &__XMouseArea::ButtonPress, this, &DDockMenu::onButtonPress);
+    connect(m_mouseAreaInter, &__XMouseArea::CursorMove, this, &DDockMenu::onCursorMove);
+}
+
+DDockMenu::~DDockMenu()
+{
+    releaseFocus();
 }
 
 void DDockMenu::setItemActivity(const QString &, bool)
@@ -115,17 +126,31 @@ DDockMenu *DDockMenu::menuUnderPoint(const QPoint point)
 
 void DDockMenu::grabFocus()
 {
-    if (m_menuContent) {
-        m_menuContent->grabFocus();
-    }
+    m_menuContent->grabKeyboard();
+    m_mouseAreaKey = m_mouseAreaInter->RegisterFullScreen();
 }
 
 void DDockMenu::releaseFocus()
 {
-
+    m_menuContent->releaseKeyboard();
+    m_mouseAreaInter->UnregisterArea(m_mouseAreaKey);
 }
 
 void DDockMenu::destroyAll()
 {
     deleteLater();
+}
+
+void DDockMenu::onButtonPress(int in0, int in1, int in2, const QString &in3)
+{
+    if (in3 == m_mouseAreaKey) {
+        m_menuContent->processButtonClick(in1, in2);
+    }
+}
+
+void DDockMenu::onCursorMove(int in0, int in1, const QString &in2)
+{
+    if (in2 == m_mouseAreaKey) {
+        m_menuContent->processCursorMove(in0, in1);
+    }
 }

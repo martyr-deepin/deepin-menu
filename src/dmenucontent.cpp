@@ -135,14 +135,6 @@ void DMenuContent::doCurrentAction()
     parent->destroyAll();
 }
 
-void DMenuContent::grabFocus()
-{
-    QTimer::singleShot(500, this, [this] {
-        grabKeyboard();
-        grabMouse();
-    });
-}
-
 // override methods
 void DMenuContent::paintEvent(QPaintEvent *)
 {
@@ -198,25 +190,6 @@ void DMenuContent::paintEvent(QPaintEvent *)
     painter.end();
 }
 
-void DMenuContent::mouseMoveEvent(QMouseEvent *event)
-{
-    int index = itemIndexUnderEvent(event);
-    setCurrentIndex(index);
-}
-
-void DMenuContent::mouseReleaseEvent(QMouseEvent *event)
-{
-    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
-    if (parent) {
-        DDockMenu *menu = parent->menuUnderPoint(event->globalPos());
-        if (menu) {
-            doCurrentAction();
-        } else {
-            parent->destroyAll();
-        }
-    }
-}
-
 void DMenuContent::keyPressEvent(QKeyEvent *event)
 {
     DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
@@ -245,6 +218,25 @@ void DMenuContent::keyPressEvent(QKeyEvent *event)
             p_parent->grabFocus();
         }
         break;
+    }
+}
+
+void DMenuContent::processCursorMove(int x, int y)
+{
+    int index = itemIndexUnderEvent(QPoint(x, y));
+    setCurrentIndex(index);
+}
+
+void DMenuContent::processButtonClick(int x, int y)
+{
+    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
+    if (parent) {
+        DDockMenu *menu = parent->menuUnderPoint(QPoint(x, y));
+        if (menu) {
+            doCurrentAction();
+        } else {
+            parent->destroyAll();
+        }
     }
 }
 
@@ -450,12 +442,14 @@ void DMenuContent::sendItemClickedSignal(QString id, bool checked)
     }
 }
 
-int DMenuContent::itemIndexUnderEvent(QMouseEvent *event) const
+int DMenuContent::itemIndexUnderEvent(QPoint point) const
 {
     DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
-    DDockMenu *menuUnderCursor = parent->menuUnderPoint(event->globalPos());
+    QPoint lPoint(point.x() - parent->x(), point.y() - parent->y());
+
+    DDockMenu *menuUnderCursor = parent->menuUnderPoint(point);
     if (menuUnderCursor == parent) {
         int previousHeight = this->rect().y();
 
@@ -463,10 +457,10 @@ int DMenuContent::itemIndexUnderEvent(QMouseEvent *event) const
             QAction *action = this->actions().at(i);
             int itemHeight = action->text().isEmpty() ? SEPARATOR_HEIGHT : MENU_ITEM_HEIGHT;
 
-            if (previousHeight <= event->y() &&
-                    event->y() <= previousHeight + itemHeight &&
-                    this->rect().x() <= event->x() &&
-                    event->x() <= this->rect().x() + this->rect().width()) {
+            if (previousHeight <= lPoint.y() &&
+                    lPoint.y() <= previousHeight + itemHeight &&
+                    this->rect().x() <= lPoint.x() &&
+                    lPoint.x() <= this->rect().x() + this->rect().width()) {
                 return i;
             } else {
                 previousHeight += itemHeight;
