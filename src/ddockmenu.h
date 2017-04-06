@@ -53,6 +53,8 @@ private:
     DDockMenu *menuUnderPoint(const QPoint point);
     void showSubMenu(int x, int y, const QJsonObject &obj );
 
+    bool event(QEvent *event) Q_DECL_OVERRIDE;
+
 private:
     friend class DMenuContent;
     DMenuContent *m_menuContent;

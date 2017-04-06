@@ -28,6 +28,8 @@ DDockMenu::DDockMenu(DDockMenu *parent):
                                                       "/com/deepin/api/XMouseArea",
                                                       QDBusConnection::sessionBus(), this))
 {
+    setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+
     setAccessibleName("DockMenu");
     setBackgroundColor(QColor::fromRgb(18, 18, 18, 255 * 0.9));
     setBorderColor(QColor::fromRgb(255, 255, 255, 255 * 0.1));
@@ -102,6 +104,15 @@ void DDockMenu::showSubMenu(int, int, const QJsonObject &)
 
 }
 
+bool DDockMenu::event(QEvent *event)
+{
+    if (event->type() == QEvent::WindowDeactivate) {
+        destroyAll();
+    }
+
+    return DArrowRectangle::event(event);
+}
+
 DDockMenu *DDockMenu::menuUnderPoint(const QPoint point)
 {
     if (geometry().contains(point)) {
@@ -115,6 +126,7 @@ void DDockMenu::grabFocus()
     // Try to make us the focus grabber window, so that tooltips
     // on Dock will disappear.
     QTimer::singleShot(500, this, [this] {
+        activateWindow();
         grabMouse();
         grabKeyboard();
     });
