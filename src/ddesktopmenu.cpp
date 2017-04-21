@@ -34,7 +34,7 @@ DDesktopMenu::DDesktopMenu() :
     });
 
     connect(m_mouseArea, &__XMouseArea::ButtonPress, this, [this] (int, int x, int y, const QString &key) {
-        if (key == m_key && !geometry().contains(x, y)) {
+        if (key == m_key && !containsPoint(QPoint(x, y))) {
             hide();
         }
     });
@@ -96,6 +96,8 @@ QAction *DDesktopMenu::action(const QString &id)
 
 void DDesktopMenu::addActionFromJson(QMenu *menu, const QJsonArray &items)
 {
+    m_ownMenus << menu;
+
     foreach (QJsonValue item, items) {
         QJsonObject itemObj = item.toObject();
         const QString itemText = itemObj["itemText"].toString().replace("_", QString()).replace(QRegExp("\\([^)]+\\)"), QString());
@@ -133,4 +135,14 @@ void DDesktopMenu::addActionFromJson(QMenu *menu, const QJsonArray &items)
             hide();
         });
     }
+}
+
+bool DDesktopMenu::containsPoint(const QPoint &point) const
+{
+    for (const QMenu *menu : m_ownMenus) {
+        if (menu->geometry().contains(point))
+            return true;
+    }
+
+    return false;
 }

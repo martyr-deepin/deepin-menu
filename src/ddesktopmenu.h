@@ -39,9 +39,12 @@ protected:
 private:
     QAction *action(const QString &id);
     void addActionFromJson(QMenu *menu, const QJsonArray &items);
+    bool containsPoint(const QPoint &point) const;
 
     QString m_key;
     XMouseArea *m_mouseArea;
+
+    QList<QMenu*> m_ownMenus;
 };
 
 #endif // DDESKTOPMENU_H
