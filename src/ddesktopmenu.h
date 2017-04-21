@@ -29,6 +29,7 @@ public:
     void setItemActivity(const QString &itemId, bool isActive) Q_DECL_OVERRIDE;
     void setItemChecked(const QString &itemId, bool checked) Q_DECL_OVERRIDE;
     void setItemText(const QString &itemId, const QString &text) Q_DECL_OVERRIDE;
+    void grabFocus() Q_DECL_OVERRIDE;
 
 signals:
     void itemClicked(const QString &id, bool checked);

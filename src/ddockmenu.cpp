@@ -131,7 +131,16 @@ void DDockMenu::grabFocus()
         grabKeyboard();
     });
 
-    m_mouseAreaKey = m_mouseAreaInter->RegisterFullScreen();
+    QDBusPendingCall call = m_mouseAreaInter->RegisterFullScreen();
+    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher] {
+        if (watcher->isError()) {
+            qWarning() << "error registering mouse area";
+        } else {
+            QDBusReply<QString> reply = watcher->reply();
+            m_mouseAreaKey = reply.value();
+        }
+    });
 }
 
 void DDockMenu::releaseFocus()

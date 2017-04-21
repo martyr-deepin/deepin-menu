@@ -22,17 +22,6 @@ DDesktopMenu::DDesktopMenu() :
     // won't even show working with deepin-terminal2 and dde-launcher.
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::BypassWindowManagerHint | Qt::Tool);
 
-    QDBusPendingCall call = m_mouseArea->RegisterFullScreen();
-    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
-    connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher] {
-        if (watcher->isError()) {
-            qWarning() << "error registering mouse area";
-        } else {
-            QDBusReply<QString> reply = watcher->reply();
-            m_key = reply.value();
-        }
-    });
-
     connect(m_mouseArea, &__XMouseArea::ButtonPress, this, [this] (int, int x, int y, const QString &key) {
         if (key == m_key && !containsPoint(QPoint(x, y))) {
             hide();
@@ -72,6 +61,26 @@ void DDesktopMenu::setItemText(const QString &itemId, const QString &text)
     if (action) {
         action->setText(text);
     }
+}
+
+void DDesktopMenu::grabFocus()
+{
+    QTimer::singleShot(100, this, [this] {
+        activateWindow();
+        grabMouse();
+        grabKeyboard();
+    });
+
+    QDBusPendingCall call = m_mouseArea->RegisterFullScreen();
+    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher] {
+        if (watcher->isError()) {
+            qWarning() << "error registering mouse area";
+        } else {
+            QDBusReply<QString> reply = watcher->reply();
+            m_key = reply.value();
+        }
+    });
 }
 
 void DDesktopMenu::keyPressEvent(QKeyEvent *event)
