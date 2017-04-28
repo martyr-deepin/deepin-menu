@@ -31,7 +31,7 @@ DDockMenu::DDockMenu(DDockMenu *parent):
     setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
 
     setAccessibleName("DockMenu");
-    setBackgroundColor(QColor::fromRgb(18, 18, 18, 255 * 0.9));
+    setBackgroundColor(DBlurEffectWidget::DarkColor);
     setBorderColor(QColor::fromRgb(255, 255, 255, 255 * 0.1));
     setMargin(0);
 
