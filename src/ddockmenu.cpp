@@ -152,7 +152,13 @@ void DDockMenu::releaseFocus()
 
 void DDockMenu::destroyAll()
 {
-    deleteLater();
+    // NOTE(hualet): the events processed by this menu is actually delivered by
+    // xmousearea which is xrecord backed, so if we destroy this window too
+    // early, say immediately after mouse clicks, the actual events will go to
+    // the window behide the menu(desktop for example).
+    QTimer::singleShot(500, this, [this] {
+        deleteLater();
+    });
 }
 
 void DDockMenu::onButtonPress(int, int in1, int in2, const QString &in3)
