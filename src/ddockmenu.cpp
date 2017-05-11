@@ -34,6 +34,8 @@ DDockMenu::DDockMenu(DDockMenu *parent):
     setBackgroundColor(DBlurEffectWidget::DarkColor);
     setBorderColor(QColor::fromRgb(255, 255, 255, 255 * 0.1));
     setMargin(0);
+    setArrowWidth(18);
+    setArrowHeight(10);
 
     normalStyle = ItemStyle{Qt::transparent,
             Qt::white,
