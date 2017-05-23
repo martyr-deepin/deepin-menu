@@ -201,9 +201,11 @@ void DMenuContent::processButtonClick(int x, int y)
     DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     if (parent) {
         DDockMenu *menu = parent->menuUnderPoint(QPoint(x, y));
+        qDebug() << "menu geometry is " << parent->geometry();
         if (menu) {
             doCurrentAction();
         } else {
+            qDebug() << "no menu under mouse event: " << x << y << ", destroy menus.";
             parent->destroyAll();
         }
     }

@@ -12,7 +12,7 @@ TARGET = deepin-menu
 TEMPLATE = app
 
 CONFIG += c++11 link_pkgconfig
-PKGCONFIG += dtkbase dtkwidget dframeworkdbus
+PKGCONFIG += dtkbase dtkwidget dtkutil dframeworkdbus
 
 SOURCES += src/main.cpp \
     src/ddesktopmenu.cpp \

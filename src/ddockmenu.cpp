@@ -166,6 +166,7 @@ void DDockMenu::destroyAll()
 void DDockMenu::onButtonPress(int, int in1, int in2, const QString &in3)
 {
     if (in3 == m_mouseAreaKey) {
+        qDebug() << "receive button press event from xmousearea: " << in1 << in2;
         m_menuContent->processButtonClick(in1, in2);
     }
 }
@@ -180,6 +181,7 @@ void DDockMenu::onCursorMove(int in0, int in1, const QString &in2)
 void DDockMenu::onKeyPress(const QString &in0, int, int, const QString &in3)
 {
     if (in3 == m_mouseAreaKey) {
+        qDebug() << "receive key press event from xmousearea: " << in0;
         m_menuContent->processKeyPress(in0);
     }
 }

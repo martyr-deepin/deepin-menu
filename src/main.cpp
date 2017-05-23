@@ -10,6 +10,7 @@
 #include <QDBusConnectionInterface>
 
 #include <DApplication>
+#include <DLog>
 
 #include "dbus_manager_adaptor.h"
 #include "manager_object.h"
@@ -18,12 +19,19 @@
 #define MENU_SERVICE_NAME "com.deepin.menu"
 #define MENU_SERVICE_PATH "/com/deepin/menu"
 
+DUTIL_USE_NAMESPACE
 DWIDGET_USE_NAMESPACE
 
 int main(int argc, char *argv[])
 {
     DApplication::loadDXcbPlugin();
     DMenuApplication app(argc, argv);
+    app.setOrganizationName("deepin");
+    app.setApplicationName("deepin-menu");
+    app.setApplicationVersion("2.0");
+
+    DLogManager::registerConsoleAppender();
+    DLogManager::registerFileAppender();
 
     ManagerObject managerObject;
     ManagerAdaptor manager(&managerObject);
