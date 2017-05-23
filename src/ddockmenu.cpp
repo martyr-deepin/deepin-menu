@@ -158,7 +158,7 @@ void DDockMenu::destroyAll()
     // xmousearea which is xrecord backed, so if we destroy this window too
     // early, say immediately after mouse clicks, the actual events will go to
     // the window behide the menu(desktop for example).
-    QTimer::singleShot(500, this, [this] {
+    QTimer::singleShot(100, this, [this] {
         deleteLater();
     });
 }
