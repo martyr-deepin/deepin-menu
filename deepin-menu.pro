@@ -43,5 +43,5 @@ LIBS += -lxcb -lX11
 RESOURCES += \
     images.qrc
 
-target.path = /usr/lib
+target.path = /usr/bin
 INSTALLS += target

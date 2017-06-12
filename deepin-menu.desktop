@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
 Name=Deepin Menu
-Exec=/usr/lib/deepin-menu
+Exec=/usr/bin/deepin-menu
 NoDisplay=true
 OnlyShowIn=Deepin
