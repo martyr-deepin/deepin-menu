@@ -438,7 +438,7 @@ int DMenuContent::itemIndexUnderEvent(QPoint point) const
 
     DDockMenu *menuUnderCursor = parent->menuUnderPoint(point);
     if (menuUnderCursor == parent) {
-        int previousHeight = this->rect().y();
+        int previousHeight = y();
 
         for (int i = 0; i < this->actions().count(); i++) {
             QAction *action = this->actions().at(i);
