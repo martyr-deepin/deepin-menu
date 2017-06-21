@@ -137,7 +137,7 @@ void DDockMenu::grabFocus()
     QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher] {
         if (watcher->isError()) {
-            qWarning() << "error registering mouse area";
+            qWarning() << "error registering mouse area: " << watcher->error().message();
         } else {
             QDBusReply<QString> reply = watcher->reply();
             m_mouseAreaKey = reply.value();
