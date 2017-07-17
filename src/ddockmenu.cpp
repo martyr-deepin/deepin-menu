@@ -30,9 +30,14 @@ DDockMenu::DDockMenu(DDockMenu *parent):
 {
     setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
 
+    m_wmHelper = DWindowManagerHelper::instance();
+
+    connect(m_wmHelper, &DWindowManagerHelper::hasCompositeChanged, this, &DDockMenu::onWMCompositeChanged);
+
+    onWMCompositeChanged();
+
     setAccessibleName("DockMenu");
     setBackgroundColor(DBlurEffectWidget::DarkColor);
-    setBorderColor(QColor::fromRgb(255, 255, 255, 255 * 0.1));
     setMargin(0);
     setArrowWidth(18);
     setArrowHeight(10);
@@ -184,4 +189,12 @@ void DDockMenu::onKeyPress(const QString &in0, int, int, const QString &in3)
         qDebug() << "receive key press event from xmousearea: " << in0;
         m_menuContent->processKeyPress(in0);
     }
+}
+
+void DDockMenu::onWMCompositeChanged()
+{
+    if (m_wmHelper->hasComposite())
+        setBorderColor(QColor(255, 255, 255, 0.1 * 255));
+    else
+        setBorderColor(QColor("#2C3238"));
 }

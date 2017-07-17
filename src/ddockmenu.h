@@ -12,7 +12,7 @@
 
 #include <darrowrectangle.h>
 #include "dabstractmenu.h"
-
+#include <DWindowManagerHelper>
 #include <com_deepin_api_xmousearea.h>
 
 DWIDGET_USE_NAMESPACE
@@ -47,6 +47,7 @@ private slots:
     void onButtonPress(int in0, int in1, int in2, const QString &in3);
     void onCursorMove(int in0, int in1, const QString &in2);
     void onKeyPress(const QString &in0, int in1, int in2, const QString &in3);
+    void onWMCompositeChanged();
 
 private:
     DDockMenu *getRootMenu();
@@ -65,6 +66,8 @@ private:
 
     QString m_mouseAreaKey;
     com::deepin::api::XMouseArea *m_mouseAreaInter;
+
+    DWindowManagerHelper *m_wmHelper;
 };
 
 #endif // DDOCKMENU_H
