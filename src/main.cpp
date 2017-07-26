@@ -19,7 +19,7 @@
 #define MENU_SERVICE_NAME "com.deepin.menu"
 #define MENU_SERVICE_PATH "/com/deepin/menu"
 
-DUTIL_USE_NAMESPACE
+DCORE_USE_NAMESPACE
 DWIDGET_USE_NAMESPACE
 
 int main(int argc, char *argv[])
