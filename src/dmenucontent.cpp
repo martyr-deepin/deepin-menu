@@ -21,6 +21,7 @@
 #include <QPoint>
 #include <QStaticText>
 #include <QDebug>
+#include <QApplication>
 
 #include "utils.h"
 #include "dmenucontent.h"
@@ -100,7 +101,7 @@ int DMenuContent::contentHeight()
         }
     }
 
-    return result + TopBottomPadding * 2;
+    return (result + TopBottomPadding * 2);
 }
 
 void DMenuContent::doCurrentAction()
@@ -230,16 +231,21 @@ void DMenuContent::processKeyPress(const QString &key)
 // private methods
 QRect DMenuContent::getRectOfActionAtIndex(int index)
 {
-    int previousHeight = TopBottomPadding;
-    int itemHeight = this->actions().at(index)->text().isEmpty() ? SEPARATOR_HEIGHT : MENU_ITEM_HEIGHT;
-
-    for (int i = 0; i < index; i++) {
+    auto getItemHeight = [this](const int i) {
         QAction *action = this->actions().at(i);
         if (action->text().isEmpty()) {
-            previousHeight += SEPARATOR_HEIGHT;
+            return SEPARATOR_HEIGHT;
         } else {
-            previousHeight += MENU_ITEM_HEIGHT;
+            return  MENU_ITEM_HEIGHT;
         }
+    };
+
+    int previousHeight = TopBottomPadding;
+    int itemHeight = getItemHeight(index);
+
+    for (int i = 0; i < index; i++) {
+        int height = getItemHeight(i);
+        previousHeight += height;
     }
 
     return QRect(0, previousHeight, this->width(), itemHeight);
@@ -434,20 +440,24 @@ int DMenuContent::itemIndexUnderEvent(QPoint point) const
     DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
-    QPoint lPoint(point.x() - parent->x(), point.y() - parent->y());
+    const qreal ratio = qApp->devicePixelRatio();
+
+    QPoint lPoint(point.x() - parent->x() * ratio,
+                  point.y() - parent->y() * ratio);
 
     DDockMenu *menuUnderCursor = parent->menuUnderPoint(point);
     if (menuUnderCursor == parent) {
-        int previousHeight = y();
+        int previousHeight = (y() + TopBottomPadding) * ratio;
 
         for (int i = 0; i < this->actions().count(); i++) {
             QAction *action = this->actions().at(i);
-            int itemHeight = action->text().isEmpty() ? SEPARATOR_HEIGHT : MENU_ITEM_HEIGHT;
 
-            if (previousHeight <= lPoint.y() &&
-                    lPoint.y() <= previousHeight + itemHeight &&
-                    this->rect().x() <= lPoint.x() &&
-                    lPoint.x() <= this->rect().x() + this->rect().width()) {
+            int itemHeight = action->text().isEmpty() ? SEPARATOR_HEIGHT : MENU_ITEM_HEIGHT;
+            itemHeight *= ratio;
+
+            QRect itemRect( x() *ratio, previousHeight, width() * ratio, itemHeight );
+
+            if (itemRect.contains(lPoint)) {
                 return i;
             } else {
                 previousHeight += itemHeight;

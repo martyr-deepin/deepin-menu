@@ -16,6 +16,7 @@
 #include <QJsonObject>
 #include <QDebug>
 #include <QJsonArray>
+#include <QApplication>
 
 #include "ddockmenu.h"
 #include "dmenucontent.h"
@@ -98,6 +99,7 @@ void DDockMenu::setItems(QJsonArray items)
 
 
     setContent(m_menuContent);
+
     resizeWithContent();
 }
 
@@ -120,11 +122,24 @@ bool DDockMenu::event(QEvent *event)
     return DArrowRectangle::event(event);
 }
 
+/**
+ * @brief DDockMenu::menuUnderPoint
+ * @param point is a global position.
+ * @return
+ */
 DDockMenu *DDockMenu::menuUnderPoint(const QPoint point)
 {
-    if (geometry().contains(point)) {
+    const qreal ratio = qApp->devicePixelRatio();
+
+    QRect rect( geometry().x() * ratio,
+                geometry().y() * ratio,
+                geometry().width() * ratio,
+                geometry().height() * ratio);
+
+    if (rect.contains(point)) {
         return this;
     }
+
     return nullptr;
 }
 
