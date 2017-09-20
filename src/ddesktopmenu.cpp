@@ -33,8 +33,7 @@ DDesktopMenu::DDesktopMenu() :
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::BypassWindowManagerHint | Qt::Tool);
 
     connect(m_mouseArea, &__XMouseArea::ButtonPress, this, [this] (int, int x, int y, const QString &key) {
-        const qreal ratio = devicePixelRatioF();
-        if (key == m_key && !containsPoint(QPoint(x / ratio, y / ratio))) {
+        if (key == m_key && !containsPoint(QPoint(x, y))) {
             hide();
         }
     });

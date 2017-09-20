@@ -107,9 +107,8 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
         m_dockMenu->show(x, y);
         m_dockMenu->grabFocus();
     } else if (m_desktopMenu) {
-        const qreal ratio = qApp->devicePixelRatio();
         m_desktopMenu->setItems(menuContentObj["items"].toArray());
-        m_desktopMenu->popup(QPoint(x / ratio, y / ratio));
+        m_desktopMenu->popup(QPoint(x, y));
         m_desktopMenu->grabFocus();
     }
 }
