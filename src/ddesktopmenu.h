@@ -23,9 +23,9 @@
 #include <QMenu>
 #include "dabstractmenu.h"
 
-#include <com_deepin_api_xmousearea.h>
+#include <dregionmonitor.h>
 
-using namespace com::deepin::api;
+DWIDGET_USE_NAMESPACE
 
 class DDesktopMenu : public QMenu, public DAbstractMenu
 {
@@ -52,8 +52,7 @@ private:
     void addActionFromJson(QMenu *menu, const QJsonArray &items);
     bool containsPoint(const QPoint &point) const;
 
-    QString m_key;
-    XMouseArea *m_mouseArea;
+    DRegionMonitor *m_mouseArea;
 
     QList<QMenu*> m_ownMenus;
 };

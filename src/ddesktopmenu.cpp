@@ -23,17 +23,19 @@
 #include <QJsonObject>
 #include <QDebug>
 #include <QKeyEvent>
+#include <QDBusPendingCall>
+#include <QTimer>
 
 DDesktopMenu::DDesktopMenu() :
     QMenu(),
-    m_mouseArea(new XMouseArea("com.deepin.api.XMouseArea", "/com/deepin/api/XMouseArea", QDBusConnection::sessionBus(), this))
+    m_mouseArea(new DRegionMonitor(this))
 {
     // NOTE(hualet): don't change those window flags, if you delete below line, deepin-menu
     // won't even show working with deepin-terminal2 and dde-launcher.
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::BypassWindowManagerHint | Qt::Tool);
 
-    connect(m_mouseArea, &__XMouseArea::ButtonPress, this, [this] (int, int x, int y, const QString &key) {
-        if (key == m_key && !containsPoint(QPoint(x, y))) {
+    connect(m_mouseArea, &DRegionMonitor::buttonRelease, this, [this] (const QPoint &p, const int flag) {
+        if (flag == 1 && !containsPoint(p)) {
             hide();
         }
     });
@@ -41,7 +43,8 @@ DDesktopMenu::DDesktopMenu() :
 
 DDesktopMenu::~DDesktopMenu()
 {
-    m_mouseArea->UnregisterArea(m_key);
+    m_mouseArea->unregisterRegion();
+    m_mouseArea->deleteLater();
 }
 
 void DDesktopMenu::setItems(QJsonArray items)
@@ -81,16 +84,7 @@ void DDesktopMenu::grabFocus()
         grabKeyboard();
     });
 
-    QDBusPendingCall call = m_mouseArea->RegisterFullScreen();
-    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
-    connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher] {
-        if (watcher->isError()) {
-            qWarning() << "error registering mouse area: " << watcher->error().message();
-        } else {
-            QDBusReply<QString> reply = watcher->reply();
-            m_key = reply.value();
-        }
-    });
+    m_mouseArea->registerRegion();
 }
 
 void DDesktopMenu::keyPressEvent(QKeyEvent *event)
