@@ -34,8 +34,8 @@ DDesktopMenu::DDesktopMenu() :
     // won't even show working with deepin-terminal2 and dde-launcher.
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::BypassWindowManagerHint | Qt::Tool);
 
-    connect(m_mouseArea, &DRegionMonitor::buttonRelease, this, [this] (const QPoint &p, const int flag) {
-        if (flag == 1 && !containsPoint(p)) {
+    connect(m_mouseArea, &DRegionMonitor::buttonPress, this, [this] (const QPoint &p, const int flag) {
+        if (!containsPoint(p)) {
             hide();
         }
     });
