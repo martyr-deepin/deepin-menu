@@ -37,9 +37,7 @@
 #include "dmenucontent.h"
 #include "ddockmenu.h"
 
-#define MENU_ITEM_MAX_WIDTH 300
-#define MENU_ITEM_HEIGHT 24
-#define MENU_ITEM_FONT_SIZE 13
+#define MENU_ITEM_MAX_WIDTH 500
 #define SEPARATOR_HEIGHT 6
 
 static const int LeftRightPadding = 20;
@@ -88,9 +86,7 @@ int DMenuContent::contentWidth()
 {
     int result = 0;
 
-    QFont font;
-    font.setPixelSize(MENU_ITEM_FONT_SIZE);
-    QFontMetrics metrics(font);
+    QFontMetrics metrics(font());
 
     foreach (QAction *action, this->actions()) {
         result = qMax(result, metrics.width(action->text()));
@@ -103,11 +99,12 @@ int DMenuContent::contentHeight()
 {
     int result = 0;
 
+    QFontMetrics fm(font());
     foreach (QAction *action, this->actions()) {
         if (action->text().isEmpty()) {
             result += SEPARATOR_HEIGHT;
         } else {
-            result += MENU_ITEM_HEIGHT;
+            result += fm.height();
         }
     }
 
@@ -150,10 +147,8 @@ void DMenuContent::doCurrentAction()
 void DMenuContent::paintEvent(QPaintEvent *)
 {
     DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
-    QFont font;
-    font.setPixelSize(MENU_ITEM_FONT_SIZE);
+
     QPainter painter(this);
-    painter.setFont(font);
 
     for(int i = 0; i < this->actions().count(); i++) {
         QAction *action = this->actions().at(i);
@@ -241,12 +236,14 @@ void DMenuContent::processKeyPress(const QString &key)
 // private methods
 QRect DMenuContent::getRectOfActionAtIndex(int index)
 {
-    auto getItemHeight = [this](const int i) {
+    QFontMetrics fm(font());
+
+    auto getItemHeight = [this, &fm](const int i) {
         QAction *action = this->actions().at(i);
         if (action->text().isEmpty()) {
             return SEPARATOR_HEIGHT;
         } else {
-            return  MENU_ITEM_HEIGHT;
+            return fm.height();
         }
     };
 
@@ -459,10 +456,11 @@ int DMenuContent::itemIndexUnderEvent(QPoint point) const
     if (menuUnderCursor == parent) {
         int previousHeight = (y() + TopBottomPadding) * ratio;
 
+        QFontMetrics fm(font());
         for (int i = 0; i < this->actions().count(); i++) {
             QAction *action = this->actions().at(i);
 
-            int itemHeight = action->text().isEmpty() ? SEPARATOR_HEIGHT : MENU_ITEM_HEIGHT;
+            int itemHeight = action->text().isEmpty() ? SEPARATOR_HEIGHT : fm.height();
             itemHeight *= ratio;
 
             QRect itemRect( x() *ratio, previousHeight, width() * ratio, itemHeight );
@@ -480,9 +478,7 @@ int DMenuContent::itemIndexUnderEvent(QPoint point) const
 
 QString DMenuContent::elideText(QString source, int maxWidth) const
 {
-    QFont font;
-    font.setPixelSize(MENU_ITEM_FONT_SIZE);
-    QFontMetrics metrics(font);
+    QFontMetrics metrics(font());
 
     if (metrics.width(source) < maxWidth) {
         return source;
