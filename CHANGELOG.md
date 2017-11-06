@@ -1,3 +1,18 @@
+<a name="3.1.8"></a>
+### 3.1.8 (2017-11-06)
+
+
+#### Features
+
+*   font size change with system font settings ([642f4c6a](https://github.com/linuxdeepin/deepin-menu/commit/642f4c6ad8a55fb35a8bfaf0bd3fe3efc8060862))
+
+#### Bug Fixes
+
+*   desktop menu hide immediately after showing ([79faf768](https://github.com/linuxdeepin/deepin-menu/commit/79faf768bf20c34a93adb6c73a4d742c5310aedd))
+* **dock menu:**  no spacing between items ([fd39cc14](https://github.com/linuxdeepin/deepin-menu/commit/fd39cc144b39f2fe80335fb304ed64762252ed1a))
+
+
+
 <a name="3.1.7"></a>
 ### 3.1.7 (2017-10-24)
 
