@@ -39,6 +39,7 @@
 
 #define MENU_ITEM_MAX_WIDTH 500
 #define SEPARATOR_HEIGHT 6
+#define MENU_ITEM_TOP_BOTTOM_PADDING 2
 
 static const int LeftRightPadding = 20;
 static const int TopBottomPadding = 4;
@@ -104,7 +105,7 @@ int DMenuContent::contentHeight()
         if (action->text().isEmpty()) {
             result += SEPARATOR_HEIGHT;
         } else {
-            result += fm.height();
+            result += fm.height() + MENU_ITEM_TOP_BOTTOM_PADDING * 2;
         }
     }
 
@@ -243,7 +244,7 @@ QRect DMenuContent::getRectOfActionAtIndex(int index)
         if (action->text().isEmpty()) {
             return SEPARATOR_HEIGHT;
         } else {
-            return fm.height();
+            return fm.height() + MENU_ITEM_TOP_BOTTOM_PADDING * 2;
         }
     };
 
@@ -460,7 +461,8 @@ int DMenuContent::itemIndexUnderEvent(QPoint point) const
         for (int i = 0; i < this->actions().count(); i++) {
             QAction *action = this->actions().at(i);
 
-            int itemHeight = action->text().isEmpty() ? SEPARATOR_HEIGHT : fm.height();
+            int itemHeight = action->text().isEmpty() ? SEPARATOR_HEIGHT
+                                                      : (fm.height() + MENU_ITEM_TOP_BOTTOM_PADDING * 2);
             itemHeight *= ratio;
 
             QRect itemRect( x() *ratio, previousHeight, width() * ratio, itemHeight );
