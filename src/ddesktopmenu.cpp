@@ -144,7 +144,6 @@ void DDesktopMenu::addActionFromJson(QMenu *menu, const QJsonArray &items)
         QRegExp regexp("_(.)");
         regexp.indexIn(itemObj["itemText"].toString());
         QString navKey = regexp.cap(1);
-        qDebug()<<navKey;
         QString navKeyWrapper = QString("%1").arg(navKey);
         itemText = itemObj["itemText"].toString().replace(regexp, navKeyWrapper);
         action->setText(itemText);
