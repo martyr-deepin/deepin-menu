@@ -202,7 +202,7 @@ void DMenuContent::processCursorMove(int x, int y)
     int index = itemIndexUnderEvent(QPoint(x, y));
     setCurrentIndex(index);
 }
-
+#include<QMessageBox>
 void DMenuContent::processButtonClick(int x, int y)
 {
     DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
@@ -232,13 +232,13 @@ void DMenuContent::processKeyPress(const QString &key)
     } else if (key == "down") {
         this->selectNext();
     } else {
-        int _next_index_has_shortcut = getNextItemsHasShortcut(_currentIndex + 1, key);
-        if (_next_index_has_shortcut != -1) {
-            this->setCurrentIndex(_next_index_has_shortcut);
-            if (_next_index_has_shortcut == getNextItemsHasShortcut(_next_index_has_shortcut + 1, key)) {
-                this->doCurrentAction();
-            }
-        }
+//        int _next_index_has_shortcut = getNextItemsHasShortcut(_currentIndex + 1, key);
+//        if (_next_index_has_shortcut != -1) {
+//            this->setCurrentIndex(_next_index_has_shortcut);
+//            if (_next_index_has_shortcut == getNextItemsHasShortcut(_next_index_has_shortcut + 1, key)) {
+//                this->doCurrentAction();
+//            }
+//        }
     }
 }
 

@@ -9,3 +9,7 @@ core
 moc_*
 qrc_*.cpp
 deepin-menu.pro.user*
+
+cmake-build-debug/
+.idea/
+CMakeLists.txt
