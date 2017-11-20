@@ -34,7 +34,7 @@ DDesktopMenu::DDesktopMenu() :
     // won't even show working with deepin-terminal2 and dde-launcher.
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::BypassWindowManagerHint | Qt::Tool);
 
-    connect(m_mouseArea, &DRegionMonitor::buttonPress, this, [this] (const QPoint &p, const int flag) {
+    connect(m_mouseArea, &DRegionMonitor::buttonPress, this, [this] (const QPoint &p, const int) {
         if (!containsPoint(p)) {
             hide();
         }
@@ -89,10 +89,19 @@ void DDesktopMenu::grabFocus()
 
 void DDesktopMenu::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Escape) {
+    int k=event->key();
+    if (k == Qt::Key_Escape) {
         hide();
     }
-
+    auto kayChar=QString(char(k));
+    foreach(QMenu *q,m_ownMenus){
+        foreach(QAction *act,q->actions()){
+            qDebug()<<act->property("itemNavKey").toString();
+            if(kayChar==act->property("itemNavKey").toString()){
+                act->trigger();
+            }
+        }
+    }
     QMenu::keyPressEvent(event);
 }
 

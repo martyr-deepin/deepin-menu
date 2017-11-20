@@ -231,14 +231,6 @@ void DMenuContent::processKeyPress(const QString &key)
         this->selectPrevious();
     } else if (key == "down") {
         this->selectNext();
-    } else {
-        int _next_index_has_shortcut = getNextItemsHasShortcut(_currentIndex + 1, key);
-        if (_next_index_has_shortcut != -1) {
-            this->setCurrentIndex(_next_index_has_shortcut);
-            if (_next_index_has_shortcut == getNextItemsHasShortcut(_next_index_has_shortcut + 1, key)) {
-                this->doCurrentAction();
-            }
-        }
     }
 }
 
