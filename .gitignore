@@ -12,4 +12,3 @@ deepin-menu.pro.user*
 
 cmake-build-debug/
 .idea/
-CMakeLists.txt

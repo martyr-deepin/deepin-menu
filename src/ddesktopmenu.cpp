@@ -94,12 +94,11 @@ void DDesktopMenu::keyPressEvent(QKeyEvent *event)
         hide();
     }
     auto kayChar=QString(char(k));
-    foreach(QMenu *q,m_ownMenus){
-        foreach(QAction *act,q->actions()){
-            qDebug()<<act->property("itemNavKey").toString();
-            if(kayChar==act->property("itemNavKey").toString()){
-                act->trigger();
-            }
+    auto acts=m_ownMenus[0]->actions();
+
+    for (QAction *act:acts) {
+        if (kayChar == act->property("itemNavKey").toString()) {
+            act->trigger();
         }
     }
     QMenu::keyPressEvent(event);
@@ -122,7 +121,7 @@ void DDesktopMenu::addActionFromJson(QMenu *menu, const QJsonArray &items)
 
     foreach (QJsonValue item, items) {
         QJsonObject itemObj = item.toObject();
-        QString itemText = itemObj["itemText"].toString().replace("_", QString()).replace(QRegExp("\\([^)]+\\)"), QString());
+        QString itemText = static_cast<QString &&>(itemObj["itemText"].toString().replace("_", QString()).replace(QRegExp("\\([^)]+\\)"), QString()));
         const QString itemIcon = itemObj["itemIcon"].toString();
 
         const QJsonObject subMenuJson = itemObj["itemSubMenu"].toObject();
