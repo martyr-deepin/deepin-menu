@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6)
-project(deepin_menu)
+project(deepin-menu)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
@@ -12,7 +12,7 @@ find_package(Qt5Widgets)
 find_package(Qt5Core)
 find_package(Qt5Gui)
 find_package(QT4 REQUIRED)
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+add_definitions(${QT_DEFINITIONS})
 
 include(${QT_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -48,7 +48,7 @@ set(deepin_menu_libs
         X11
         )
 
-set(deepinMenu_HEADERS
+set(deepin_menu_headers
         src/ddesktopmenu.h
         src/utils.h
         src/dmenucontent.h
@@ -60,9 +60,9 @@ set(deepinMenu_HEADERS
         src/dmenuapplication.h
         src/dabstractmenu.h
         )
-SET(deepinMenu_QRCS images.qrc)
+set(deepin_menu_qrcs images.qrc)
 
-SET(deepinMenu_SRCS
+set(deepin_menu_srcs
         src/main.cpp
         src/ddesktopmenu.cpp
         src/utils.cpp
@@ -77,12 +77,11 @@ SET(deepinMenu_SRCS
         ${deepinMenu_QRCS}
         )
 
-ADD_EXECUTABLE(deepin-menu
-        ${deepinMenu_SRCS}
-        ${deepinMenu_HEADERS_MOC}
-        ${deepinMenu_UIS_UIC}
-        ${deepinMenu_QRC_RCC}
+add_executable(deepin-menu
+        ${deepin_menu_srcs}
+        ${deepin_menu_headers}
+        ${deepin_menu_qrcs}
         )
 
-TARGET_LINK_LIBRARIES(deepin-menu ${deepin_menu_libs})
+target_link_libraries(deepin-menu ${deepin_menu_libs})
 
