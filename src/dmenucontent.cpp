@@ -307,6 +307,11 @@ void DMenuContent::selectPrevious()
     DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
+    if (currentIndex() <= 0) {
+        setCurrentIndex(actions().size() - 1);
+        return;
+    }
+
     for (int i = currentIndex() - 1; i >= 0; i--) {
         QAction * action = actions().at(i);
 
@@ -321,12 +326,18 @@ void DMenuContent::selectPrevious()
             break;
         }
     }
+
 }
 
 void DMenuContent::selectNext()
 {
     DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
+
+    if (currentIndex() >= actions().size() - 1) {
+        setCurrentIndex(0);
+        return;
+    }
 
     for (int i = currentIndex() + 1; i < actions().count(); i++) {
         QAction * action = actions().at(i);

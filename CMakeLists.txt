@@ -4,18 +4,13 @@ project(deepin-menu)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 set(CMAKE_AUTOMOC TRUE)
-set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_RELEASE} -fprofile-arcs -ftest-coverage")
-add_compile_options(-fPIC)
-
+#add_compile_options(-fPIC)
 
 find_package(Qt5Widgets)
 find_package(Qt5Core)
 find_package(Qt5Gui)
 find_package(QT4 REQUIRED)
-add_definitions(${QT_DEFINITIONS})
 
-include(${QT_USE_FILE})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # include qt
 include_directories(/usr/include/x86_64-linux-gnu/qt5)
