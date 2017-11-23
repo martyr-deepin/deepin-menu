@@ -26,7 +26,7 @@
 #include <dregionmonitor.h>
 
 DWIDGET_USE_NAMESPACE
-
+class DMenuContent;
 class DDesktopMenu : public QMenu, public DAbstractMenu
 {
     Q_OBJECT
@@ -55,6 +55,9 @@ private:
     DRegionMonitor *m_mouseArea;
 
     QList<QMenu*> m_ownMenus;
+private:
+    friend class DMenuContent;
+    DMenuContent *m_menuContent;
 };
 
 #endif // DDESKTOPMENU_H

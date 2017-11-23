@@ -100,6 +100,14 @@ void DDockMenu::setItems(QJsonArray items)
         action->setProperty("itemIconInactive", itemObj["itemIconInactive"].toString());
         action->setProperty("itemSubMenu", itemObj["itemSubMenu"].toObject());
 
+        QRegExp regexp("_(.)");
+        regexp.indexIn(itemObj["itemText"].toString());
+        QString navKey = regexp.cap(1);
+        QString navKeyWrapper = QString("%1").arg(navKey);
+        itemText = itemObj["itemText"].toString().replace(regexp, navKeyWrapper);
+        action->setText(itemText);
+        action->setProperty("itemNavKey", navKey);
+
         m_menuContent->addAction(action);
     }
 

@@ -34,7 +34,7 @@ DDesktopMenu::DDesktopMenu() :
     // won't even show working with deepin-terminal2 and dde-launcher.
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::BypassWindowManagerHint | Qt::Tool);
 
-    connect(m_mouseArea, &DRegionMonitor::buttonPress, this, [this] (const QPoint &p, const int flag) {
+    connect(m_mouseArea, &DRegionMonitor::buttonPress, this, [this] (const QPoint &p, const int) {
         if (!containsPoint(p)) {
             hide();
         }
@@ -89,10 +89,18 @@ void DDesktopMenu::grabFocus()
 
 void DDesktopMenu::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Escape) {
+    int k=event->key();
+    if (k == Qt::Key_Escape) {
         hide();
     }
+    auto kayChar=QString(char(k));
+    auto acts=m_ownMenus[0]->actions();
 
+    for (QAction *act:acts) {
+        if (kayChar == act->property("itemNavKey").toString()) {
+            act->trigger();
+        }
+    }
     QMenu::keyPressEvent(event);
 }
 
@@ -113,7 +121,7 @@ void DDesktopMenu::addActionFromJson(QMenu *menu, const QJsonArray &items)
 
     foreach (QJsonValue item, items) {
         QJsonObject itemObj = item.toObject();
-        const QString itemText = itemObj["itemText"].toString().replace("_", QString()).replace(QRegExp("\\([^)]+\\)"), QString());
+        QString itemText = static_cast<QString &&>(itemObj["itemText"].toString().replace("_", QString()).replace(QRegExp("\\([^)]+\\)"), QString()));
         const QString itemIcon = itemObj["itemIcon"].toString();
 
         const QJsonObject subMenuJson = itemObj["itemSubMenu"].toObject();
@@ -140,6 +148,14 @@ void DDesktopMenu::addActionFromJson(QMenu *menu, const QJsonArray &items)
         action->setChecked(itemObj["checked"].toBool());
 
         action->setProperty("itemId", itemObj["itemId"].toString());
+
+        QRegExp regexp("_(.)");
+        regexp.indexIn(itemObj["itemText"].toString());
+        QString navKey = regexp.cap(1);
+        QString navKeyWrapper = QString("%1").arg(navKey);
+        itemText = itemObj["itemText"].toString().replace(regexp, navKeyWrapper);
+        action->setText(itemText);
+        action->setProperty("itemNavKey", navKey);
 
         connect(action, &QAction::triggered, this, [this, action] {
             const QString id = action->property("itemId").toString();

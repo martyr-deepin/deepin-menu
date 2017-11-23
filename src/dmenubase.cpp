@@ -180,7 +180,11 @@ void DMenuBase::setContent(QJsonArray items)
         QJsonObject itemObj = item.toObject();
 
         QAction *action = new QAction(this->menuContent().data());
-        QString itemText = itemObj["itemText"].toString().replace("_", QString()).replace(QRegExp("\\([^)]+\\)"), QString());/*.replace(regexp, navKeyWrapper)*/;
+        QRegExp regexp("_(.)");
+        regexp.indexIn(itemObj["itemText"].toString());
+        QString navKey = regexp.cap(1);
+        QString navKeyWrapper = QString("<u>%1</u>").arg(navKey);
+        QString itemText = itemObj["itemText"].toString().replace(regexp, navKeyWrapper);
 
         action->setText(itemText);
         action->setEnabled(itemObj["isActive"].toBool());
@@ -191,7 +195,7 @@ void DMenuBase::setContent(QJsonArray items)
         action->setProperty("itemIconHover", itemObj["itemIconHover"].toString());
         action->setProperty("itemIconInactive", itemObj["itemIconInactive"].toString());
         action->setProperty("itemSubMenu", itemObj["itemSubMenu"].toObject());
-//        action->setProperty("itemNavKey", navKey);
+        action->setProperty("itemNavKey", navKey);
 
         _menuContent->addAction(action);
     }
