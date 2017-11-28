@@ -1,3 +1,13 @@
+<a name=""></a>
+##  3.2.0 (2017-11-28)
+
+
+#### Bug Fixes
+
+* **dockmenu:**  multi screen coordinates are not correct ([e2d60cfe](https://github.com/linuxdeepin/deepin-menu/commit/e2d60cfe9d5591cb48665b8ea584da7f96c1c1d8))
+
+
+
 <a name="3.1.8"></a>
 ### 3.1.8 (2017-11-06)
 
