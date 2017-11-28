@@ -65,6 +65,7 @@ private:
     void showSubMenu(int x, int y, const QJsonObject &obj );
 
     bool event(QEvent *event) Q_DECL_OVERRIDE;
+    const QPoint deviceScaledCoordinate(const QPoint &p, const double ratio) const;
 
 private:
     friend class DMenuContent;

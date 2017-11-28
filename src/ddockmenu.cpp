@@ -27,6 +27,7 @@
 #include <QDebug>
 #include <QJsonArray>
 #include <QApplication>
+#include <QScreen>
 
 #include "ddockmenu.h"
 #include "dmenucontent.h"
@@ -139,18 +140,7 @@ bool DDockMenu::event(QEvent *event)
  */
 DDockMenu *DDockMenu::menuUnderPoint(const QPoint point)
 {
-    const qreal ratio = qApp->devicePixelRatio();
-
-    QRect rect( geometry().x() * ratio,
-                geometry().y() * ratio,
-                geometry().width() * ratio,
-                geometry().height() * ratio);
-
-    if (rect.contains(point)) {
-        return this;
-    }
-
-    return nullptr;
+    return geometry().contains(point) ? this : nullptr;
 }
 
 void DDockMenu::grabFocus()
@@ -197,14 +187,16 @@ void DDockMenu::onButtonPress(int, int in1, int in2, const QString &in3)
 {
     if (in3 == m_mouseAreaKey) {
         qDebug() << "receive button press event from xmousearea: " << in1 << in2;
-        m_menuContent->processButtonClick(in1, in2);
+        const QPoint p = deviceScaledCoordinate(QPoint(in1, in2), qApp->devicePixelRatio());
+        m_menuContent->processButtonClick(p.x(), p.y());
     }
 }
 
 void DDockMenu::onCursorMove(int in0, int in1, const QString &in2)
 {
     if (in2 == m_mouseAreaKey) {
-        m_menuContent->processCursorMove(in0, in1);
+        const QPoint p = deviceScaledCoordinate(QPoint(in0, in1), qApp->devicePixelRatio());
+        m_menuContent->processCursorMove(p.x(), p.y());
     }
 }
 
@@ -222,4 +214,18 @@ void DDockMenu::onWMCompositeChanged()
         setBorderColor(QColor(255, 255, 255, 0.1 * 255));
     else
         setBorderColor(QColor("#2C3238"));
+}
+
+const QPoint DDockMenu::deviceScaledCoordinate(const QPoint &p, const double ratio) const
+{
+    for (const auto *s : qApp->screens())
+    {
+        const QRect &g(s->geometry());
+        const QRect realRect(g.topLeft(), g.size() * ratio);
+
+        if (realRect.contains(p))
+            return QPoint(realRect.topLeft() + (p - realRect.topLeft()) / ratio);
+    }
+
+    return p / ratio;
 }

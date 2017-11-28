@@ -448,14 +448,11 @@ int DMenuContent::itemIndexUnderEvent(QPoint point) const
     DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
-    const qreal ratio = qApp->devicePixelRatio();
-
-    QPoint lPoint(point.x() - parent->x() * ratio,
-                  point.y() - parent->y() * ratio);
+    const QPoint lPoint = mapFromGlobal(point);
 
     DDockMenu *menuUnderCursor = parent->menuUnderPoint(point);
     if (menuUnderCursor == parent) {
-        int previousHeight = (y() + TopBottomPadding) * ratio;
+        int previousHeight = (y() + TopBottomPadding);
 
         QFontMetrics fm(font());
         for (int i = 0; i < this->actions().count(); i++) {
@@ -463,9 +460,8 @@ int DMenuContent::itemIndexUnderEvent(QPoint point) const
 
             int itemHeight = action->text().isEmpty() ? SEPARATOR_HEIGHT
                                                       : (fm.height() + MENU_ITEM_TOP_BOTTOM_PADDING * 2);
-            itemHeight *= ratio;
 
-            QRect itemRect( x() *ratio, previousHeight, width() * ratio, itemHeight );
+            QRect itemRect(x(), previousHeight, width(), itemHeight);
 
             if (itemRect.contains(lPoint)) {
                 return i;
