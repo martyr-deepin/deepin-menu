@@ -10,20 +10,4 @@
 #export DH_VERBOSE=1
 
 %:
-	dh $@ --with python2
-
-override_dh_auto_build:
-	dh_auto_build
-	python setup.py build
-	qmake DEFINES+=QT_NO_DEBUG_OUTPUT && make
-
-override_dh_auto_install:
-	dh_auto_install --destdir=debian/deepin-menu
-	python setup.py install --root=debian/deepin-menu --install-layout=deb
-	make INSTALL_ROOT=debian/deepin-menu install
-	mkdir -p debian/deepin-menu/usr/share/pyshared
-	mv debian/deepin-menu/usr/deepin_menu debian/deepin-menu/usr/share/pyshared
-
-override_dh_fixperms:
-	dh_fixperms
-	chmod +x debian/deepin-menu/usr/share/pyshared/deepin_menu/menu.py
+	dh $@  --parallel

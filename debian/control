@@ -3,22 +3,16 @@ Priority: extra
 Maintainer: Deepin Sysdev <sysdev@deepin.com>
 Build-Depends: debhelper (>= 9),
  pkg-config,
- python,
- python-setuptools,
  qt5-qmake,
  qt5-default,
- qtdeclarative5-dev,
  libqt5x11extras5-dev,
  libdtkwidget-dev,
  libdframeworkdbus-dev
 Standards-Version: 3.9.5
-Section: libs
 Homepage: https://gitcafe.com/Deepin/deepin-menu.git
 
 Package: deepin-menu
-Section: libdevel
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends},
-        python, python-pyqt5, 
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Deepin menu service for building beautiful menus.
  Deepin menu service for building beautiful menus.

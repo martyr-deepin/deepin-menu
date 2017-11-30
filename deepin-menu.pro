@@ -40,8 +40,14 @@ HEADERS  += \
 
 LIBS += -lxcb -lX11
 
+dbus.path = /usr/share/dbus-1/services
+dbus.files = data/com.deepin.menu.service
+
+autostart.path = /etc/xdg/autostart
+autostart.files = deepin-menu.desktop
+
 RESOURCES += \
     images.qrc
 
 target.path = /usr/bin
-INSTALLS += target
+INSTALLS += target dbus autostart
