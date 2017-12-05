@@ -36,9 +36,7 @@
 DDockMenu::DDockMenu(DDockMenu *parent):
     DArrowRectangle(DArrowRectangle::ArrowBottom, parent),
     m_menuContent(new DMenuContent(this)),
-    m_mouseAreaInter(new com::deepin::api::XMouseArea("com.deepin.api.XMouseArea",
-                                                      "/com/deepin/api/XMouseArea",
-                                                      QDBusConnection::sessionBus(), this))
+    m_mouseAreaInter(new DRegionMonitor(this))
 {
     setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
 
@@ -70,9 +68,9 @@ DDockMenu::DDockMenu(DDockMenu *parent):
             ":/images/check_dark_inactive.png",
             ":/images/arrow-dark.png"};
 
-    connect(m_mouseAreaInter, &__XMouseArea::ButtonPress, this, &DDockMenu::onButtonPress);
-    connect(m_mouseAreaInter, &__XMouseArea::CursorMove, this, &DDockMenu::onCursorMove);
-    connect(m_mouseAreaInter, &__XMouseArea::KeyPress, this, &DDockMenu::onKeyPress);
+    connect(m_mouseAreaInter, &DRegionMonitor::buttonPress, this, &DDockMenu::onButtonPress);
+    connect(m_mouseAreaInter, &DRegionMonitor::cursorMove, this, &DDockMenu::onCursorMove);
+    connect(m_mouseAreaInter, &DRegionMonitor::keyPress, this, &DDockMenu::onKeyPress);
 }
 
 DDockMenu::~DDockMenu()
@@ -153,23 +151,13 @@ void DDockMenu::grabFocus()
         grabKeyboard();
     });
 
-    QDBusPendingCall call = m_mouseAreaInter->RegisterFullScreen();
-    QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
-    connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher] {
-        if (watcher->isError()) {
-            qWarning() << "error registering mouse area: " << watcher->error().message();
-        } else {
-            QDBusReply<QString> reply = watcher->reply();
-            m_mouseAreaKey = reply.value();
-        }
-    });
+    m_mouseAreaInter->registerRegion();
 }
 
 void DDockMenu::releaseFocus()
 {
     releaseMouse();
     releaseKeyboard();
-    m_mouseAreaInter->UnregisterArea(m_mouseAreaKey);
 }
 
 void DDockMenu::destroyAll()
@@ -183,29 +171,23 @@ void DDockMenu::destroyAll()
     });
 }
 
-void DDockMenu::onButtonPress(int, int in1, int in2, const QString &in3)
+void DDockMenu::onButtonPress(const QPoint &p, const int flag)
 {
-    if (in3 == m_mouseAreaKey) {
-        qDebug() << "receive button press event from xmousearea: " << in1 << in2;
-        const QPoint p = deviceScaledCoordinate(QPoint(in1, in2), qApp->devicePixelRatio());
-        m_menuContent->processButtonClick(p.x(), p.y());
-    }
+    Q_UNUSED(flag);
+
+    qDebug() << "receive button press event from xmousearea: " << p;
+    m_menuContent->processButtonClick(p.x(), p.y());
 }
 
-void DDockMenu::onCursorMove(int in0, int in1, const QString &in2)
+void DDockMenu::onCursorMove(const QPoint &p)
 {
-    if (in2 == m_mouseAreaKey) {
-        const QPoint p = deviceScaledCoordinate(QPoint(in0, in1), qApp->devicePixelRatio());
-        m_menuContent->processCursorMove(p.x(), p.y());
-    }
+    m_menuContent->processCursorMove(p.x(), p.y());
 }
 
-void DDockMenu::onKeyPress(const QString &in0, int, int, const QString &in3)
+void DDockMenu::onKeyPress(const QString &keyname)
 {
-    if (in3 == m_mouseAreaKey) {
-        qDebug() << "receive key press event from xmousearea: " << in0;
-        m_menuContent->processKeyPress(in0);
-    }
+    qDebug() << "receive key press event from xmousearea: " << keyname;
+    m_menuContent->processKeyPress(keyname);
 }
 
 void DDockMenu::onWMCompositeChanged()
@@ -214,18 +196,4 @@ void DDockMenu::onWMCompositeChanged()
         setBorderColor(QColor(255, 255, 255, 0.1 * 255));
     else
         setBorderColor(QColor("#2C3238"));
-}
-
-const QPoint DDockMenu::deviceScaledCoordinate(const QPoint &p, const double ratio) const
-{
-    for (const auto *s : qApp->screens())
-    {
-        const QRect &g(s->geometry());
-        const QRect realRect(g.topLeft(), g.size() * ratio);
-
-        if (realRect.contains(p))
-            return QPoint(realRect.topLeft() + (p - realRect.topLeft()) / ratio);
-    }
-
-    return p / ratio;
 }

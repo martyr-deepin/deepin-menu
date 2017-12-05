@@ -23,7 +23,7 @@
 #include <darrowrectangle.h>
 #include "dabstractmenu.h"
 #include <DWindowManagerHelper>
-#include <com_deepin_api_xmousearea.h>
+#include <dregionmonitor.h>
 
 DWIDGET_USE_NAMESPACE
 
@@ -54,9 +54,9 @@ signals:
     void itemClicked(const QString &id, bool checked);
 
 private slots:
-    void onButtonPress(int in0, int in1, int in2, const QString &in3);
-    void onCursorMove(int in0, int in1, const QString &in2);
-    void onKeyPress(const QString &in0, int in1, int in2, const QString &in3);
+    void onButtonPress(const QPoint &p, const int flag);
+    void onCursorMove(const QPoint &p);
+    void onKeyPress(const QString &keyname);
     void onWMCompositeChanged();
 
 private:
@@ -65,7 +65,6 @@ private:
     void showSubMenu(int x, int y, const QJsonObject &obj );
 
     bool event(QEvent *event) Q_DECL_OVERRIDE;
-    const QPoint deviceScaledCoordinate(const QPoint &p, const double ratio) const;
 
 private:
     friend class DMenuContent;
@@ -75,8 +74,7 @@ private:
     ItemStyle hoverStyle;
     ItemStyle inactiveStyle;
 
-    QString m_mouseAreaKey;
-    com::deepin::api::XMouseArea *m_mouseAreaInter;
+    DRegionMonitor *m_mouseAreaInter;
 
     DWindowManagerHelper *m_wmHelper;
 };
