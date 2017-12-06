@@ -1,5 +1,6 @@
 Source: deepin-menu
 Priority: extra
+Section: devel
 Maintainer: Deepin Sysdev <sysdev@deepin.com>
 Build-Depends: debhelper (>= 9),
  pkg-config,
