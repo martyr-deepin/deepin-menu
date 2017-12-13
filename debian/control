@@ -8,7 +8,6 @@ Build-Depends: debhelper (>= 9),
  qt5-default,
  libqt5x11extras5-dev,
  libdtkwidget-dev,
- libdframeworkdbus-dev
 Standards-Version: 3.9.5
 Homepage: https://gitcafe.com/Deepin/deepin-menu.git
 
