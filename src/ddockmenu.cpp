@@ -143,9 +143,8 @@ DDockMenu *DDockMenu::menuUnderPoint(const QPoint point)
 
 void DDockMenu::grabFocus()
 {
-    // Try to make us the focus grabber window, so that tooltips
-    // on Dock will disappear.
-    QTimer::singleShot(500, this, [this] {
+    // NOTE(kirigaya): Delay a little to prevent focus failure
+    QTimer::singleShot(200, this, [this] {
         activateWindow();
         grabMouse();
         grabKeyboard();
