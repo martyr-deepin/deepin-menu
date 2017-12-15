@@ -1,13 +1,8 @@
-Format: http://dep.debian.net/deps/dep5
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: deepin-menu
-Source: https://gitcafe.com/Deepin/deepin-menu.git
 
 Files: *
-Copyright: 2015 Deepin Technology Co., Ltd.
-License: GPL-3+
-
-Files: debian/*
-Copyright: 2015 Deepin Sysdev <sysdev@deepin.com>
+Copyright: 2017 Deepin Technology Co., Ltd.
 License: GPL-3+
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
