@@ -34,9 +34,17 @@ static DArrowRectangle::ArrowDirection DirectionFromString(QString direction) {
 MenuObject::MenuObject():
     QObject(),
     m_dockMenu(nullptr),
-    m_desktopMenu(nullptr)
+    m_desktopMenu(nullptr),
+    m_quitTimer(new QTimer(this))
 {
+    m_quitTimer->setInterval(60 * 1000);
+    m_quitTimer->setSingleShot(true);
 
+    connect(m_quitTimer, &QTimer::timeout, this, [=] {
+        qApp->exit();
+    });
+
+    connect(this, &MenuObject::ItemInvoked, m_quitTimer, static_cast<void (QTimer::*)()>(&QTimer::start));
 }
 
 MenuObject::~MenuObject()
@@ -78,10 +86,12 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
 
     if(jsonObj["isDockMenu"].toBool()) {
         m_dockMenu = new DDockMenu;
+        m_dockMenu->installEventFilter(this);
         connect(m_dockMenu, &DDockMenu::destroyed, this, &MenuObject::menuDismissedSlot);
         connect(m_dockMenu, &DDockMenu::itemClicked, this, &MenuObject::ItemInvoked);
     } else {
         m_desktopMenu = new DDesktopMenu;
+        m_desktopMenu->installEventFilter(this);
         connect(m_desktopMenu, &DDesktopMenu::aboutToHide, this, &MenuObject::menuDismissedSlot);
         connect(m_desktopMenu, &DDesktopMenu::itemClicked, this, &MenuObject::ItemInvoked);
     }
@@ -114,4 +124,17 @@ void MenuObject::menuDismissedSlot()
     }
 
     this->deleteLater();
+}
+
+bool MenuObject::eventFilter(QObject *watched, QEvent *event)
+{
+    // NOTE(kirigaya): when menu hide, timed exit;
+    if (watched == m_dockMenu || watched == m_desktopMenu) {
+        if (event->type() == QEvent::Show)
+            m_quitTimer->stop();
+        if (event->type() == QEvent::Hide)
+            m_quitTimer->start();
+    }
+
+    return false;
 }
