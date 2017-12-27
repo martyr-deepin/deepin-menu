@@ -43,11 +43,5 @@ LIBS += -lxcb -lX11
 RESOURCES += \
     images.qrc
 
-isEqual(ENABLE_AUTOSTART, YES) {
-    autostart.path = /etc/xdg/autostart/
-    autostart.files = deepin-menu.desktop
-    INSTALLS += autostart
-}
-
 target.path = /usr/bin
 INSTALLS += target

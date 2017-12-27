@@ -11,7 +11,6 @@
 #define MENU_OBJECT_H
 
 #include <QObject>
-#include <QTimer>
 
 class DDockMenu;
 class DDesktopMenu;
@@ -36,13 +35,9 @@ public slots:
 private slots:
     void menuDismissedSlot();
 
-protected:
-    bool eventFilter(QObject *watched, QEvent *event) Q_DECL_OVERRIDE;
-
 private:
     DDockMenu *m_dockMenu;
     DDesktopMenu *m_desktopMenu;
-    QTimer *m_quitTimer;
 };
 
 #endif // MENU_OBJECT_H
