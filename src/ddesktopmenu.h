@@ -23,10 +23,6 @@
 #include <QMenu>
 #include "dabstractmenu.h"
 
-#include <dregionmonitor.h>
-
-DWIDGET_USE_NAMESPACE
-
 class DDesktopMenu : public QMenu, public DAbstractMenu
 {
     Q_OBJECT
@@ -50,9 +46,6 @@ protected:
 private:
     QAction *action(const QString &id);
     void addActionFromJson(QMenu *menu, const QJsonArray &items);
-    bool containsPoint(const QPoint &point) const;
-
-    DRegionMonitor *m_mouseArea;
 
     QList<QMenu*> m_ownMenus;
 };

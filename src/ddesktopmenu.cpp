@@ -26,27 +26,18 @@
 #include <QDBusPendingCall>
 #include <QTimer>
 
-DDesktopMenu::DDesktopMenu() :
-    QMenu(),
-    m_mouseArea(new DRegionMonitor(this))
+DDesktopMenu::DDesktopMenu()
+    : QMenu()
 {
     setAccessibleName("DesktopMenu");
 
     // NOTE(hualet): don't change those window flags, if you delete below line, deepin-menu
     // won't even show working with deepin-terminal2 and dde-launcher.
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::BypassWindowManagerHint | Qt::Tool);
-
-    connect(m_mouseArea, &DRegionMonitor::buttonPress, this, [this] (const QPoint &p, const int flag) {
-        if (!containsPoint(p)) {
-            hide();
-        }
-    });
 }
 
 DDesktopMenu::~DDesktopMenu()
 {
-    m_mouseArea->unregisterRegion();
-    m_mouseArea->deleteLater();
 }
 
 void DDesktopMenu::setItems(QJsonArray items)
@@ -85,8 +76,6 @@ void DDesktopMenu::grabFocus()
         grabMouse();
         grabKeyboard();
     });
-
-    m_mouseArea->registerRegion();
 }
 
 void DDesktopMenu::keyPressEvent(QKeyEvent *event)
@@ -150,14 +139,4 @@ void DDesktopMenu::addActionFromJson(QMenu *menu, const QJsonArray &items)
             hide();
         });
     }
-}
-
-bool DDesktopMenu::containsPoint(const QPoint &point) const
-{
-    for (const QMenu *menu : m_ownMenus) {
-        if (menu->geometry().contains(point))
-            return true;
-    }
-
-    return false;
 }
