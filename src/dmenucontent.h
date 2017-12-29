@@ -35,9 +35,8 @@ protected:
 
 private:
     friend class DDockMenu;
-    void processCursorMove(int x, int y);
-    void processButtonClick(int x, int y);
-    void processKeyPress(const QString &key);
+    void processCursorMove(const QPoint &p);
+    void processButtonClick(const QPoint &p);
 
 private:
     int _iconWidth;
