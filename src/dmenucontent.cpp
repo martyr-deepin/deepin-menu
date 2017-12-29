@@ -197,40 +197,24 @@ void DMenuContent::paintEvent(QPaintEvent *)
     painter.end();
 }
 
-void DMenuContent::processCursorMove(int x, int y)
+void DMenuContent::processCursorMove(const QPoint &p)
 {
-    int index = itemIndexUnderEvent(QPoint(x, y));
+    int index = itemIndexUnderEvent(p);
     setCurrentIndex(index);
 }
 
-void DMenuContent::processButtonClick(int x, int y)
+void DMenuContent::processButtonClick(const QPoint &p)
 {
     DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     if (parent) {
-        DDockMenu *menu = parent->menuUnderPoint(QPoint(x, y));
+        DDockMenu *menu = parent->menuUnderPoint(p);
         qDebug() << "menu geometry is " << parent->geometry();
         if (menu) {
             doCurrentAction();
         } else {
-            qDebug() << "no menu under mouse event: " << x << y << ", destroy menus.";
+            qDebug() << "no menu under mouse event: " << p.x() << p.y() << ", destroy menus.";
             parent->destroyAll();
         }
-    }
-}
-
-void DMenuContent::processKeyPress(const QString &key)
-{
-    DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
-    Q_ASSERT(parent);
-
-    if (key == "escape") {
-        parent->destroyAll();
-    } else if (key == "return") {
-        this->doCurrentAction();
-    } else if (key == "up") {
-        this->selectPrevious();
-    } else if (key == "down") {
-        this->selectNext();
     }
 }
 

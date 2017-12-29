@@ -23,7 +23,6 @@
 #include <darrowrectangle.h>
 #include "dabstractmenu.h"
 #include <DWindowManagerHelper>
-#include <dregionmonitor.h>
 
 DWIDGET_USE_NAMESPACE
 
@@ -54,9 +53,6 @@ signals:
     void itemClicked(const QString &id, bool checked);
 
 private slots:
-    void onButtonPress(const QPoint &p, const int flag);
-    void onCursorMove(const QPoint &p);
-    void onKeyPress(const QString &keyname);
     void onWMCompositeChanged();
 
 private:
@@ -64,7 +60,11 @@ private:
     DDockMenu *menuUnderPoint(const QPoint point);
     void showSubMenu(int x, int y, const QJsonObject &obj );
 
+protected:
     bool event(QEvent *event) Q_DECL_OVERRIDE;
+    void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+    void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private:
     friend class DMenuContent;
@@ -73,8 +73,6 @@ private:
     ItemStyle normalStyle;
     ItemStyle hoverStyle;
     ItemStyle inactiveStyle;
-
-    DRegionMonitor *m_mouseAreaInter;
 
     DWindowManagerHelper *m_wmHelper;
 };

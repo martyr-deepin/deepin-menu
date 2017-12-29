@@ -35,10 +35,11 @@
 
 DDockMenu::DDockMenu(DDockMenu *parent):
     DArrowRectangle(DArrowRectangle::ArrowBottom, parent),
-    m_menuContent(new DMenuContent(this)),
-    m_mouseAreaInter(new DRegionMonitor(this))
+    m_menuContent(new DMenuContent(this))
 {
     setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+
+    setMouseTracking(true);
 
     m_wmHelper = DWindowManagerHelper::instance();
 
@@ -67,10 +68,6 @@ DDockMenu::DDockMenu(DDockMenu *parent):
             QColor("#646464"),
             ":/images/check_dark_inactive.png",
             ":/images/arrow-dark.png"};
-
-    connect(m_mouseAreaInter, &DRegionMonitor::buttonPress, this, &DDockMenu::onButtonPress);
-    connect(m_mouseAreaInter, &DRegionMonitor::cursorMove, this, &DDockMenu::onCursorMove);
-    connect(m_mouseAreaInter, &DRegionMonitor::keyPress, this, &DDockMenu::onKeyPress);
 }
 
 DDockMenu::~DDockMenu()
@@ -131,6 +128,43 @@ bool DDockMenu::event(QEvent *event)
     return DArrowRectangle::event(event);
 }
 
+void DDockMenu::mouseMoveEvent(QMouseEvent *event)
+{
+    DArrowRectangle::mouseMoveEvent(event);
+
+    m_menuContent->processCursorMove(mapToGlobal(event->pos()));
+}
+
+void DDockMenu::keyPressEvent(QKeyEvent *event)
+{
+    DArrowRectangle::keyPressEvent(event);
+
+    switch (event->key()) {
+    case Qt::Key_Escape:
+        destroyAll();
+        break;
+    case Qt::Key_Return:
+    case Qt::Key_Enter:
+        m_menuContent->doCurrentAction();
+        break;
+    case Qt::Key_Up:
+        m_menuContent->selectPrevious();
+        break;
+    case Qt::Key_Down:
+        m_menuContent->selectNext();
+        break;
+    default:
+        break;
+    }
+}
+
+void DDockMenu::mousePressEvent(QMouseEvent *event)
+{
+    DArrowRectangle::mousePressEvent(event);
+
+    m_menuContent->processButtonClick(mapToGlobal(event->pos()));
+}
+
 /**
  * @brief DDockMenu::menuUnderPoint
  * @param point is a global position.
@@ -149,8 +183,6 @@ void DDockMenu::grabFocus()
         grabMouse();
         grabKeyboard();
     });
-
-    m_mouseAreaInter->registerRegion();
 }
 
 void DDockMenu::releaseFocus()
@@ -168,25 +200,6 @@ void DDockMenu::destroyAll()
     QTimer::singleShot(100, this, [this] {
         deleteLater();
     });
-}
-
-void DDockMenu::onButtonPress(const QPoint &p, const int flag)
-{
-    Q_UNUSED(flag);
-
-    qDebug() << "receive button press event from xmousearea: " << p;
-    m_menuContent->processButtonClick(p.x(), p.y());
-}
-
-void DDockMenu::onCursorMove(const QPoint &p)
-{
-    m_menuContent->processCursorMove(p.x(), p.y());
-}
-
-void DDockMenu::onKeyPress(const QString &keyname)
-{
-    qDebug() << "receive key press event from xmousearea: " << keyname;
-    m_menuContent->processKeyPress(keyname);
 }
 
 void DDockMenu::onWMCompositeChanged()
