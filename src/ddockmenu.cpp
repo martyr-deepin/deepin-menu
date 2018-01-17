@@ -205,7 +205,7 @@ void DDockMenu::destroyAll()
 void DDockMenu::onWMCompositeChanged()
 {
     if (m_wmHelper->hasComposite())
-        setBorderColor(QColor(255, 255, 255, 0.1 * 255));
+        setBorderColor(QColor(255, 255, 255, 0));
     else
         setBorderColor(QColor("#2C3238"));
 }
