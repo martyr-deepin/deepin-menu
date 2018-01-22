@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui x11extras dbus
+QT       += core gui dbus
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -37,8 +37,6 @@ HEADERS  += \
     src/ddockmenu.h \
     src/dmenuapplication.h \
     src/dabstractmenu.h
-
-LIBS += -lxcb -lX11
 
 dbus.path = /usr/share/dbus-1/services
 dbus.files = data/com.deepin.menu.service

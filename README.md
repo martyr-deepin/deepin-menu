@@ -7,9 +7,7 @@ Deepin Menu is the unified menu service for Deepin Desktop Environment.
 ### Build dependencies
 
 * Qt (>= 5.6)
-* python2
-* python2 setup tools
-* XCB and XLib
+* dtkwidget (>= 2.0.6)
 
 ### Runtime dependencies
 
@@ -18,7 +16,7 @@ Deepin Menu is the unified menu service for Deepin Desktop Environment.
   * Qt5-Widgets
   * Qt5-Gui
   * Qt5-DBus
-  * Qt5-X11extras
+* dtkwidget (>=2.0.6)
 
 ## Installation
 

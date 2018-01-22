@@ -5,7 +5,6 @@ Maintainer: Deepin Packages Builder <packages@deepin.com>
 Build-Depends: debhelper (>= 9),
  pkg-config,
  qt5-qmake,
- libqt5x11extras5-dev,
  libdtkwidget-dev,
 Standards-Version: 3.9.8
 Homepage: https://gitcafe.com/Deepin/deepin-menu.git
