@@ -1,3 +1,13 @@
+<a name="3.3.1"></a>
+### 3.3.1 (2018-03-22)
+
+
+#### Bug Fixes
+
+* **ddesktopmenu:**  remove BypassWindowManagerHint ([92779b8c](https://github.com/linuxdeepin/deepin-menu/commit/92779b8ca7228c8fa5206acc554459aa8da6737d))
+
+
+
 <a name=""></a>
 ##  3.3.0 (2018-03-08)
 
