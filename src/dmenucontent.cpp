@@ -141,6 +141,7 @@ void DMenuContent::doCurrentAction()
         parent->releaseFocus();
         this->sendItemClickedSignal(currentAction->property("itemId").toString(), false);
     }
+    qDebug() << "do action, destory all";
     parent->destroyAll();
 }
 

@@ -29,11 +29,17 @@ ManagerObject::ManagerObject(QObject *parent) :
 {
     menuObjectPath = "";
     menuObject = NULL;
+    menuAdaptor = nullptr;
 }
 
 QDBusObjectPath ManagerObject::RegisterMenu()
 {
     this->UnregisterMenu();
+
+    if (menuObject)
+        menuObject->deleteLater();
+    if (menuAdaptor)
+        menuAdaptor->deleteLater();
 
     QString uuid = QUuid::createUuid().toString();
     uuid = uuid.replace("{", "");

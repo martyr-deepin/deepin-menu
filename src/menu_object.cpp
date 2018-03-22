@@ -51,6 +51,7 @@ MenuObject::MenuObject():
 
 MenuObject::~MenuObject()
 {
+    qDebug() << Q_FUNC_INFO;
     if (m_dockMenu) m_dockMenu->destroyAll();
     if (m_desktopMenu) m_desktopMenu->deleteLater();
 
@@ -118,7 +119,9 @@ void MenuObject::menuDismissedSlot()
     if (m_dockMenu) {
         m_dockMenu->deleteLater();
         m_dockMenu = nullptr;
-    } else if (m_desktopMenu) {
+    }
+
+    if (m_desktopMenu) {
         m_desktopMenu->deleteLater();
         m_desktopMenu = nullptr;
     }

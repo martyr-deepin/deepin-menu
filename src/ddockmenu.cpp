@@ -122,6 +122,7 @@ void DDockMenu::showSubMenu(int, int, const QJsonObject &)
 bool DDockMenu::event(QEvent *event)
 {
     if (event->type() == QEvent::WindowDeactivate) {
+        qDebug() << "window deactivate, destory menu";
         destroyAll();
     }
 
@@ -198,6 +199,7 @@ void DDockMenu::destroyAll()
     // early, say immediately after mouse clicks, the actual events will go to
     // the window behide the menu(desktop for example).
     QTimer::singleShot(100, this, [this] {
+        qApp->processEvents();
         deleteLater();
     });
 }
