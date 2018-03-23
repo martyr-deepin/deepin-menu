@@ -38,8 +38,6 @@ QDBusObjectPath ManagerObject::RegisterMenu()
 
     if (menuObject)
         menuObject->deleteLater();
-    if (menuAdaptor)
-        menuAdaptor->deleteLater();
 
     QString uuid = QUuid::createUuid().toString();
     uuid = uuid.replace("{", "");
