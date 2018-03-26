@@ -1,3 +1,14 @@
+<a name="3.3.2"></a>
+### 3.3.2 (2018-03-26)
+
+
+#### Bug Fixes
+
+*   prevent memory leaks, use QPointer for MenuObject ([7511080e](https://github.com/linuxdeepin/deepin-menu/commit/7511080ec142709b7f5bdefba84627c2ad82f234))
+*   crash cause menu adapter double free ([41a9b79a](https://github.com/linuxdeepin/deepin-menu/commit/41a9b79a8734cbd04b9194647420f81e52633ff3))
+
+
+
 <a name="3.3.1"></a>
 ### 3.3.1 (2018-03-22)
 
