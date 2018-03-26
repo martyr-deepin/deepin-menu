@@ -41,8 +41,8 @@ public slots:
     void UnregisterMenu(const QString &menuObjectPath);
 
 private:
-    MenuObject *menuObject;
-    MenuAdaptor *menuAdaptor;
+    QPointer<MenuObject> menuObject;
+    QPointer<MenuAdaptor> menuAdaptor;
     QString menuObjectPath;
 
 private slots:

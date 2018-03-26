@@ -28,7 +28,7 @@ ManagerObject::ManagerObject(QObject *parent) :
     QObject(parent)
 {
     menuObjectPath = "";
-    menuObject = NULL;
+    menuObject = nullptr;
     menuAdaptor = nullptr;
 }
 
@@ -36,8 +36,12 @@ QDBusObjectPath ManagerObject::RegisterMenu()
 {
     this->UnregisterMenu();
 
-    if (menuObject)
+    if (!menuObject.isNull())
         menuObject->deleteLater();
+
+    if (!menuAdaptor.isNull()) {
+        menuAdaptor->deleteLater();
+    }
 
     QString uuid = QUuid::createUuid().toString();
     uuid = uuid.replace("{", "");
@@ -66,7 +70,7 @@ void ManagerObject::UnregisterMenu()
 
 void ManagerObject::UnregisterMenu(const QString &)
 {
-    if (menuObject) {
+    if (!menuObject.isNull()) {
         menuObject->deleteLater();
     }
 }
@@ -74,7 +78,9 @@ void ManagerObject::UnregisterMenu(const QString &)
 // private slots
 void ManagerObject::menuObjectDestroiedSlot()
 {
-    menuObject = NULL;
+    if (!menuObject.isNull()) {
+        menuObject->deleteLater();
+    }
 
     QDBusConnection connection = QDBusConnection::sessionBus();
     connection.unregisterObject(menuObjectPath);
