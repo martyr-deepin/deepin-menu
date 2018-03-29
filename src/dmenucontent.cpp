@@ -139,6 +139,7 @@ void DMenuContent::doCurrentAction()
         }
     } else {
         parent->releaseFocus();
+
         this->sendItemClickedSignal(currentAction->property("itemId").toString(), false);
     }
     qDebug() << "do action, destory all";
@@ -330,6 +331,7 @@ void DMenuContent::selectNext()
 }
 
 void DMenuContent::doCheck(int index) {
+
     DDockMenu *parent = qobject_cast<DDockMenu*>(this->parent());
     Q_ASSERT(parent);
 
@@ -419,6 +421,8 @@ void DMenuContent::sendItemClickedSignal(QString id, bool checked)
     Q_ASSERT(root);
     while (root) {
         if (!root->parent()) {
+            qDebug() << Q_FUNC_INFO << "itemClicked";
+
             root->itemClicked(id, checked);
             break;
         } else {

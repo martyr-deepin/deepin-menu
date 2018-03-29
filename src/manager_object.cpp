@@ -34,14 +34,12 @@ ManagerObject::ManagerObject(QObject *parent) :
 
 QDBusObjectPath ManagerObject::RegisterMenu()
 {
-    this->UnregisterMenu();
+    UnregisterMenu();
 
-    if (!menuObject.isNull())
-        menuObject->deleteLater();
-
-    if (!menuAdaptor.isNull()) {
+    if (!menuAdaptor.isNull())
         menuAdaptor->deleteLater();
-    }
+
+    menuRegisterGuard.lock();
 
     QString uuid = QUuid::createUuid().toString();
     uuid = uuid.replace("{", "");
@@ -49,38 +47,47 @@ QDBusObjectPath ManagerObject::RegisterMenu()
     uuid = uuid.replace("-", "_");
     menuObjectPath = "/com/deepin/menu/" + uuid;
 
-    menuObject = new MenuObject();
+    menuObject = new MenuObject;
     menuAdaptor = new MenuAdaptor(menuObject);
 
-    connect(menuObject, SIGNAL(destroyed()), this, SLOT(menuObjectDestroiedSlot()));
+    connect(menuObject.data(), &MenuObject::destroyed, this, &ManagerObject::menuObjectDestroiedSlot, Qt::QueuedConnection);
 
     QDBusConnection connection = QDBusConnection::sessionBus();
     connection.registerObject(menuObjectPath, menuObject);
 
     QDBusObjectPath result(menuObjectPath);
+
+    menuRegisterGuard.unlock();
+
     return result;
 }
 
 void ManagerObject::UnregisterMenu()
 {
-    if (menuObjectPath != "") {
-        this->UnregisterMenu(menuObjectPath);
-    }
+    UnregisterMenu(menuObjectPath);
 }
 
 void ManagerObject::UnregisterMenu(const QString &)
 {
-    if (!menuObject.isNull()) {
-        menuObject->deleteLater();
+    menuRegisterGuard.lock();
+
+    if (!menuObject.isNull() || !menuObjectPath.isEmpty())
+    {
+        if (!menuObject.isNull())
+            menuObject->deleteLater();
+
+        menuObject.clear();
+        menuObjectPath.clear();
     }
+
+    menuRegisterGuard.unlock();
 }
 
 // private slots
 void ManagerObject::menuObjectDestroiedSlot()
 {
-    if (!menuObject.isNull()) {
+    if (!menuObject.isNull())
         menuObject->deleteLater();
-    }
 
     QDBusConnection connection = QDBusConnection::sessionBus();
     connection.unregisterObject(menuObjectPath);

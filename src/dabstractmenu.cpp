@@ -26,11 +26,6 @@ DAbstractMenu::DAbstractMenu()
 
 }
 
-void DAbstractMenu::grabFocus()
-{
-
-}
-
 void DAbstractMenu::releaseFocus()
 {
 

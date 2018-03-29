@@ -69,9 +69,11 @@ void DDesktopMenu::setItemText(const QString &itemId, const QString &text)
     }
 }
 
-void DDesktopMenu::grabFocus()
+void DDesktopMenu::showEvent(QShowEvent *e)
 {
-    QTimer::singleShot(100, this, [this] {
+    QMenu::showEvent(e);
+
+    QTimer::singleShot(0, this, [=] {
         activateWindow();
         grabMouse();
         grabKeyboard();

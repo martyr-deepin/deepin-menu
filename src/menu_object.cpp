@@ -52,10 +52,15 @@ MenuObject::MenuObject():
 MenuObject::~MenuObject()
 {
     qDebug() << Q_FUNC_INFO;
-    if (m_dockMenu) m_dockMenu->destroyAll();
-    if (m_desktopMenu) m_desktopMenu->deleteLater();
 
-    emit MenuUnregistered();
+    if (m_dockMenu)
+        m_dockMenu->destroyAll();
+
+    if (m_desktopMenu)
+        m_desktopMenu->deleteLater();
+
+    if (m_dockMenu || m_desktopMenu)
+        emit MenuUnregistered();
 }
 
 void MenuObject::SetItemActivity(const QString &itemId, bool isActive)
@@ -106,11 +111,9 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
         m_dockMenu->setArrowDirection(DirectionFromString(direction));
         m_dockMenu->setItems(menuContentObj["items"].toArray());
         m_dockMenu->show(x, y);
-        m_dockMenu->grabFocus();
     } else if (m_desktopMenu) {
         m_desktopMenu->setItems(menuContentObj["items"].toArray());
         m_desktopMenu->popup(QPoint(x, y));
-        m_desktopMenu->grabFocus();
     }
 }
 

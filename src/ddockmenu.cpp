@@ -72,6 +72,7 @@ DDockMenu::DDockMenu(DDockMenu *parent):
 
 DDockMenu::~DDockMenu()
 {
+    setVisible(false);
     releaseFocus();
 }
 
@@ -122,11 +123,28 @@ void DDockMenu::showSubMenu(int, int, const QJsonObject &)
 bool DDockMenu::event(QEvent *event)
 {
     if (event->type() == QEvent::WindowDeactivate) {
-        qDebug() << "window deactivate, destory menu";
-        destroyAll();
+        // NOTE(sbw): test if we have mouse handle
+        if (rect().contains(mapFromGlobal(QCursor::pos())))
+        {
+            activateWindow();
+        } else {
+            qDebug() << "window deactivate, destory menu";
+            destroyAll();
+        }
     }
 
     return DArrowRectangle::event(event);
+}
+
+void DDockMenu::showEvent(QShowEvent *e)
+{
+    DArrowRectangle::showEvent(e);
+
+    QTimer::singleShot(0, this, [=] {
+        activateWindow();
+        grabMouse();
+        grabKeyboard();
+    });
 }
 
 void DDockMenu::mouseMoveEvent(QMouseEvent *event)
@@ -176,18 +194,10 @@ DDockMenu *DDockMenu::menuUnderPoint(const QPoint point)
     return geometry().contains(point) ? this : nullptr;
 }
 
-void DDockMenu::grabFocus()
-{
-    // NOTE(kirigaya): Delay a little to prevent focus failure
-    QTimer::singleShot(200, this, [this] {
-        activateWindow();
-        grabMouse();
-        grabKeyboard();
-    });
-}
-
 void DDockMenu::releaseFocus()
 {
+    qDebug() << Q_FUNC_INFO << this;
+
     releaseMouse();
     releaseKeyboard();
 }

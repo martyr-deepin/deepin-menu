@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QString>
 #include <QDBusObjectPath>
+#include <QMutex>
 
 #include <src/dbus_menu_adaptor.h>
 #include <src/menu_object.h>
@@ -41,6 +42,7 @@ public slots:
     void UnregisterMenu(const QString &menuObjectPath);
 
 private:
+    QMutex menuRegisterGuard;
     QPointer<MenuObject> menuObject;
     QPointer<MenuAdaptor> menuAdaptor;
     QString menuObjectPath;

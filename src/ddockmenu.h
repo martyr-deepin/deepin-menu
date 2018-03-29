@@ -20,8 +20,9 @@
 #ifndef DDOCKMENU_H
 #define DDOCKMENU_H
 
-#include <darrowrectangle.h>
 #include "dabstractmenu.h"
+
+#include <darrowrectangle.h>
 #include <DWindowManagerHelper>
 
 DWIDGET_USE_NAMESPACE
@@ -44,7 +45,6 @@ public:
 
     void setItems(QJsonArray items) Q_DECL_OVERRIDE;
 
-    void grabFocus() Q_DECL_OVERRIDE;
     void releaseFocus() Q_DECL_OVERRIDE;
 
     void destroyAll();
@@ -62,6 +62,7 @@ private:
 
 protected:
     bool event(QEvent *event) Q_DECL_OVERRIDE;
+    void showEvent(QShowEvent *e) override;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;

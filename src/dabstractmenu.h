@@ -28,7 +28,6 @@ public:
     explicit DAbstractMenu();
 
 public:
-    virtual void grabFocus();
     virtual void releaseFocus();
 
     virtual void setItems(QJsonArray items);
