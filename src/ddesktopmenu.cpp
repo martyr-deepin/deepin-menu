@@ -89,6 +89,17 @@ void DDesktopMenu::keyPressEvent(QKeyEvent *event)
     QMenu::keyPressEvent(event);
 }
 
+bool DDesktopMenu::event(QEvent *event)
+{
+    if (event->type() == QEvent::WindowDeactivate) {
+        if (!rect().contains(mapFromGlobal(QCursor::pos()))) {
+            hide();
+        }
+    }
+
+    return QMenu::event(event);
+}
+
 QAction *DDesktopMenu::action(const QString &id)
 {
     for (QAction *action : actions()) {
