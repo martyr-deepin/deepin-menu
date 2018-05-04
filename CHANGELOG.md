@@ -1,3 +1,13 @@
+<a name="3.3.3"></a>
+## 3.3.3 (2018-05-04)
+
+
+#### Bug Fixes
+
+*   desktop menu cannot hide ([80505421](https://github.com/linuxdeepin/deepin-menu/commit/80505421a26d704e9c819829651bc684412c6394))
+
+
+
 <a name="3.3.2"></a>
 ### 3.3.2 (2018-03-26)
 
