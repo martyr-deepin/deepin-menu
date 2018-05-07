@@ -140,7 +140,7 @@ void DDockMenu::showEvent(QShowEvent *e)
 {
     DArrowRectangle::showEvent(e);
 
-    QTimer::singleShot(0, this, [=] {
+    QTimer::singleShot(100, this, [=] {
         activateWindow();
         grabMouse();
         grabKeyboard();
@@ -177,11 +177,16 @@ void DDockMenu::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void DDockMenu::mousePressEvent(QMouseEvent *event)
+void DDockMenu::mouseReleaseEvent(QMouseEvent *event)
 {
     DArrowRectangle::mousePressEvent(event);
 
-    m_menuContent->processButtonClick(mapToGlobal(event->pos()));
+    if (rect().contains(mapFromGlobal(QCursor::pos()))) {
+        m_menuContent->processButtonClick(mapToGlobal(event->pos()));
+    } else {
+        qDebug() << "window deactivate, destory menu";
+        destroyAll();
+    }
 }
 
 /**

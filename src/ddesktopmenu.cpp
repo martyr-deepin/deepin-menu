@@ -73,7 +73,7 @@ void DDesktopMenu::showEvent(QShowEvent *e)
 {
     QMenu::showEvent(e);
 
-    QTimer::singleShot(0, this, [=] {
+    QTimer::singleShot(100, this, [=] {
         activateWindow();
         grabMouse();
         grabKeyboard();
@@ -98,6 +98,15 @@ bool DDesktopMenu::event(QEvent *event)
     }
 
     return QMenu::event(event);
+}
+
+void DDesktopMenu::mouseReleaseEvent(QMouseEvent *event)
+{
+    QMenu::mouseReleaseEvent(event);
+
+    if (!rect().contains(mapFromGlobal(QCursor::pos()))) {
+        hide();
+    }
 }
 
 QAction *DDesktopMenu::action(const QString &id)
