@@ -40,6 +40,10 @@ int main(int argc, char *argv[])
     app.setApplicationName("deepin-menu");
     app.setApplicationVersion("2.0");
 
+#if DTK_VERSION >= DTK_VERSION_CHECK(2, 0, 9, 0)
+    app.setOOMScoreAdj(500);
+#endif
+
     DLogManager::registerConsoleAppender();
     DLogManager::registerFileAppender();
 
