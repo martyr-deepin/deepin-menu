@@ -33,9 +33,10 @@
 #include "dmenucontent.h"
 #include "utils.h"
 
-DDockMenu::DDockMenu(DDockMenu *parent):
-    DArrowRectangle(DArrowRectangle::ArrowBottom, parent),
-    m_menuContent(new DMenuContent(this))
+DDockMenu::DDockMenu(DDockMenu *parent)
+    : DArrowRectangle(DArrowRectangle::ArrowBottom, parent)
+    , m_menuContent(new DMenuContent(this))
+    , m_monitor(new DRegionMonitor(this))
 {
     setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
 
@@ -68,12 +69,19 @@ DDockMenu::DDockMenu(DDockMenu *parent):
             QColor("#646464"),
             ":/images/check_dark_inactive.png",
             ":/images/arrow-dark.png"};
+
+    connect(m_monitor, &DRegionMonitor::buttonPress, this, [=] (const QPoint &p) {
+        if (!rect().contains(p)) {
+            hide();
+        }
+    });
 }
 
 DDockMenu::~DDockMenu()
 {
     setVisible(false);
     releaseFocus();
+    releaseKeyboard();
 }
 
 void DDockMenu::setItems(QJsonArray items)
@@ -140,11 +148,20 @@ void DDockMenu::showEvent(QShowEvent *e)
 {
     DArrowRectangle::showEvent(e);
 
+    m_monitor->registerRegion();
+
     QTimer::singleShot(100, this, [=] {
         activateWindow();
-        grabMouse();
         grabKeyboard();
     });
+}
+
+void DDockMenu::hideEvent(QHideEvent *event)
+{
+    DArrowRectangle::hideEvent(event);
+
+    m_monitor->unregisterRegion();
+    releaseKeyboard();
 }
 
 void DDockMenu::mouseMoveEvent(QMouseEvent *event)

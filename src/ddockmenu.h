@@ -21,7 +21,7 @@
 #define DDOCKMENU_H
 
 #include "dabstractmenu.h"
-
+#include <dregionmonitor.h>
 #include <darrowrectangle.h>
 #include <DWindowManagerHelper>
 
@@ -62,10 +62,11 @@ private:
 
 protected:
     bool event(QEvent *event) Q_DECL_OVERRIDE;
-    void showEvent(QShowEvent *e) override;
+    void showEvent(QShowEvent *e) Q_DECL_OVERRIDE;
+    void hideEvent(QHideEvent *event) Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *event);
 
 private:
     friend class DMenuContent;
@@ -74,7 +75,7 @@ private:
     ItemStyle normalStyle;
     ItemStyle hoverStyle;
     ItemStyle inactiveStyle;
-
+    DRegionMonitor *m_monitor;
     DWindowManagerHelper *m_wmHelper;
 };
 

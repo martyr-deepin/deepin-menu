@@ -21,7 +21,11 @@
 #define DDESKTOPMENU_H
 
 #include <QMenu>
+#include <dregionmonitor.h>
+
 #include "dabstractmenu.h"
+
+DWIDGET_USE_NAMESPACE
 
 class DDesktopMenu : public QMenu, public DAbstractMenu
 {
@@ -41,14 +45,13 @@ signals:
 
 protected:
     void showEvent(QShowEvent *e) Q_DECL_OVERRIDE;
+    void hideEvent(QHideEvent *e) Q_DECL_OVERRIDE;
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
-    bool event(QEvent *event) Q_DECL_OVERRIDE;
-    void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private:
     QAction *action(const QString &id);
     void addActionFromJson(QMenu *menu, const QJsonArray &items);
-
+    DRegionMonitor *m_monitor;
     QList<QMenu*> m_ownMenus;
 };
 

@@ -28,16 +28,24 @@
 
 DDesktopMenu::DDesktopMenu()
     : QMenu()
+    , m_monitor(new DRegionMonitor(this))
 {
     setAccessibleName("DesktopMenu");
 
     // NOTE(hualet): don't change those window flags, if you delete below line, deepin-menu
     // won't even show working with deepin-terminal2 and dde-launcher.
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::Tool);
+
+    connect(m_monitor, &DRegionMonitor::buttonPress, this, [=] (const QPoint &p) {
+        if (!rect().contains(p)) {
+            hide();
+        }
+    });
 }
 
 DDesktopMenu::~DDesktopMenu()
 {
+    releaseKeyboard();
 }
 
 void DDesktopMenu::setItems(QJsonArray items)
@@ -73,11 +81,20 @@ void DDesktopMenu::showEvent(QShowEvent *e)
 {
     QMenu::showEvent(e);
 
+    m_monitor->registerRegion();
+
     QTimer::singleShot(100, this, [=] {
         activateWindow();
-        grabMouse();
         grabKeyboard();
     });
+}
+
+void DDesktopMenu::hideEvent(QHideEvent *e)
+{
+    QMenu::hideEvent(e);
+
+    m_monitor->unregisterRegion();
+    releaseKeyboard();
 }
 
 void DDesktopMenu::keyPressEvent(QKeyEvent *event)
@@ -87,26 +104,6 @@ void DDesktopMenu::keyPressEvent(QKeyEvent *event)
     }
 
     QMenu::keyPressEvent(event);
-}
-
-bool DDesktopMenu::event(QEvent *event)
-{
-    if (event->type() == QEvent::WindowDeactivate) {
-        if (!rect().contains(mapFromGlobal(QCursor::pos()))) {
-            hide();
-        }
-    }
-
-    return QMenu::event(event);
-}
-
-void DDesktopMenu::mouseReleaseEvent(QMouseEvent *event)
-{
-    QMenu::mouseReleaseEvent(event);
-
-    if (!rect().contains(mapFromGlobal(QCursor::pos()))) {
-        hide();
-    }
 }
 
 QAction *DDesktopMenu::action(const QString &id)
