@@ -37,7 +37,7 @@ DDesktopMenu::DDesktopMenu()
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::Tool);
 
     connect(m_monitor, &DRegionMonitor::buttonPress, this, [=] (const QPoint &p) {
-        if (!rect().contains(p)) {
+        if (!geometry().contains(p)) {
             hide();
         }
     });

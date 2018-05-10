@@ -71,8 +71,11 @@ DDockMenu::DDockMenu(DDockMenu *parent)
             ":/images/arrow-dark.png"};
 
     connect(m_monitor, &DRegionMonitor::buttonPress, this, [=] (const QPoint &p) {
-        if (!rect().contains(p)) {
-            hide();
+        if (geometry().contains(p)) {
+            m_menuContent->processButtonClick(p);
+        } else {
+            qDebug() << "window deactivate, destory menu";
+            destroyAll();
         }
     });
 }
@@ -191,18 +194,6 @@ void DDockMenu::keyPressEvent(QKeyEvent *event)
         break;
     default:
         break;
-    }
-}
-
-void DDockMenu::mouseReleaseEvent(QMouseEvent *event)
-{
-    DArrowRectangle::mousePressEvent(event);
-
-    if (rect().contains(mapFromGlobal(QCursor::pos()))) {
-        m_menuContent->processButtonClick(mapToGlobal(event->pos()));
-    } else {
-        qDebug() << "window deactivate, destory menu";
-        destroyAll();
     }
 }
 
