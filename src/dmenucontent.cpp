@@ -423,6 +423,10 @@ void DMenuContent::sendItemClickedSignal(QString id, bool checked)
         if (!root->parent()) {
             qDebug() << Q_FUNC_INFO << "itemClicked";
 
+            // NOTE(sbw): ensure mouse/keyboard released before send itemClicked,
+            root->releaseMouse();
+            root->releaseFocus();
+            root->releaseKeyboard();
             root->itemClicked(id, checked);
             break;
         } else {

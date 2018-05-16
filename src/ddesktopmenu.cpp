@@ -153,6 +153,10 @@ void DDesktopMenu::addActionFromJson(QMenu *menu, const QJsonArray &items)
 
         connect(action, &QAction::triggered, this, [this, action] {
             const QString id = action->property("itemId").toString();
+
+            releaseFocus();
+            releaseMouse();
+            releaseKeyboard();
             emit itemClicked(id, action->isChecked());
 
             hide();
