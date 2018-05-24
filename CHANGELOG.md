@@ -1,3 +1,19 @@
+<a name="3.3.4"></a>
+## 3.3.4 (2018-05-24)
+
+
+#### Features
+
+*   Add oom score ([aeda7e58](https://github.com/linuxdeepin/deepin-menu/commit/aeda7e58658184c1305b2114fa20fd9248de2d61))
+
+#### Bug Fixes
+
+*   not click ([82196c3a](https://github.com/linuxdeepin/deepin-menu/commit/82196c3a4a14ff189f06831d02bc1f844b5ba53b))
+*   use DRegionMonitor replace all grab ([5dc5e63f](https://github.com/linuxdeepin/deepin-menu/commit/5dc5e63f24973d17ec371ef9e10cc0387b738997))
+*   click outside the menu to hide ([2a4f2f30](https://github.com/linuxdeepin/deepin-menu/commit/2a4f2f3093daadf4b751f705aa3b3583f3238a0d))
+
+
+
 <a name="3.3.3"></a>
 ## 3.3.3 (2018-05-04)
 
