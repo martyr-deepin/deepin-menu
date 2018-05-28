@@ -130,4 +130,6 @@ void MenuObject::menuDismissedSlot()
     }
 
     this->deleteLater();
+
+    emit MenuUnregistered();
 }
