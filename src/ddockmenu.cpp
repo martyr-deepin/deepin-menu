@@ -39,6 +39,7 @@ DDockMenu::DDockMenu(DDockMenu *parent)
     , m_monitor(new DRegionMonitor(this))
 {
     setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+    setAttribute(Qt::WA_InputMethodEnabled, false);
 
     setMouseTracking(true);
 
@@ -149,20 +150,26 @@ bool DDockMenu::event(QEvent *event)
 
 void DDockMenu::showEvent(QShowEvent *e)
 {
-    DArrowRectangle::showEvent(e);
-
+    Q_ASSERT(!m_monitor->registered());
     m_monitor->registerRegion();
 
     QTimer::singleShot(100, this, [=] {
-        activateWindow();
+        if (!isVisible())
+            return;
+        if (!isActiveWindow())
+            activateWindow();
+
         grabKeyboard();
     });
+
+    DArrowRectangle::showEvent(e);
 }
 
 void DDockMenu::hideEvent(QHideEvent *event)
 {
     DArrowRectangle::hideEvent(event);
 
+    Q_ASSERT(m_monitor->registered());
     m_monitor->unregisterRegion();
     releaseKeyboard();
 }
