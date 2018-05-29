@@ -1,3 +1,9 @@
+<a name="3.3.5"></a>
+## 3.3.5 (2018-05-29)
+
+*   Fix menu unregister but not notify signals emitted
+
+
 <a name="3.3.4"></a>
 ## 3.3.4 (2018-05-24)
 
