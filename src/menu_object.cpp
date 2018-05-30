@@ -131,5 +131,7 @@ void MenuObject::menuDismissedSlot()
 
     this->deleteLater();
 
-    emit MenuUnregistered();
+    QTimer::singleShot(100, this, [=] {
+        emit MenuUnregistered();
+    });
 }
