@@ -1,3 +1,13 @@
+<a name="3.3.7"></a>
+## 3.3.7 (2018-05-31)
+
+
+#### Bug Fixes
+
+*   menu dead lock on destructor ([a865d4f9](https://github.com/linuxdeepin/deepin-menu/commit/a865d4f9040e0f0102aaa9ce68d5d8a399349b46))
+
+
+
 <a name="3.3.6"></a>
 ## 3.3.6 (2018-05-30)
 
