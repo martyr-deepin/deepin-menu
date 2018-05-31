@@ -21,6 +21,7 @@
 #define MENU_OBJECT_H
 
 #include <QObject>
+#include <QPointer>
 
 class DDockMenu;
 class DDesktopMenu;
@@ -46,8 +47,8 @@ private slots:
     void menuDismissedSlot();
 
 private:
-    DDockMenu *m_dockMenu;
-    DDesktopMenu *m_desktopMenu;
+    QPointer<DDockMenu> m_dockMenu;
+    QPointer<DDesktopMenu> m_desktopMenu;
 };
 
 #endif // MENU_OBJECT_H

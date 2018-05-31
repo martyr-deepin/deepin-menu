@@ -69,6 +69,9 @@ void ManagerObject::UnregisterMenu()
 
 void ManagerObject::UnregisterMenu(const QString &)
 {
+    if (menuObject.isNull() && menuObjectPath.isEmpty())
+        return;
+
     menuRegisterGuard.lock();
 
     if (!menuObject.isNull() || !menuObjectPath.isEmpty())

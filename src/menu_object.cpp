@@ -51,34 +51,32 @@ MenuObject::MenuObject():
 
 MenuObject::~MenuObject()
 {
-    qDebug() << Q_FUNC_INFO;
+    if (!m_dockMenu.isNull() || !m_desktopMenu.isNull())
+        emit MenuUnregistered();
 
-    if (m_dockMenu)
+    if (!m_dockMenu.isNull())
         m_dockMenu->deleteLater();
 
-    if (m_desktopMenu)
+    if (!m_desktopMenu.isNull())
         m_desktopMenu->deleteLater();
-
-    if (m_dockMenu || m_desktopMenu)
-        emit MenuUnregistered();
 }
 
 void MenuObject::SetItemActivity(const QString &itemId, bool isActive)
 {
-    if (m_dockMenu) m_dockMenu->setItemActivity(itemId, isActive);
-    if (m_desktopMenu) m_desktopMenu->setItemActivity(itemId, isActive);
+    if (!m_dockMenu.isNull()) m_dockMenu->setItemActivity(itemId, isActive);
+    if (!m_desktopMenu.isNull()) m_desktopMenu->setItemActivity(itemId, isActive);
 }
 
 void MenuObject::SetItemChecked(const QString &itemId, bool checked)
 {
-    if (m_dockMenu) m_dockMenu->setItemChecked(itemId, checked);
-    if (m_desktopMenu) m_desktopMenu->setItemChecked(itemId, checked);
+    if (!m_dockMenu.isNull()) m_dockMenu->setItemChecked(itemId, checked);
+    if (!m_desktopMenu.isNull()) m_desktopMenu->setItemChecked(itemId, checked);
 }
 
 void MenuObject::SetItemText(const QString &itemId, const QString &text)
 {
-    if (m_dockMenu) m_dockMenu->setItemText(itemId, text);
-    if (m_desktopMenu) m_desktopMenu->setItemText(itemId, text);
+    if (!m_dockMenu.isNull()) m_dockMenu->setItemText(itemId, text);
+    if (!m_desktopMenu.isNull()) m_desktopMenu->setItemText(itemId, text);
 }
 
 void MenuObject::ShowMenu(const QString &menuJsonContent)
@@ -107,11 +105,11 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
     QJsonDocument menuContent = QJsonDocument::fromJson(bytes);
     QJsonObject menuContentObj = menuContent.object();
 
-    if (m_dockMenu) {
+    if (!m_dockMenu.isNull()) {
         m_dockMenu->setArrowDirection(DirectionFromString(direction));
         m_dockMenu->setItems(menuContentObj["items"].toArray());
         m_dockMenu->show(x, y);
-    } else if (m_desktopMenu) {
+    } else if (!m_desktopMenu.isNull()) {
         m_desktopMenu->setItems(menuContentObj["items"].toArray());
         m_desktopMenu->popup(QPoint(x, y));
     }
@@ -119,17 +117,18 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
 
 void MenuObject::menuDismissedSlot()
 {
-    if (m_dockMenu) {
+    if (!m_dockMenu.isNull() || !m_desktopMenu.isNull())
+        emit MenuUnregistered();
+
+    if (!m_dockMenu.isNull()) {
         m_dockMenu->deleteLater();
         m_dockMenu = nullptr;
     }
 
-    if (m_desktopMenu) {
+    if (!m_desktopMenu.isNull()) {
         m_desktopMenu->deleteLater();
         m_desktopMenu = nullptr;
     }
 
-    this->deleteLater();
-
-    emit MenuUnregistered();
+    deleteLater();
 }
