@@ -54,7 +54,7 @@ MenuObject::~MenuObject()
     qDebug() << Q_FUNC_INFO;
 
     if (m_dockMenu)
-        m_dockMenu->destroyAll();
+        m_dockMenu->deleteLater();
 
     if (m_desktopMenu)
         m_desktopMenu->deleteLater();
@@ -94,11 +94,11 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
 
     if(jsonObj["isDockMenu"].toBool()) {
         m_dockMenu = new DDockMenu;
-        connect(m_dockMenu, &DDockMenu::destroyed, this, &MenuObject::menuDismissedSlot);
+        connect(m_dockMenu, &DDockMenu::destroyed, this, &MenuObject::menuDismissedSlot, Qt::QueuedConnection);
         connect(m_dockMenu, &DDockMenu::itemClicked, this, &MenuObject::ItemInvoked, Qt::QueuedConnection);
     } else {
         m_desktopMenu = new DDesktopMenu;
-        connect(m_desktopMenu, &DDesktopMenu::aboutToHide, this, &MenuObject::menuDismissedSlot);
+        connect(m_desktopMenu, &DDesktopMenu::aboutToHide, this, &MenuObject::menuDismissedSlot, Qt::QueuedConnection);
         connect(m_desktopMenu, &DDesktopMenu::itemClicked, this, &MenuObject::ItemInvoked, Qt::QueuedConnection);
     }
 
@@ -131,7 +131,5 @@ void MenuObject::menuDismissedSlot()
 
     this->deleteLater();
 
-    QTimer::singleShot(100, this, [=] {
-        emit MenuUnregistered();
-    });
+    emit MenuUnregistered();
 }
