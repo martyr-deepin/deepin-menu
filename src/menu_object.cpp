@@ -93,11 +93,11 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
     if(jsonObj["isDockMenu"].toBool()) {
         m_dockMenu = new DDockMenu;
         connect(m_dockMenu, &DDockMenu::destroyed, this, &MenuObject::menuDismissedSlot, Qt::QueuedConnection);
-        connect(m_dockMenu, &DDockMenu::itemClicked, this, &MenuObject::ItemInvoked, Qt::QueuedConnection);
+        connect(m_dockMenu, &DDockMenu::itemClicked, this, &MenuObject::ItemInvoked);
     } else {
         m_desktopMenu = new DDesktopMenu;
         connect(m_desktopMenu, &DDesktopMenu::aboutToHide, this, &MenuObject::menuDismissedSlot, Qt::QueuedConnection);
-        connect(m_desktopMenu, &DDesktopMenu::itemClicked, this, &MenuObject::ItemInvoked, Qt::QueuedConnection);
+        connect(m_desktopMenu, &DDesktopMenu::itemClicked, this, &MenuObject::ItemInvoked);
     }
 
     bytes.clear();

@@ -37,9 +37,11 @@ DDesktopMenu::DDesktopMenu()
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::Tool);
 
     connect(m_monitor, &DRegionMonitor::buttonPress, this, [=] (const QPoint &p) {
-        if (!geometry().contains(p)) {
-            hide();
-        }
+        for (auto *menu : m_ownMenus)
+            if (menu->geometry().contains(p))
+                return;
+
+        QTimer::singleShot(100, this, &DDesktopMenu::hide);
     });
 }
 
@@ -133,6 +135,7 @@ void DDesktopMenu::addActionFromJson(QMenu *menu, const QJsonArray &items)
 
         QAction *action = nullptr;
         if (subMenuItemsJson.count()) {
+
             QMenu *subMenu = new QMenu(menu);
             action = menu->addMenu(subMenu);
             addActionFromJson(subMenu, subMenuItemsJson);
@@ -153,13 +156,13 @@ void DDesktopMenu::addActionFromJson(QMenu *menu, const QJsonArray &items)
 
         action->setProperty("itemId", itemObj["itemId"].toString());
 
-        connect(action, &QAction::triggered, this, [this, action] {
+        connect(action, &QAction::triggered, menu, [=] (const bool checked) {
             const QString id = action->property("itemId").toString();
 
             releaseFocus();
             releaseMouse();
             releaseKeyboard();
-            emit itemClicked(id, action->isChecked());
+            emit itemClicked(id, checked);
 
             hide();
         });
