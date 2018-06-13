@@ -1,3 +1,13 @@
+<a name="3.3.8"></a>
+### 3.3.8 (2018-06-13)
+
+
+#### Bug Fixes
+
+* **subment:**  submenu not send invoked singnals ([8fbf86d8](https://github.com/linuxdeepin/deepin-menu/commit/8fbf86d8b34371f10fb8af1f71ee308294633191))
+
+
+
 <a name="3.3.7"></a>
 ## 3.3.7 (2018-05-31)
 
