@@ -23,6 +23,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QtGlobal>
+#include <QStyle>
 #include <QDebug>
 
 #include "menu_object.h"
@@ -111,6 +112,12 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
         m_dockMenu->show(x, y);
     } else if (!m_desktopMenu.isNull()) {
         m_desktopMenu->setItems(menuContentObj["items"].toArray());
+
+        // 在Qt 5.10.x上, 菜单 show 之前没有被polish, 导致 dstyle 中无法将菜单设置为"圆角+模糊"样式
+        if (m_desktopMenu->style() && !m_desktopMenu->testAttribute(Qt::WA_WState_Polished)) {
+            m_desktopMenu->style()->polish(m_desktopMenu);
+        }
+
         m_desktopMenu->popup(QPoint(x, y));
     }
 }
