@@ -1,3 +1,13 @@
+<a name="3.3.9"></a>
+### 3.3.9 (2018-07-20)
+
+
+#### Bug Fixes
+
+*   wrong menu style on Qt 5.10.x ([d423e499](https://github.com/linuxdeepin/deepin-menu/commit/d423e499dbb9e4fd1a5c46a5311909776bbd6313))
+
+
+
 <a name="3.3.8"></a>
 ### 3.3.8 (2018-06-13)
 
