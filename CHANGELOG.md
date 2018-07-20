@@ -1,3 +1,13 @@
+<a name="3.3.10"></a>
+### 3.3.10 (2018-07-20)
+
+
+#### Bug Fixes
+
+*   not emit signal ([af266ccf](https://github.com/linuxdeepin/deepin-menu/commit/af266ccf7ecc615f7dc2035969694de3606ef384))
+
+
+
 <a name="3.3.9"></a>
 ### 3.3.9 (2018-07-20)
 
