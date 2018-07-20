@@ -52,14 +52,6 @@ MenuObject::MenuObject():
 
 MenuObject::~MenuObject()
 {
-    if (!m_dockMenu.isNull() || !m_desktopMenu.isNull())
-        emit MenuUnregistered();
-
-    if (!m_dockMenu.isNull())
-        m_dockMenu->deleteLater();
-
-    if (!m_desktopMenu.isNull())
-        m_desktopMenu->deleteLater();
 }
 
 void MenuObject::SetItemActivity(const QString &itemId, bool isActive)
@@ -124,8 +116,7 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
 
 void MenuObject::menuDismissedSlot()
 {
-    if (!m_dockMenu.isNull() || !m_desktopMenu.isNull())
-        emit MenuUnregistered();
+    emit MenuUnregistered();
 
     if (!m_dockMenu.isNull()) {
         m_dockMenu->deleteLater();
