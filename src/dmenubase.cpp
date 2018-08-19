@@ -261,7 +261,7 @@ bool DMenuBase::grabFocusInternal(int tryTimes)
         i++;
     }
     if (i >= tryTimes) {
-        qWarning() << QString("GrabMouse Failed after tring %1 times").arg(i);
+        qWarning() << QString("GrabMouse Failed after trying %1 times").arg(i);
     } else {
         qDebug() << QString("GrabMouse tries %1").arg(i);
     }
@@ -274,7 +274,7 @@ bool DMenuBase::grabFocusInternal(int tryTimes)
         j++;
     }
     if (j >= tryTimes) {
-        qWarning() << QString("GrabKeyboard Failed after tring %1 times").arg(j);
+        qWarning() << QString("GrabKeyboard Failed after trying %1 times").arg(j);
     } else {
         qDebug() << QString("GrabKeyboard tries %1").arg(j);
     }

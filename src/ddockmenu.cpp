@@ -75,7 +75,7 @@ DDockMenu::DDockMenu(DDockMenu *parent)
         if (geometry().contains(p)) {
             m_menuContent->processButtonClick(p);
         } else {
-            qDebug() << "window deactivate, destory menu";
+            qDebug() << "window deactivate, destroy menu";
             destroyAll();
         }
     });
@@ -140,7 +140,7 @@ bool DDockMenu::event(QEvent *event)
         {
             activateWindow();
         } else {
-            qDebug() << "window deactivate, destory menu";
+            qDebug() << "window deactivate, destroy menu";
             destroyAll();
         }
     }

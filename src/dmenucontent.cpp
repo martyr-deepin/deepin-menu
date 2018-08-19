@@ -142,7 +142,7 @@ void DMenuContent::doCurrentAction()
 
         this->sendItemClickedSignal(currentAction->property("itemId").toString(), false);
     }
-    qDebug() << "do action, destory all";
+    qDebug() << "do action, destroy all";
     parent->destroyAll();
 }
 
