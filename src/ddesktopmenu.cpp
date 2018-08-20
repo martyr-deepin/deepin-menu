@@ -47,6 +47,7 @@ DDesktopMenu::DDesktopMenu()
 
 DDesktopMenu::~DDesktopMenu()
 {
+    m_monitor->unregisterRegion();
     releaseKeyboard();
 }
 
@@ -83,7 +84,6 @@ void DDesktopMenu::showEvent(QShowEvent *e)
 {
     QMenu::showEvent(e);
 
-    Q_ASSERT(!m_monitor->registered());
     m_monitor->registerRegion();
 
     QTimer::singleShot(100, this, [=] {
@@ -96,7 +96,6 @@ void DDesktopMenu::hideEvent(QHideEvent *e)
 {
     QMenu::hideEvent(e);
 
-    Q_ASSERT(m_monitor->registered());
     m_monitor->unregisterRegion();
     releaseKeyboard();
 }

@@ -77,7 +77,7 @@ void ManagerObject::UnregisterMenu(const QString &)
     if (!menuObject.isNull() || !menuObjectPath.isEmpty())
     {
         if (!menuObject.isNull())
-            menuObject->deleteLater();
+            delete menuObject;
 
         menuObject.clear();
         menuObjectPath.clear();

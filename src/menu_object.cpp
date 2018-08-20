@@ -52,6 +52,13 @@ MenuObject::MenuObject():
 
 MenuObject::~MenuObject()
 {
+    if (!m_dockMenu.isNull()) {
+        delete m_dockMenu;
+    }
+
+    if (!m_desktopMenu.isNull()) {
+        delete m_desktopMenu;
+    }
 }
 
 void MenuObject::SetItemActivity(const QString &itemId, bool isActive)

@@ -83,6 +83,7 @@ DDockMenu::DDockMenu(DDockMenu *parent)
 
 DDockMenu::~DDockMenu()
 {
+    m_monitor->unregisterRegion();
     setVisible(false);
     releaseFocus();
     releaseKeyboard();
@@ -169,7 +170,6 @@ void DDockMenu::hideEvent(QHideEvent *event)
 {
     DArrowRectangle::hideEvent(event);
 
-    Q_ASSERT(m_monitor->registered());
     m_monitor->unregisterRegion();
     releaseKeyboard();
 }
