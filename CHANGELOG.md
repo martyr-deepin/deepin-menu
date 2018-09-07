@@ -1,3 +1,13 @@
+<a name=""></a>
+##  3.4.0 (2018-09-07)
+
+
+#### Bug Fixes
+
+*   not hide menu when unregisterMenu ([cba7f135](https://github.com/linuxdeepin/deepin-menu/commit/cba7f135edbdbaa7df903f43dea86a0cfbafb038))
+
+
+
 <a name="3.3.10"></a>
 ### 3.3.10 (2018-07-20)
 
