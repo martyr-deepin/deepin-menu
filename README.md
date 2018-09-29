@@ -6,13 +6,13 @@ Deepin Menu is the unified menu service for Deepin Desktop Environment.
 
 ### Build dependencies
 
-* Qt (>= 5.6)
+* Qt (>= 5.10)
 * dtkwidget (>= 2.0.6)
 
 ### Runtime dependencies
 
 * DBus
-* Qt5 (>= 5.6)
+* Qt5 (>= 5.10)
   * Qt5-Widgets
   * Qt5-Gui
   * Qt5-DBus
