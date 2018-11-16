@@ -73,7 +73,10 @@ DDockMenu::DDockMenu(DDockMenu *parent)
 
     connect(m_monitor, &DRegionMonitor::buttonPress, this, [=] (const QPoint &p) {
         if (geometry().contains(p)) {
-            m_menuContent->processButtonClick(p);
+            // The action performed is not from QAction and needs to be postponed because the menu requires a hover style.
+            QTimer::singleShot(100, this, [=] {
+                m_menuContent->processButtonClick(p);
+            });
         } else {
             qDebug() << "window deactivate, destroy menu";
             destroyAll();
