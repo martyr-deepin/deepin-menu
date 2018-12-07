@@ -1,3 +1,13 @@
+<a name="3.4.1"></a>
+### 3.4.1 (2018-12-07)
+
+
+#### Features
+
+*   support touchscreen ([18abfd60](https://github.com/linuxdeepin/deepin-menu/commit/18abfd60a9291c34c200ce3a8aa50ccf0cd99d39))
+
+
+
 <a name=""></a>
 ##  3.4.0 (2018-09-07)
 
