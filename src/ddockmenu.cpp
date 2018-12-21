@@ -38,7 +38,6 @@ DDockMenu::DDockMenu(DDockMenu *parent)
     , m_menuContent(new DMenuContent(this))
     , m_monitor(new DRegionMonitor(this))
 {
-    setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
     setAttribute(Qt::WA_InputMethodEnabled, false);
 
     setMouseTracking(true);
@@ -147,6 +146,10 @@ bool DDockMenu::event(QEvent *event)
             qDebug() << "window deactivate, destroy menu";
             destroyAll();
         }
+    }
+
+    if (event->type() == QEvent::Move) {
+        qDebug() << pos();
     }
 
     return DArrowRectangle::event(event);
