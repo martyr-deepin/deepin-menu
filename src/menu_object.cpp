@@ -25,6 +25,7 @@
 #include <QtGlobal>
 #include <QStyle>
 #include <QDebug>
+#include <QScreen>
 
 #include "menu_object.h"
 #include "ddesktopmenu.h"
@@ -117,7 +118,28 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
             m_desktopMenu->style()->polish(m_desktopMenu);
         }
 
-        m_desktopMenu->popup(QPoint(x, y));
+        // 窗管标题栏和深度终端提供的坐标都是缩放过的，由于Qt的topleft是原始坐标，但是size是缩放
+        // 的，所以需要单独处理，不能直接使用接受的坐标进行显示。
+        QList<QScreen *> oldList = qApp->screens();
+        const qreal ratio = qApp->devicePixelRatio();
+        const QPoint p(x, y);  // p is scale ratio value!
+
+        // 得到坐标所在的屏幕
+        for (auto it = oldList.constBegin(); it != oldList.constEnd(); ++it) {
+            QScreen const * currentScreen = (*it);
+            const QPoint point = currentScreen->geometry().topLeft() / ratio;
+            QRect rect(point, currentScreen->geometry().size());
+
+            if (rect.contains(p)) {
+                // 计算缩放后接收坐标距离当前屏幕左边缘的长宽
+                // 保持原始的topleft和在当前屏幕内坐标的偏移就可以正常显示了
+                QPoint tmpP;
+                tmpP.setX(currentScreen->geometry().topLeft().x() + p.x() - point.x());
+                tmpP.setY(currentScreen->geometry().topLeft().y() + p.y() - point.y());
+                m_desktopMenu->popup(tmpP);
+                break;
+            }
+        }
     }
 }
 
