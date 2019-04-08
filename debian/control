@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 9),
  qt5-qmake,
  libdtkwidget-dev,
 Standards-Version: 3.9.8
-Homepage: https://gitcafe.com/Deepin/deepin-menu.git
+Homepage: https://github.com/linuxdeepin/deepin-menu
 
 Package: deepin-menu
 Architecture: any
