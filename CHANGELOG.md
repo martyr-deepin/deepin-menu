@@ -1,3 +1,13 @@
+<a name="3.4.2"></a>
+### 3.4.2 (2019-04-12)
+
+
+#### Bug Fixes
+
+*   position shift when use kwin ([c86bbfd4](https://github.com/linuxdeepin/deepin-menu/commit/c86bbfd4643ceef903b1469ee4847b1cba770711))
+
+
+
 <a name="3.4.1"></a>
 ### 3.4.1 (2018-12-07)
 

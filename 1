@@ -1,0 +1,16 @@
+refactor: fix menu not being displayed correctly on other screens after
+screen scale ratio
+
+the qt program maintains the topleft's original coordinates after
+use scale ratio, but the screen size is scaled. so get the scaling
+position of the coordinate point on the current screen, and then
+calculate the offset of the upper left corner.
+# 请为您的变更输入提交说明。以 '#' 开始的行将被忽略，而一个空的提交
+# 说明将会终止提交。
+#
+# 位于分支 master
+# 您的分支与上游分支 'origin/master' 一致。
+#
+# 要提交的变更：
+#	修改：     src/menu_object.cpp
+#
