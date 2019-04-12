@@ -136,7 +136,7 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
                 QPoint tmpP;
                 tmpP.setX(currentScreen->geometry().topLeft().x() + p.x() - point.x());
                 tmpP.setY(currentScreen->geometry().topLeft().y() + p.y() - point.y());
-                m_desktopMenu->popup(tmpP);
+                m_desktopMenu->popup(tmpP / ratio);
                 break;
             }
         }
