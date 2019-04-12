@@ -1,3 +1,13 @@
+<a name="3.4.3"></a>
+### 3.4.3 (2019-04-12)
+
+
+#### Bug Fixes
+
+* **pos:**  HiDPI screen coordinates ([8d3cae29](https://github.com/linuxdeepin/deepin-menu/commit/8d3cae292312fc56b16e610afb8bb65641fcaefc))
+
+
+
 <a name="3.4.2"></a>
 ### 3.4.2 (2019-04-12)
 
