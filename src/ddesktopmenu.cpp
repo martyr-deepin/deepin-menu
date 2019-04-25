@@ -25,6 +25,9 @@
 #include <QKeyEvent>
 #include <QDBusPendingCall>
 #include <QTimer>
+#include <QApplication>
+#include <QScreen>
+#include <qpa/qplatformscreen.h>
 
 DDesktopMenu::DDesktopMenu()
     : QMenu()
@@ -77,6 +80,27 @@ void DDesktopMenu::setItemText(const QString &itemId, const QString &text)
     QAction *action = this->action(itemId);
     if (action) {
         action->setText(text);
+    }
+}
+
+void DDesktopMenu::popup(const QPoint pos)
+{
+    // 因为.dde_env已经不包含qt的缩放环境变量，所以收到的都是原始坐标
+    QList<QScreen *> oldList = qApp->screens();
+
+    // 得到坐标所在的屏幕
+    for (auto it = oldList.constBegin(); it != oldList.constEnd(); ++it) {
+        QScreen const * currentScreen = (*it);
+        QRect rect = currentScreen->handle()->geometry();
+        const QPoint point = rect.topLeft();
+
+        if (rect.contains(pos)) {
+            // 计算接收坐标距离当前屏幕左边缘的长宽
+            // 保持原始的topleft和在当前屏幕内坐标的偏移就可以正常显示了
+            QPoint tmpP(rect.topLeft() + (pos - point) / devicePixelRatioF());
+            QMenu::popup(tmpP);
+            break;
+        }
     }
 }
 

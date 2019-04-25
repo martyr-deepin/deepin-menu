@@ -6,6 +6,9 @@
 
 QT       += core gui dbus
 
+greaterThan(QT_MINOR_VERSION, 7): QT += gui-private
+else: QT += platformsupport-private
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = deepin-menu
