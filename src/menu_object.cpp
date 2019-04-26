@@ -118,7 +118,7 @@ void MenuObject::ShowMenu(const QString &menuJsonContent)
             m_desktopMenu->style()->polish(m_desktopMenu);
         }
 
-        m_desktopMenu->popup(QPoint(x, y));
+        m_desktopMenu->showMenu(QPoint(x, y), jsonObj["isScaled"].toBool());
     }
 }
 

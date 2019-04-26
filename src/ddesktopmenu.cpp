@@ -83,8 +83,13 @@ void DDesktopMenu::setItemText(const QString &itemId, const QString &text)
     }
 }
 
-void DDesktopMenu::popup(const QPoint pos)
+void DDesktopMenu::showMenu(const QPoint pos, bool isScaled)
 {
+    QPoint handlePos = pos;
+    if (isScaled) {
+        handlePos = pos * devicePixelRatioF();
+    }
+
     // 因为.dde_env已经不包含qt的缩放环境变量，所以收到的都是原始坐标
     QList<QScreen *> oldList = qApp->screens();
 
@@ -94,11 +99,10 @@ void DDesktopMenu::popup(const QPoint pos)
         QRect rect = currentScreen->handle()->geometry();
         const QPoint point = rect.topLeft();
 
-        if (rect.contains(pos)) {
+        if (rect.contains(handlePos)) {
             // 计算接收坐标距离当前屏幕左边缘的长宽
             // 保持原始的topleft和在当前屏幕内坐标的偏移就可以正常显示了
-            QPoint tmpP(rect.topLeft() + (pos - point) / devicePixelRatioF());
-            QMenu::popup(tmpP);
+            QMenu::popup(QPoint(rect.topLeft() + (handlePos - point) / devicePixelRatioF()));
             break;
         }
     }

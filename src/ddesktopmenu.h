@@ -40,7 +40,7 @@ public:
     void setItemChecked(const QString &itemId, bool checked) Q_DECL_OVERRIDE;
     void setItemText(const QString &itemId, const QString &text) Q_DECL_OVERRIDE;
 
-    void popup(const QPoint pos);
+    void showMenu(const QPoint pos, bool isScaled);
 
 signals:
     void itemClicked(const QString &id, bool checked);
