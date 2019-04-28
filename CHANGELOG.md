@@ -1,3 +1,13 @@
+<a name="3.4.5"></a>
+### 3.4.5 (2019-04-28)
+
+
+#### Features
+
+* **menu:**  Add a description of whether to scale ([aefb41b1](https://github.com/linuxdeepin/deepin-menu/commit/aefb41b1525653b88fee1e116c0b9100c04f2fa6))
+
+
+
 <a name="3.4.4"></a>
 ## 3.4.4 (2019-04-25)
 
