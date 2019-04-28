@@ -1,3 +1,13 @@
+<a name="3.4.6"></a>
+### 3.4.6 (2019-04-28)
+
+
+#### Others
+
+*   set isScaled default value to true ([f2f6de0a](https://github.com/linuxdeepin/deepin-menu/commit/f2f6de0acd5a663183b4df29ff4d337f39723b9b))
+
+
+
 <a name="3.4.5"></a>
 ### 3.4.5 (2019-04-28)
 
