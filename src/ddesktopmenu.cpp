@@ -36,8 +36,8 @@ DDesktopMenu::DDesktopMenu()
     setAccessibleName("DesktopMenu");
 
     // NOTE(hualet): don't change those window flags, if you delete below line, deepin-menu
-    // won't even show working with deepin-terminal2 and dde-launcher.
-    setWindowFlags(Qt::WindowStaysOnTopHint | Qt::Tool);
+    // won't even show working with deepin-terminal.
+    setWindowFlags(windowFlags() | Qt::ToolTip);
 
     connect(m_monitor, &DRegionMonitor::buttonPress, this, [=] (const QPoint &p) {
         for (auto *menu : m_ownMenus)
