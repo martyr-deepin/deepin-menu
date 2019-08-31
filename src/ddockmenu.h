@@ -26,6 +26,7 @@
 #include <DWindowManagerHelper>
 
 DWIDGET_USE_NAMESPACE
+DGUI_USE_NAMESPACE
 
 struct ItemStyle {
     QColor itemBackgroundColor;
@@ -40,8 +41,8 @@ class DDockMenu : public DArrowRectangle, public DAbstractMenu
 {
     Q_OBJECT
 public:
-    explicit DDockMenu(DDockMenu *parent = 0);
-    ~DDockMenu();
+    explicit DDockMenu(DDockMenu *parent = nullptr);
+    ~DDockMenu() override;
 
     void setItems(QJsonArray items) Q_DECL_OVERRIDE;
 
@@ -65,7 +66,7 @@ protected:
     void showEvent(QShowEvent *e) Q_DECL_OVERRIDE;
     void hideEvent(QHideEvent *event) Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void keyPressEvent(QKeyEvent *event);
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     friend class DMenuContent;
