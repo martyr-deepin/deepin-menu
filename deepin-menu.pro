@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui dbus
+QT       += core gui dbus dtkwidget
 
 greaterThan(QT_MINOR_VERSION, 7): QT += gui-private
 else: QT += platformsupport-private
@@ -15,7 +15,6 @@ TARGET = deepin-menu
 TEMPLATE = app
 
 CONFIG += c++11 link_pkgconfig
-PKGCONFIG += dtkwidget
 
 SOURCES += src/main.cpp \
     src/ddesktopmenu.cpp \
