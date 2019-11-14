@@ -5,7 +5,7 @@ make_check_code_quality:
   stage: code_quality
   tags: 
     - fortify-tester1
-  scripts:
+  script:
     - sourceanalyzer -b test -clean
     - qmake
     - make
