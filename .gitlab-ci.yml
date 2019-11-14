@@ -2,10 +2,10 @@ include:
     - remote: 'https://gitlab.deepin.io/dev-tools/letmeci/raw/master/gitlab-ci/dde.yml'
 
 make_check_code_quality:
-    stage: code_quality
-    tags: 
+  stage: code_quality
+  tags: 
     - fortify-tester1
-script:
+  scripts:
     - sourceanalyzer -b test -clean
     - qmake
     - make
