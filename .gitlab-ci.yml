@@ -1,0 +1,13 @@
+include:
+    - remote: 'https://gitlab.deepin.io/dev-tools/letmeci/raw/master/gitlab-ci/dde.yml'
+
+make_check_code_quality:
+    stage: code_quality
+    tags: 
+    - fortify-tester1
+script:
+    - sourceanalyzer -b test -clean
+    - qmake
+    - make
+    - sourceanalyzer -b test -scan | tee result.txt
+    - egrep "^\[.+critical" ./result.txt && exit 1 || exit 0
