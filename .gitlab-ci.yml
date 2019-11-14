@@ -1,13 +1,20 @@
 include:
     - remote: 'https://gitlab.deepin.io/dev-tools/letmeci/raw/master/gitlab-ci/dde.yml'
 
+
+variables:
+    BUILD_CLASS: "qmake"
+    PKG_NAME: "deepin-menu"
+
 make_check_code_quality:
   stage: code_quality
   tags: 
     - fortify-tester1
   script:
+    - sudo apt build-dep $PKG_NAME
     - sourceanalyzer -b test -clean
-    - qmake
-    - make
+    - if [[ "$BUILD_CLASS" -eq "qmake" ]]; then qmake;make; fi
+    - if [[ "$BUILD_CLASS" -eq "cmake" ]]; then cmake .; make; fi
+    - if [[ "$BUILD_CLASS" -eq "python" ]]; then sourceanalyzer -b test `pwd`; fi
     - sourceanalyzer -b test -scan | tee result.txt
     - egrep "^\[.+critical" ./result.txt && exit 1 || exit 0
