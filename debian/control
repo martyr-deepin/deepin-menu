@@ -21,6 +21,6 @@ Homepage: https://github.com/linuxdeepin/deepin-menu
 
 Package: deepin-menu
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, qttranslations5-l10n
 Description: Deepin menu service
  Deepin menu service for building beautiful menus.
