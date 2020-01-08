@@ -3,5 +3,7 @@ include:
 
 
 variables:
-    BUILD_CLASS: "qmake"
+variables:
+    CPPCHECK: "true"
+    CODESPELL: "true"
     PKG_NAME: "deepin-menu"
