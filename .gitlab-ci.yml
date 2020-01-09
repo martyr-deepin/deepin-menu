@@ -3,7 +3,6 @@ include:
 
 
 variables:
-variables:
     CPPCHECK: "true"
     CODESPELL: "true"
     PKG_NAME: "deepin-menu"
